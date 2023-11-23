@@ -2,54 +2,48 @@ import chalk from "chalk";
 import { execSync } from "child_process";
 import cliProgress from "cli-progress";
 import dotenv from "dotenv";
+import path from "path";
+import { dataFolder } from "./filesystem";
+import { readFile, readFileSync } from "fs";
+import { parseTranscript } from "./transcript";
 
 dotenv.config();
 
-export async function downloadTranscripts() {
-  const channelURL = "";
-  const channelId = "";
+interface SearchResult {
+  title: string;
+  id: string;
+}
 
-  let processedIds: string[] = [];
+export async function search(
+  query: string,
+  n_results: number = 5
+): Promise<SearchResult[]> {
+  const searchCommand = `yt-dlp "ytsearch:${n_results}:${query}"`;
+  const results = execSync(searchCommand).toString().trim();
+  return results;
+}
 
-  // Fetch all video IDs from the channel
-  console.clear();
-  console.log(chalk.blue(`Fetching all video IDs (can be slow)...`));
-  const videoIdCommand = `yt-dlp --get-id -i "${channelURL}"`;
-  const videoIdsRaw = execSync(videoIdCommand).toString().trim();
-  const videoIds = videoIdsRaw.split("\n");
-
-  // Filter out already processed IDs
-  const newVideoIds = videoIds.filter((id) => !processedIds.includes(id));
-
-  if (newVideoIds.length === 0) {
-    console.log(chalk.green(`No new videos`));
-    return;
+export async function getOrDownloadTranscript(
+  videoId: string,
+  videoTitle: string
+) {
+  const command = `yt-dlp --write-sub --write-auto-sub --sub-lang en --sub-format vtt --skip-download -o "${dataFolder}/${videoId}.%(ext)s" "https://www.youtube.com/watch?v=${videoId}"`;
+  try {
+    execSync(command);
+    const transcriptText = readFileSync(
+      path.join(dataFolder, `${videoId}.en.vtt`),
+      "utf-8"
+    );
+    return await parseTranscript({
+      transcript: transcriptText,
+      videoId,
+      videoTitle,
+    });
+  } catch (error) {
+    console.error(
+      chalk.red(
+        `Failed to download transcript for video ID ${videoId}: ${error}`
+      )
+    );
   }
-
-  console.log(chalk.green(`Found ${newVideoIds.length} new videos`));
-  console.log(chalk.blue(`Downloading transcripts...`));
-
-  const progressBar = new cliProgress.SingleBar(
-    {},
-    cliProgress.Presets.shades_classic
-  );
-  progressBar.start(newVideoIds.length, 0);
-
-  newVideoIds.forEach((id) => {
-    progressBar.increment();
-    // TODO: languages
-    // TODO: output JSON
-    const command = `yt-dlp --write-sub --write-auto-sub --sub-lang en --sub-format vtt --skip-download -o "${transcriptDir}/${id}.%(ext)s" "https://www.youtube.com/watch?v=${id}"`;
-    try {
-      execSync(command);
-      processedIds.push(id);
-    } catch (error) {
-      console.error(
-        chalk.red(`Failed to download transcript for video ID ${id}: ${error}`)
-      );
-    }
-  });
-
-  progressBar.stop();
-  console.log(chalk.green(`Done!`));
 }
