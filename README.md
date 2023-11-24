@@ -30,3 +30,9 @@ Welcome to Open Recommender, an open source recommendation system for YouTube.
 ## 📚 How it Works
 
 See the working notes [here](https://www.remnote.com/a/YouTube-Recommender/655daa97d42611e86f8536ec)
+
+## Related Papers and Blog Posts
+
+- [BookGPT: A General Framework for Book Recommendation Based on a Large Language Model](https://arxiv.org/pdf/2305.15673.pdf)
+- [A Survey on Large Language Models for Recommendation](https://arxiv.org/abs/2305.19860)
+- [Recommender Systems in the Era of Large Language Models (LLMs)](https://arxiv.org/abs/2307.02046)

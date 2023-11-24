@@ -6,7 +6,15 @@ import { dataFolder } from "../filesystem";
 import { parseSync } from "subtitle";
 import { tokenize } from "../tokenize";
 
-export async function download(videoId: string, videoTitle: string) {
+interface TranscriptFetchResult {
+  cues: TranscriptCue[];
+  text: string;
+}
+
+export async function fetchTranscript(
+  videoId: string,
+  videoTitle: string
+): Promise<TranscriptFetchResult | undefined> {
   const command = `yt-dlp --write-sub --write-auto-sub --sub-lang en --sub-format vtt --skip-download -o "${dataFolder}/${videoId}.%(ext)s" "https://www.youtube.com/watch?v=${videoId}"`;
   try {
     execSync(command);
@@ -14,22 +22,29 @@ export async function download(videoId: string, videoTitle: string) {
       path.join(dataFolder, `${videoId}.en.vtt`),
       "utf-8"
     );
-    return await parse({
+    const cues = await parseTranscript({
       transcript: transcriptText,
       videoId,
       videoTitle,
     });
+    return {
+      cues,
+      text: transcriptText,
+    };
   } catch (error) {
     console.error(
       chalk.red(
         `Failed to download transcript for video ID ${videoId}: ${error}`
       )
     );
-    return;
   }
 }
 
-export interface TranscriptChunk {
+export function transcriptToString(cues: TranscriptCue[]) {
+  return cues.map((cue) => cue.text).join(" ");
+}
+
+export interface TranscriptCue {
   videoTitle: string;
   /**
    * URL of the source video.
@@ -47,11 +62,11 @@ export interface TranscriptChunk {
   end: number;
 }
 
-async function parse(args: {
+async function parseTranscript(args: {
   transcript: string;
   videoId: string;
   videoTitle: string;
-}): Promise<TranscriptChunk[]> {
+}): Promise<TranscriptCue[]> {
   const { transcript, videoId, videoTitle } = args;
   const parsedTranscript = parseSync(transcript);
   const chunks = parsedTranscript
@@ -79,12 +94,12 @@ async function parse(args: {
         end,
       };
     })
-    .filter((x) => !x.text.includes("<c>")) as TranscriptChunk[];
+    .filter((x) => !x.text.includes("<c>")) as TranscriptCue[];
   return chunks;
 }
 
-async function mergeChunks(chunks: TranscriptChunk[], videoTitle: string) {
-  let mergedChunks: TranscriptChunk[] = [];
+async function mergeChunks(chunks: TranscriptCue[], videoTitle: string) {
+  let mergedChunks: TranscriptCue[] = [];
   let tempText = "";
   let tempStart = 0;
   let tempEnd = 0;

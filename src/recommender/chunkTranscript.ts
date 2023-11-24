@@ -1,20 +1,21 @@
-/**
- * We chunk the transcript into logical sections using an LLM.
- * We could use YouTube's chapters, but they are not always available.
- * We also extract entities mentioned in each section.
- */
-
 import {
   ChatCompletionMessage,
   ChatCompletionMessageParam,
 } from "openai/resources";
 import { z } from "zod";
 import zodToJsonSchema from "zod-to-json-schema";
+import { Prompt } from "./prompt";
 
-export const chunkTranscriptPrompt: ChatCompletionMessageParam[] = [
+/**
+ * We chunk the transcript into logical sections and add metadata using an LLM.
+ * We could use YouTube's chapters, but they are not always available, accurate or granular enough.
+ */
+
+const prompt: ChatCompletionMessageParam[] = [
   {
     role: "system",
     content: `
+
 `.trim(),
   },
   {
@@ -31,28 +32,36 @@ const transcriptChunkSchema = z.object({
   entities: z.array(z.string()),
 });
 
-export const chunkTranscriptSchema = z.object({
+export type TranscriptChunk = z.infer<typeof transcriptChunkSchema>;
+
+const outputSchema = z.object({
   sections: z.array(transcriptChunkSchema),
 });
 
-export const chunkTranscriptFunction: ChatCompletionMessage.FunctionCall = {
+export const functionCall: ChatCompletionMessage.FunctionCall = {
   name: "chunkTranscript",
-  arguments: JSON.stringify(zodToJsonSchema(chunkTranscriptSchema)),
+  arguments: JSON.stringify(zodToJsonSchema(outputSchema)),
 };
 
-export interface TranscriptChunk {
-  text: string;
-  start: number;
-  end: number;
-  entities: string[];
-}
+const inputSchema = z.object({
+  transcript: z.array(
+    z.object({
+      text: z.string(),
+      start: z.number(),
+      end: z.number(),
+    })
+  ),
+  videoTitle: z.string(),
+});
 
-export interface ChunkTranscriptVars {
-  transcript: any;
-  // including the video title and summary will
-  // help the LLM to accurately extract entities
-  videoTitle: string;
-  videoSummary: string;
-}
+export type ChunkTranscriptVars = z.infer<typeof inputSchema>;
 
-export async function chunkTranscript(args: ChunkTranscriptVars) {}
+export const chunkTranscript = new Prompt({
+  function: {
+    schema: outputSchema,
+    function: functionCall,
+  },
+  prompt: prompt,
+  model: "gpt-3.5-turbo",
+  inputSchema,
+});

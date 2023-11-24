@@ -2,22 +2,11 @@ import { EvaluateTestSuite, generateTable } from "promptfoo";
 import dotenv from "dotenv";
 import { z } from "zod";
 import promptfoo from "promptfoo";
-import {
-  ChunkTranscriptVars,
-  chunkTranscriptFunction,
-  chunkTranscriptPrompt,
-  chunkTranscriptSchema,
-} from "./chunkTranscript";
+import { ChunkTranscriptVars, chunkTranscript } from "./chunkTranscript";
 import {
   AppraiseTranscriptVars,
-  appraiseTranscriptFunction,
-  appraiseTranscriptPrompt,
-  appraiseTranscriptSchema,
+  appraiseTranscript,
 } from "./appraiseTranscript";
-import {
-  SummarizeTranscriptVars,
-  summarizeTranscriptPrompt,
-} from "./summarizeTranscript";
 
 dotenv.config();
 
@@ -66,8 +55,8 @@ const assertValidSchema = (schema: z.ZodSchema<any>) => {
 const promptTests: Record<string, EvaluateTestSuite> = {
   "chunk-transcript": {
     ...testOptions({
-      prompt: chunkTranscriptPrompt,
-      functions: [chunkTranscriptFunction],
+      prompt: chunkTranscript.prompt,
+      functions: [chunkTranscript.function],
     }),
     tests: [
       {
@@ -83,35 +72,23 @@ const promptTests: Record<string, EvaluateTestSuite> = {
           videoTitle: "Test video",
           videoSummary: "This is a test video",
         } satisfies ChunkTranscriptVars,
-        assert: [assertValidSchema(chunkTranscriptSchema)],
+        assert: [assertValidSchema(chunkTranscript.function!.schema)],
       },
     ],
   },
   "appraise-transcript": {
     ...testOptions({
-      prompt: appraiseTranscriptPrompt,
-      functions: [appraiseTranscriptFunction],
+      prompt: appraiseTranscript.prompt,
+      functions: [appraiseTranscript.function],
     }),
     tests: [
       {
         vars: {
           transcript: "This is a test",
           videoTitle: "Test video",
+          userContext: "This is a test user",
         } satisfies AppraiseTranscriptVars,
-        assert: [assertValidSchema(appraiseTranscriptSchema)],
-      },
-    ],
-  },
-  "summarize-transcript": {
-    ...testOptions({
-      prompt: summarizeTranscriptPrompt,
-    }),
-    tests: [
-      {
-        vars: {
-          transcript: "This is a test",
-          videoTitle: "Test video",
-        } satisfies SummarizeTranscriptVars,
+        assert: [assertValidSchema(appraiseTranscript.function!.schema)],
       },
     ],
   },

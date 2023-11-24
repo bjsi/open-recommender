@@ -1,32 +1,50 @@
 import { recommender } from "./recommender";
+import { formatSearchResults } from "./recommender/filterSearchResults";
 import { yt } from "./youtube";
 import { SearchResult } from "./youtube/search";
-import { TranscriptChunk } from "./youtube/transcript";
+import {
+  TranscriptCue,
+  transcriptToString as cuesToString,
+} from "./youtube/transcript";
 
 (async () => {
-  const results = await yt.search("space");
+  const results = await yt.search("elon musk");
   if (!results.length) {
     console.log("No results found");
     return;
   }
 
-  const filtered = await recommender.filter({ results });
-  if (!filtered.length) {
+  const { filteredResults } = await recommender.filter({
+    results: formatSearchResults(results),
+    userContext: "",
+  });
+  if (!filteredResults.length) {
     console.log("No results passed the search filter");
     return;
   }
 
-  const appraised: (SearchResult & { transcript: TranscriptChunk[] })[] = [];
-  for (const result of filtered) {
+  type SearchResultWithTranscript = SearchResult & {
+    cues: TranscriptCue[];
+  };
+  const appraised: SearchResultWithTranscript[] = [];
+  for (const idx of filteredResults) {
+    const result = results[idx];
     console.log(result.title);
-    const transcript = await yt.transcript.fetch(result.id, result.title);
-    if (!transcript || !transcript.length) {
+    const fetchResult = await yt.transcript.fetch(result.id, result.title);
+    if (!fetchResult || !fetchResult.cues.length) {
       console.log("Skipping video without transcript");
       continue;
     }
-    const appraisal = await recommender.transcript.appraise({ transcript });
-    if (appraisal.success) {
-      appraised.push({ ...result, transcript });
+    const { cues } = fetchResult;
+    const appraisal = await recommender.transcript.appraise({
+      transcript: cuesToString(cues),
+      videoTitle: result.title,
+      userContext: "",
+    });
+    if (appraisal.recommend) {
+      console.log("Recommending " + result.title);
+      console.log(appraisal.reasoning);
+      appraised.push({ ...result, cues });
     }
   }
 
@@ -34,4 +52,12 @@ import { TranscriptChunk } from "./youtube/transcript";
     console.log("No results passed the transcript appraisal filter");
     return;
   }
+
+  // const chunkedTranscripts = [];
+  // for (const result of appraised) {
+  //   const chunked = await recommender.transcript.chunk({ results: [result] });
+  //   chunkedTranscripts.push(...chunked);
+  // }
+
+  // const chunked = await recommender.transcript.chunk({ results: appraised });
 })();

@@ -1,13 +1,11 @@
 import { appraiseTranscript } from "./appraiseTranscript";
 import { chunkTranscript } from "./chunkTranscript";
 import { filterSearchResults } from "./filterSearchResults";
-import { summarizeTranscript } from "./summarizeTranscript";
 
 export const recommender = {
   transcript: {
-    appraise: appraiseTranscript,
-    chunk: chunkTranscript,
-    summarize: summarizeTranscript,
+    appraise: appraiseTranscript.run,
+    chunk: chunkTranscript.run,
   },
-  filter: filterSearchResults,
+  filter: filterSearchResults.run,
 };
