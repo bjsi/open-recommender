@@ -1,5 +1,6 @@
 import { recommender } from "./recommender";
-import { formatSearchResults } from "./recommender/filterSearchResults";
+import { parseCreateQueriesOutput } from "./recommender/createQueries";
+import { searchResultsToString } from "./recommender/filterSearchResults";
 import { yt } from "./youtube";
 import { SearchResult } from "./youtube/search";
 import {
@@ -8,16 +9,30 @@ import {
 } from "./youtube/transcript";
 
 (async () => {
-  const results = await yt.search("elon musk");
-  if (!results.length) {
+  const userContext =
+    "The user is interested in software to assist learning, like RemNote and Anki.";
+  const searchQueries = parseCreateQueriesOutput(
+    (await recommender.search.createQueries({
+      userContext,
+    })) || ""
+  );
+
+  const searchResults: SearchResult[] = [];
+  for (const query of searchQueries) {
+    const results = await yt.search(query);
+    results.push(...results);
+  }
+
+  if (!searchResults.length) {
     console.log("No results found");
     return;
   }
 
-  const { filteredResults } = await recommender.filter({
-    results: formatSearchResults(results),
-    userContext: "",
-  });
+  const { filteredSearchResultIds: filteredResults } =
+    await recommender.search.filter({
+      results: searchResultsToString(searchResults),
+      userContext: "",
+    });
   if (!filteredResults.length) {
     console.log("No results passed the search filter");
     return;
@@ -28,7 +43,7 @@ import {
   };
   const appraised: SearchResultWithTranscript[] = [];
   for (const idx of filteredResults) {
-    const result = results[idx];
+    const result = searchResults[idx];
     console.log(result.title);
     const fetchResult = await yt.transcript.fetch(result.id, result.title);
     if (!fetchResult || !fetchResult.cues.length) {

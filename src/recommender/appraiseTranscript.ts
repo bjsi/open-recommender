@@ -5,6 +5,7 @@ import {
 import { z } from "zod";
 import zodToJsonSchema from "zod-to-json-schema";
 import { Prompt } from "./prompt";
+import OpenAI from "openai";
 
 /**
  * We run some quality and "taste" checks on the transcript to
@@ -49,9 +50,11 @@ const outputSchema = z.object({
   recommend: z.boolean(),
 });
 
-const functionCall: ChatCompletionMessage.FunctionCall = {
+const functionCall: OpenAI.ChatCompletionCreateParams.Function = {
   name: "appraiseTranscript",
-  arguments: JSON.stringify(zodToJsonSchema(outputSchema)),
+  description:
+    "Appraise a video transcript and decide whether to recommend it to the user.",
+  parameters: zodToJsonSchema(outputSchema),
 };
 
 export const appraiseTranscript = new Prompt({

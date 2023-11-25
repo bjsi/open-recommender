@@ -1,33 +1,45 @@
 import { execSync } from "child_process";
 import dotenv from "dotenv";
 import dayjs from "dayjs";
+import { writeFileSync } from "fs";
+import { z } from "zod";
 
 dotenv.config();
 
-export interface SearchResult {
-  id: string;
-  title: string;
-  thumbnail: string;
-  description: string;
-  channel_id: string;
-  channel_url: string;
-  duration: number;
-  view_count: number;
-  average_rating: any;
-  categories: string[];
-  tags: any[];
-  comment_count: number;
-  chapters: any;
-  like_count: number;
-  channel: string;
-  channel_follower_count: number;
-  upload_date: string;
-  playlist: string;
-  playlist_id: string;
-  display_id: string;
-  fulltitle: string;
-  language: string;
-}
+const searchResultSchema = z.object({
+  id: z.string(),
+  title: z.string(),
+  thumbnail: z.string(),
+  description: z.string(),
+  channel_id: z.string(),
+  channel_url: z.string(),
+  duration: z.number(),
+  view_count: z.number(),
+  average_rating: z.any(),
+  categories: z.array(z.string()),
+  tags: z.any(),
+  comment_count: z.number(),
+  chapters: z
+    .array(
+      z.object({
+        start_time: z.number(),
+        title: z.string(),
+        end_time: z.number(),
+      })
+    )
+    .nullable(),
+  like_count: z.number(),
+  channel: z.string(),
+  channel_follower_count: z.number(),
+  upload_date: z.string(),
+  playlist: z.string(),
+  playlist_id: z.string(),
+  display_id: z.string(),
+  fulltitle: z.string(),
+  language: z.string(),
+});
+
+export type SearchResult = z.infer<typeof searchResultSchema>;
 
 export const formatSearchResult = (result: SearchResult) => {
   return `
@@ -35,13 +47,16 @@ Title: ${result.title}
 Channel: ${result.channel}
 Views: ${result.view_count}
 Duration: ${dayjs().startOf("day").second(result.duration).format("H:mm:ss")}
-Rating: ${result.average_rating}
+Likes: ${result.like_count}
+Chapters:
+${result.chapters?.map((c, idx) => idx + 1 + ". " + c.title).join("\n")}
 `.trim();
+  // Rating: ${result.average_rating} // always seems to be null
 };
 
 export async function search(
   query: string,
-  n_results: number = 5
+  n_results: number = 3
 ): Promise<SearchResult[]> {
   const searchCommand = `yt-dlp "ytsearch${n_results}:${query}" --dump-json`;
   const rawOutput = execSync(searchCommand, {
@@ -50,7 +65,9 @@ export async function search(
     .toString()
     .trim()
     .split("\n");
-  const results = rawOutput.map((line) => JSON.parse(line));
+  const results = rawOutput.map((line) =>
+    searchResultSchema.parse(JSON.parse(line))
+  );
   return results;
 }
 

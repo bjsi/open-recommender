@@ -1,10 +1,8 @@
-import {
-  ChatCompletionMessage,
-  ChatCompletionMessageParam,
-} from "openai/resources";
+import { ChatCompletionMessageParam } from "openai/resources";
 import { z } from "zod";
 import zodToJsonSchema from "zod-to-json-schema";
 import { Prompt } from "./prompt";
+import OpenAI from "openai";
 
 /**
  * We chunk the transcript into logical sections and add metadata using an LLM.
@@ -38,19 +36,14 @@ const outputSchema = z.object({
   sections: z.array(transcriptChunkSchema),
 });
 
-export const functionCall: ChatCompletionMessage.FunctionCall = {
+const functionCall: OpenAI.ChatCompletionCreateParams.Function = {
   name: "chunkTranscript",
-  arguments: JSON.stringify(zodToJsonSchema(outputSchema)),
+  description: "Chunk a video transcript into logical sections with metadata.",
+  parameters: zodToJsonSchema(outputSchema),
 };
 
 const inputSchema = z.object({
-  transcript: z.array(
-    z.object({
-      text: z.string(),
-      start: z.number(),
-      end: z.number(),
-    })
-  ),
+  transcript: z.string(),
   videoTitle: z.string(),
 });
 

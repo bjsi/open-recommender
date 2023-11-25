@@ -17,6 +17,7 @@
   "scripts": {
     "test-prompts": "npx ts-node ./src/recommender/tests/aiTests.ts",
     "yt:search": "npx ts-node ./src/youtube/search.ts",
-    "yt:transcript": "npx ts-node ./src/youtube/transcript.ts"
+    "yt:transcript": "npx ts-node ./src/youtube/transcript.ts",
+    "yt:queries": "npx ts-node ./src/recommender/createQueries.ts"
   }
 }

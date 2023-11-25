@@ -1,11 +1,11 @@
-import {
-  ChatCompletionMessage,
-  ChatCompletionMessageParam,
-} from "openai/resources";
+import { ChatCompletionMessageParam } from "openai/resources";
 import { z } from "zod";
 import zodToJsonSchema from "zod-to-json-schema";
 import { SearchResult } from "../youtube/search";
 import { Prompt } from "./prompt";
+import OpenAI from "openai";
+import { exampleSearchResults1 } from "./tests/exampleData";
+import dotenv from "dotenv";
 
 const prompt: ChatCompletionMessageParam[] = [
   {
@@ -28,7 +28,7 @@ Query: {{ query }}
   },
 ];
 
-export const formatSearchResults = (results: SearchResult[]) => {
+export const searchResultsToString = (results: SearchResult[]) => {
   return JSON.stringify(
     results.map((r, idx) => ({
       id: idx,
@@ -48,26 +48,48 @@ const inputSchema = z.object({
   userContext: z.string(),
 });
 
+export type FilterSearchResultsInputVars = z.infer<typeof inputSchema>;
+
 const outputSchema = z.object({
   // array of ids
-  filteredResults: z.array(z.number()),
+  filteredSearchResultIds: z.array(z.number()),
 });
 
-export const filterSearchResultsFunction: ChatCompletionMessage.FunctionCall = {
+const functionCall: OpenAI.ChatCompletionCreateParams.Function = {
   name: "filterSearchResults",
-  arguments: JSON.stringify(zodToJsonSchema(outputSchema)),
+  description:
+    "Filter search results based on user context to decide which videos to recommend.",
+  parameters: zodToJsonSchema(outputSchema),
 };
-
-export interface FilterSearchResultsVars {
-  results: SearchResult[];
-}
 
 export const filterSearchResults = new Prompt({
   function: {
     schema: outputSchema,
-    function: filterSearchResultsFunction,
+    function: functionCall,
   },
   prompt: prompt,
   model: "gpt-3.5-turbo",
   inputSchema,
 });
+
+if (require.main === module) {
+  dotenv.config();
+  filterSearchResults
+    .run(
+      {
+        results: searchResultsToString(exampleSearchResults1),
+        userContext:
+          "The user is interested in learning more about RemNote's flashcard home project.",
+      },
+      true
+    )
+    .then(({ filteredSearchResultIds }) => {
+      console.log(
+        JSON.stringify(
+          filteredSearchResultIds.map((id) => exampleSearchResults1[id]),
+          null,
+          2
+        )
+      );
+    });
+}

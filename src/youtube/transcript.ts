@@ -6,15 +6,16 @@ import { dataFolder } from "../filesystem";
 import { parseSync } from "subtitle";
 import { tokenize } from "../tokenize";
 
-interface TranscriptFetchResult {
+export interface Transcript {
   cues: TranscriptCue[];
   text: string;
+  videoTitle: string;
 }
 
 export async function fetchTranscript(
   videoId: string,
   videoTitle: string
-): Promise<TranscriptFetchResult | undefined> {
+): Promise<Transcript | undefined> {
   const command = [
     "yt-dlp",
     "--write-sub",
@@ -40,6 +41,7 @@ export async function fetchTranscript(
       videoTitle,
     });
     return {
+      videoTitle,
       cues,
       text: transcriptText,
     };

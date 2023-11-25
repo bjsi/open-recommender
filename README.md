@@ -5,6 +5,7 @@
 </h1>
 
 <h3 align="center">⚠️ Work in Progress... ⚠️</h3>
+The current focus is on building out the data pipeline for searching and downloading YouTube videos and transcripts. The next step will be to build out the recommendation system itself.
 
 <br/>
 
@@ -33,13 +34,23 @@ Welcome to Open Recommender, an open source recommendation system for YouTube.
 
 ### Commands
 
-- `npm run test-prompts <optional prompt name>` to test the prompts (see `aiTests.ts`)
+- `npm run test-prompts <optional prompt name>` to test the AI prompts (see `aiTests.ts`)
 - `npm run yt:search <query>` to test YouTube search
 - `npm run yt:transcript <optional videoId>` to test downloading and parsing YouTube transcripts
+- `npm run yt:queries <optional user context>` to create a list of YouTube queries based on a user's context
 
 ## 📚 How it Works
 
-See the working notes [here](https://www.remnote.com/a/YouTube-Recommender/655daa97d42611e86f8536ec)
+A summary of the data pipeline:
+
+- Create a list of search queries to find interesting YouTube videos based on a user's Twitter engagement
+- Search YouTube
+- Filter videos based on how relevant they are to the user's context
+- Download transcripts and chunk them into smaller sections with metadata
+- Create a database of video chunks
+- Give recommendations to the user based on a mixture of their current and past interests
+
+See more detailed working notes [here](https://www.remnote.com/a/YouTube-Recommender/655daa97d42611e86f8536ec)
 
 ## Related Papers and Blog Posts
 

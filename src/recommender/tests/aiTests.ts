@@ -7,62 +7,89 @@ import {
   appraiseTranscript,
 } from "../appraiseTranscript";
 import { assertValidSchema } from "./helpers";
+import { transcriptToString } from "../../youtube/transcript";
+import {
+  exampleSearchResults1,
+  exampleSearchResults2,
+  exampleTranscript,
+} from "./exampleData";
+import {
+  FilterSearchResultsInputVars,
+  filterSearchResults,
+  searchResultsToString,
+} from "../filterSearchResults";
+import { interleaveArrays } from "./utils";
+import {
+  functionCallTestOptions as functionCallOptions,
+  plainTextTestOptions,
+} from "./options";
+import {
+  CreateQueriesInputVars,
+  createYouTubeSearchQueries,
+} from "../createQueries";
 
 dotenv.config();
 
 const promptTests: Record<string, EvaluateTestSuite> = {
   "chunk-transcript": {
-    ...testOptions({
+    ...functionCallOptions({
       prompt: chunkTranscript.prompt,
-      functions: [chunkTranscript.function],
+      functions: [chunkTranscript.function!.function],
     }),
     tests: [
       {
         vars: {
-          transcript: [
-            {
-              text: "This is a test",
-              start: 0,
-              end: 10,
-              entities: ["test"],
-            },
-          ],
-          videoTitle: "Test video",
-          videoSummary: "This is a test video",
+          transcript: transcriptToString(exampleTranscript.cues),
+          videoTitle: exampleTranscript.videoTitle,
         } satisfies ChunkTranscriptVars,
         assert: [assertValidSchema(chunkTranscript.function!.schema)],
       },
     ],
   },
   "appraise-transcript": {
-    ...testOptions({
+    ...functionCallOptions({
       prompt: appraiseTranscript.prompt,
-      functions: [appraiseTranscript.function],
+      functions: [appraiseTranscript.function!.function],
     }),
     tests: [
       {
         vars: {
-          transcript: "This is a test",
-          videoTitle: "Test video",
-          userContext: "This is a test user",
+          transcript: transcriptToString(exampleTranscript.cues),
+          videoTitle: exampleTranscript.videoTitle,
+          userContext: "The user is interested in learning software.",
         } satisfies AppraiseTranscriptInputVars,
         assert: [assertValidSchema(appraiseTranscript.function!.schema)],
       },
     ],
   },
   "filter-search-results": {
-    ...testOptions({
-      prompt: appraiseTranscript.prompt,
-      functions: [appraiseTranscript.function],
+    ...functionCallOptions({
+      prompt: filterSearchResults.prompt,
+      functions: [filterSearchResults.function!.function],
     }),
     tests: [
       {
         vars: {
-          transcript: "This is a test",
-          videoTitle: "Test video",
-          userContext: "This is a test user",
-        } satisfies AppraiseTranscriptInputVars,
-        assert: [assertValidSchema(appraiseTranscript.function!.schema)],
+          results: searchResultsToString(
+            interleaveArrays(exampleSearchResults1, exampleSearchResults2)
+          ),
+          userContext: "The user is interested in learning software.",
+        } satisfies FilterSearchResultsInputVars,
+        assert: [assertValidSchema(filterSearchResults.function!.schema)],
+      },
+    ],
+  },
+  "create-queries": {
+    ...plainTextTestOptions({
+      prompt: createYouTubeSearchQueries.prompt,
+    }),
+    tests: [
+      {
+        vars: {
+          userContext:
+            "The user is interested in software to assist with learning like Anki.",
+        } satisfies CreateQueriesInputVars,
+        assert: [],
       },
     ],
   },
