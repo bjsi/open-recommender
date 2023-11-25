@@ -31,7 +31,7 @@ import {
   const { filteredSearchResultIds: filteredResults } =
     await recommender.search.filter({
       results: searchResultsToString(searchResults),
-      userContext: "",
+      userContext,
     });
   if (!filteredResults.length) {
     console.log("No results passed the search filter");
@@ -54,7 +54,7 @@ import {
     const appraisal = await recommender.transcript.appraise({
       transcript: cuesToString(cues),
       videoTitle: result.title,
-      userContext: "",
+      userContext,
     });
     if (appraisal.recommend) {
       console.log("Recommending " + result.title);
