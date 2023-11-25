@@ -1,6 +1,6 @@
 import chalk from "chalk";
 import { execSync } from "child_process";
-import { readFileSync } from "fs";
+import { existsSync, readFileSync } from "fs";
 import path from "path";
 import { dataFolder } from "../filesystem";
 import { parseSync } from "subtitle";
@@ -15,13 +15,25 @@ export async function fetchTranscript(
   videoId: string,
   videoTitle: string
 ): Promise<TranscriptFetchResult | undefined> {
-  const command = `yt-dlp --write-sub --write-auto-sub --sub-lang en --sub-format vtt --skip-download -o "${dataFolder}/${videoId}.%(ext)s" "https://www.youtube.com/watch?v=${videoId}"`;
+  const command = [
+    "yt-dlp",
+    "--write-sub",
+    "--write-auto-sub",
+    "--sub-lang",
+    "en",
+    "--sub-format",
+    "vtt",
+    "--skip-download",
+    "-o",
+    `"${dataFolder}/${videoId}.%(ext)s"`,
+    `https://www.youtube.com/watch?v=${videoId}`,
+  ];
+  const transcriptFile = path.join(dataFolder, `${videoId}.en.vtt`);
   try {
-    execSync(command);
-    const transcriptText = readFileSync(
-      path.join(dataFolder, `${videoId}.en.vtt`),
-      "utf-8"
-    );
+    if (!existsSync(transcriptFile)) {
+      execSync(command.join(" "));
+    }
+    const transcriptText = readFileSync(transcriptFile, "utf-8");
     const cues = await parseTranscript({
       transcript: transcriptText,
       videoId,
@@ -137,4 +149,15 @@ async function mergeChunks(chunks: TranscriptCue[], videoTitle: string) {
       videoTitle,
     });
   }
+}
+
+if (require.main === module) {
+  const videoId = process.argv[2] || "eAnNGqwI2AQ";
+  if (!videoId) {
+    console.error("Please provide a video ID");
+    process.exit(1);
+  }
+  fetchTranscript(videoId, "Test video").then((result) => {
+    console.log(result?.cues);
+  });
 }

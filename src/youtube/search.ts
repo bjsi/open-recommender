@@ -1,5 +1,6 @@
 import { execSync } from "child_process";
 import dotenv from "dotenv";
+import dayjs from "dayjs";
 
 dotenv.config();
 
@@ -33,8 +34,8 @@ export const formatSearchResult = (result: SearchResult) => {
 Title: ${result.title}
 Channel: ${result.channel}
 Views: ${result.view_count}
-Duration: ${result.duration}
-Description: ${result.description}
+Duration: ${dayjs().startOf("day").second(result.duration).format("H:mm:ss")}
+Rating: ${result.average_rating}
 `.trim();
 };
 
@@ -43,6 +44,23 @@ export async function search(
   n_results: number = 5
 ): Promise<SearchResult[]> {
   const searchCommand = `yt-dlp "ytsearch${n_results}:${query}" --dump-json`;
-  const results = JSON.parse(execSync(searchCommand).toString().trim());
+  const rawOutput = execSync(searchCommand, {
+    maxBuffer: 10 * 1024 * 1024, // 10 MB
+  })
+    .toString()
+    .trim()
+    .split("\n");
+  const results = rawOutput.map((line) => JSON.parse(line));
   return results;
+}
+
+if (require.main === module) {
+  const query = process.argv[2];
+  if (!query) {
+    console.error("Please provide a query");
+    process.exit(1);
+  }
+  search(query, 3).then((results) => {
+    console.log(results.map(formatSearchResult).join("\n\n"));
+  });
 }

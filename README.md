@@ -23,9 +23,19 @@ Welcome to Open Recommender, an open source recommendation system for YouTube.
 
 ## How to Run
 
+### Installation
+
 - `git clone` this repo
 - `cd open-recommender`
 - `npm i`
+- Install [yt-dlp](https://github.com/yt-dlp/yt-dlp)
+- `cp .env.example .env` and fill in the values
+
+### Commands
+
+- `npm run test-prompts <optional prompt name>` to test the prompts (see `aiTests.ts`)
+- `npm run yt:search <query>` to test YouTube search
+- `npm run yt:transcript <optional videoId>` to test downloading and parsing YouTube transcripts
 
 ## 📚 How it Works
 

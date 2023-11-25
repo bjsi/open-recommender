@@ -42,7 +42,7 @@ const inputSchema = z.object({
   userContext: z.string(),
 });
 
-export type AppraiseTranscriptVars = z.infer<typeof inputSchema>;
+export type AppraiseTranscriptInputVars = z.infer<typeof inputSchema>;
 
 const outputSchema = z.object({
   reasoning: z.string(),
