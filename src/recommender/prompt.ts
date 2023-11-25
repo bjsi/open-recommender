@@ -1,7 +1,11 @@
-import OpenAI from "openai";
+import OpenAI from "openpipe/openai";
 import { ZodType, z } from "zod";
 import { compilePrompt } from "./compilePrompt";
 import { OPENAI_CHAT_MODELS } from "./openai";
+import {
+  ChatCompletionCreateParams,
+  ChatCompletionMessageParam,
+} from "openai/resources";
 
 export class Prompt<
   InputSchema extends ZodType,
@@ -9,19 +13,19 @@ export class Prompt<
 > {
   function?: {
     schema: OutputSchema extends ZodType ? OutputSchema : undefined;
-    function?: OpenAI.ChatCompletionCreateParams.Function;
+    function?: ChatCompletionCreateParams.Function;
   };
-  prompt: OpenAI.ChatCompletionMessageParam[];
+  prompt: ChatCompletionMessageParam[];
   model: keyof typeof OPENAI_CHAT_MODELS;
   inputSchema: InputSchema;
 
   constructor(args: {
     function?: {
       schema: OutputSchema extends ZodType ? OutputSchema : undefined;
-      function?: OpenAI.ChatCompletionCreateParams.Function;
+      function?: ChatCompletionCreateParams.Function;
     };
     model: keyof typeof OPENAI_CHAT_MODELS;
-    prompt: OpenAI.ChatCompletionMessageParam[];
+    prompt: ChatCompletionMessageParam[];
     inputSchema: InputSchema;
   }) {
     this.function = args.function;
