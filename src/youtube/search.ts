@@ -18,7 +18,7 @@ const searchResultSchema = z.object({
   average_rating: z.any(),
   categories: z.array(z.string()),
   tags: z.any(),
-  comment_count: z.number(),
+  comment_count: z.number().nullable(),
   chapters: z
     .array(
       z.object({
@@ -28,7 +28,7 @@ const searchResultSchema = z.object({
       })
     )
     .nullable(),
-  like_count: z.number(),
+  like_count: z.number().nullable(),
   channel: z.string(),
   channel_follower_count: z.number(),
   upload_date: z.string(),

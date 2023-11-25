@@ -38,6 +38,7 @@ Welcome to Open Recommender, an open source recommendation system for YouTube.
 - `npm run yt:search <query>` to test YouTube search
 - `npm run yt:transcript <optional videoId>` to test downloading and parsing YouTube transcripts
 - `npm run yt:queries <optional user context>` to create a list of YouTube queries based on a user's context
+- `npm run main <optional user context>` to run the full data pipeline
 
 ## 📚 How it Works
 

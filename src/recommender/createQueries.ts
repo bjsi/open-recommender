@@ -7,10 +7,9 @@ const prompt: ChatCompletionMessageParam[] = [
   {
     role: "system",
     content: `
-You are a YouTube video recommendation system that recommends videos to users based on their interests.
-You are given some information about the user.
-You should think of some YouTube search queries to run to find videos to recommend to the user.
-Please return a list of 3 search queries.
+- You are a YouTube video recommendation system that recommends videos to users based on their interests.
+- You should create 3 YouTube search queries to find relevant videos to recommend to the user based on their interests.
+- Output the queries as a markdown list.
 
 User Context: {{ userContext }}
 `.trim(),
@@ -25,6 +24,7 @@ export const parseCreateQueriesOutput = (output: string) => {
         .trim()
         .replace(/^- /, "")
         .replace(/^\d+\. /, "")
+        .replace(/\"/g, "")
     )
     .filter(Boolean);
   return queries;
@@ -38,7 +38,7 @@ export type CreateQueriesInputVars = z.infer<typeof inputSchema>;
 
 export const createYouTubeSearchQueries = new Prompt({
   prompt: prompt,
-  model: "gpt-3.5-turbo",
+  model: "gpt-4-1106-preview",
   inputSchema,
 });
 
