@@ -68,7 +68,7 @@ export async function search(
   const results = rawOutput.map((line) =>
     searchResultSchema.parse(JSON.parse(line))
   );
-  return results;
+  return results || [];
 }
 
 if (require.main === module) {

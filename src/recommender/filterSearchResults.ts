@@ -11,40 +11,37 @@ const prompt: ChatCompletionMessageParam[] = [
   {
     role: "system",
     content: `
-You are a YouTube video recommendation system that recommends videos to users based on their interests.
-You are given some YouTube search results.
-You must decide which videos to recommend to the user.
-
-User Context: {{ userContext }}
+- Which of the following videos would be most relevant to the user based on their interests.
+- You should not recommend videos that are not relevant to the user.
+- User's interests: {{ userContext }}
+- Videos:
+{{ searchResults }}
 `.trim(),
   },
   {
     role: "user",
     content: `
-Query: {{ query }}
-
-{{ searchResults }}
 `.trim(),
   },
 ];
 
 export const searchResultsToString = (results: SearchResult[]) => {
-  return JSON.stringify(
-    results.map((r, idx) => ({
-      id: idx,
-      title: r.title,
-      description: r.description.slice(0, 50),
-      channel: r.channel,
-      views: r.view_count,
-      rating: r.average_rating,
-    })),
-    null,
-    2
-  );
+  return results
+    .map((r, idx) =>
+      `
+ID: ${idx}
+Title: ${r.title}
+Channel: ${r.channel}
+Views: ${r.view_count}
+Chapters:
+${r.chapters?.map((c, idx) => idx + 1 + ". " + c.title).join("\n")}
+`.trim()
+    )
+    .join("\n\n");
 };
 
 const inputSchema = z.object({
-  results: z.string(),
+  searchResults: z.string(),
   userContext: z.string(),
 });
 
@@ -52,13 +49,12 @@ export type FilterSearchResultsInputVars = z.infer<typeof inputSchema>;
 
 const outputSchema = z.object({
   // array of ids
-  filteredSearchResultIds: z.array(z.number()),
+  recommendedVideos: z.array(z.number()),
 });
 
 const functionCall: OpenAI.ChatCompletionCreateParams.Function = {
-  name: "filterSearchResults",
-  description:
-    "Filter search results based on user context to decide which videos to recommend.",
+  name: "recommendVideos",
+  description: "Recommend relevant videos to the user",
   parameters: zodToJsonSchema(outputSchema),
 };
 
@@ -68,28 +64,20 @@ export const filterSearchResults = new Prompt({
     function: functionCall,
   },
   prompt: prompt,
-  model: "gpt-3.5-turbo",
+  model: "gpt-4-1106-preview",
   inputSchema,
 });
 
 if (require.main === module) {
   dotenv.config();
-  filterSearchResults
-    .run(
-      {
-        results: searchResultsToString(exampleSearchResults1),
-        userContext:
-          "The user is interested in learning more about RemNote's flashcard home project.",
-      },
-      true
-    )
-    .then(({ filteredSearchResultIds }) => {
-      console.log(
-        JSON.stringify(
-          filteredSearchResultIds.map((id) => exampleSearchResults1[id]),
-          null,
-          2
-        )
-      );
-    });
+  const searchResults = searchResultsToString(exampleSearchResults1);
+  console.log(searchResults);
+  filterSearchResults.run(
+    {
+      searchResults,
+      //"The user is interested in learning more about RemNote's flashcard home project.",
+      userContext: "The user is interested in space.",
+    },
+    true
+  );
 }

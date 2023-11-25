@@ -33,6 +33,7 @@ dotenv.config();
 const promptTests: Record<string, EvaluateTestSuite> = {
   "chunk-transcript": {
     ...functionCallOptions({
+      model: chunkTranscript.model,
       prompt: chunkTranscript.prompt,
       functions: [chunkTranscript.function!.function],
     }),
@@ -48,6 +49,7 @@ const promptTests: Record<string, EvaluateTestSuite> = {
   },
   "appraise-transcript": {
     ...functionCallOptions({
+      model: appraiseTranscript.model,
       prompt: appraiseTranscript.prompt,
       functions: [appraiseTranscript.function!.function],
     }),
@@ -64,13 +66,14 @@ const promptTests: Record<string, EvaluateTestSuite> = {
   },
   "filter-search-results": {
     ...functionCallOptions({
+      model: filterSearchResults.model,
       prompt: filterSearchResults.prompt,
       functions: [filterSearchResults.function!.function],
     }),
     tests: [
       {
         vars: {
-          results: searchResultsToString(
+          searchResults: searchResultsToString(
             interleaveArrays(exampleSearchResults1, exampleSearchResults2)
           ),
           userContext: "The user is interested in learning software.",
@@ -81,6 +84,7 @@ const promptTests: Record<string, EvaluateTestSuite> = {
   },
   "create-queries": {
     ...plainTextTestOptions({
+      model: createYouTubeSearchQueries.model,
       prompt: createYouTubeSearchQueries.prompt,
     }),
     tests: [

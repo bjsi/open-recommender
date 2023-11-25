@@ -1,6 +1,7 @@
 import OpenAI from "openai";
 import { ZodType, z } from "zod";
 import { compilePrompt } from "./compilePrompt";
+import { OPENAI_CHAT_MODELS } from "./openai";
 
 export class Prompt<
   InputSchema extends ZodType,
@@ -11,7 +12,7 @@ export class Prompt<
     function?: OpenAI.ChatCompletionCreateParams.Function;
   };
   prompt: OpenAI.ChatCompletionMessageParam[];
-  model: "gpt-3.5-turbo" | "gpt-4";
+  model: keyof typeof OPENAI_CHAT_MODELS;
   inputSchema: InputSchema;
 
   constructor(args: {
@@ -19,7 +20,7 @@ export class Prompt<
       schema: OutputSchema extends ZodType ? OutputSchema : undefined;
       function?: OpenAI.ChatCompletionCreateParams.Function;
     };
-    model: "gpt-3.5-turbo" | "gpt-4";
+    model: keyof typeof OPENAI_CHAT_MODELS;
     prompt: OpenAI.ChatCompletionMessageParam[];
     inputSchema: InputSchema;
   }) {
@@ -33,10 +34,13 @@ export class Prompt<
     vars: z.infer<InputSchema>,
     verbose = false
   ): Promise<OutputSchema extends ZodType<infer U> ? U : string | null> => {
+    const messages = compilePrompt(this.prompt, vars);
+    if (verbose) console.log(messages);
     const response = await new OpenAI().chat.completions.create({
-      messages: compilePrompt(this.prompt, vars),
+      messages,
       model: this.model,
       function_call: this.function?.function,
+      functions: this.function?.function ? [this.function.function] : undefined,
     });
     if (verbose) console.log(response.choices[0]);
     if (this.function?.schema) {

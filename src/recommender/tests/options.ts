@@ -1,13 +1,15 @@
 import { ChatCompletionMessageParam } from "openai/resources";
+import { OPENAI_CHAT_MODELS } from "../openai";
 
 export const plainTextTestOptions = (opts: {
   prompt: ChatCompletionMessageParam[];
+  model: keyof typeof OPENAI_CHAT_MODELS;
 }) => {
   return {
     prompts: [JSON.stringify(opts.prompt)],
     providers: [
       {
-        id: "openai:gpt-3.5-turbo",
+        id: `openai:${opts.model}`,
       },
     ],
   };
@@ -16,12 +18,13 @@ export const plainTextTestOptions = (opts: {
 export const functionCallTestOptions = (opts: {
   prompt: ChatCompletionMessageParam[];
   functions?: any[];
+  model: keyof typeof OPENAI_CHAT_MODELS;
 }) => {
   return {
     prompts: [JSON.stringify(opts.prompt)],
     providers: [
       {
-        id: "openai:gpt-3.5-turbo",
+        id: `openai:${opts.model}`,
         config: {
           functions: opts.functions,
         },
