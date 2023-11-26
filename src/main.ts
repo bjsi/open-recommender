@@ -1,4 +1,5 @@
 import { recommender } from "./recommender";
+import { splitTranscript } from "./recommender/chunkTranscript";
 import { parseCreateQueriesOutput } from "./recommender/createQueries";
 import { searchResultsToString } from "./recommender/filterSearchResults";
 import { yt } from "./youtube";
@@ -6,6 +7,7 @@ import { SearchResult } from "./youtube/search";
 import {
   TranscriptCue,
   transcriptToString as cuesToString,
+  transcriptCuesToVtt,
 } from "./youtube/transcript";
 import chalk from "chalk";
 
@@ -63,42 +65,50 @@ import chalk from "chalk";
       .join("\n")
   );
 
-  return;
-
   type SearchResultWithTranscript = SearchResult & {
     cues: TranscriptCue[];
   };
-  const appraised: SearchResultWithTranscript[] = [];
-  for (const result of filteredResults) {
-    console.log(result.title);
-    const fetchResult = await yt.transcript.fetch(result.id, result.title);
-    if (!fetchResult || !fetchResult.cues.length) {
-      console.log("Skipping video without transcript");
-      continue;
-    }
-    const { cues } = fetchResult;
-    const appraisal = await recommender.transcript.appraise({
-      transcript: cuesToString(cues),
-      videoTitle: result.title,
-      userContext,
-    });
-    if (appraisal.recommend) {
-      console.log("Recommending " + result.title);
-      console.log(appraisal.reasoning);
-      appraised.push({ ...result, cues });
-    }
-  }
+  console.log(chalk.blue(`Fetching ${filteredResults.length} transcripts...`));
+  const resultsWithTranscripts = (
+    await Promise.all(
+      filteredResults.map(async (result) => {
+        const fetchResult = await yt.transcript.fetch(result.id, result.title);
+        if (!fetchResult || !fetchResult.cues.length) {
+          console.log("Skipping video without transcript");
+          return;
+        } else {
+          return { ...result, cues: fetchResult.cues };
+        }
+      })
+    )
+  ).filter(Boolean) as SearchResultWithTranscript[];
+  console.log(
+    chalk.green(
+      resultsWithTranscripts.length + " transcripts fetched successfully"
+    )
+  );
 
-  if (!appraised.length) {
+  if (!resultsWithTranscripts.length) {
     console.log("No results passed the transcript appraisal filter");
     return;
   }
 
-  // const chunkedTranscripts = [];
-  // for (const result of appraised) {
-  //   const chunked = await recommender.transcript.chunk({ results: [result] });
-  //   chunkedTranscripts.push(...chunked);
-  // }
-
-  // const chunked = await recommender.transcript.chunk({ results: appraised });
+  for (const result of resultsWithTranscripts.slice(0, 1)) {
+    const webvttText = transcriptCuesToVtt(result.cues);
+    const parts = await splitTranscript(webvttText);
+    console.log(chalk.blue(`Generating chapters for "${result.title}"...`));
+    const chapters = (
+      await Promise.all(
+        parts.map(async (part) => {
+          const chunked = await recommender.transcript.chunk({
+            transcript: part,
+            videoTitle: result.title,
+          });
+          return chunked.sections;
+        })
+      )
+    ).flat();
+    console.log(chalk.green(chapters.length + " chapters generated"));
+    console.log(JSON.stringify(chapters, null, 2));
+  }
 })();

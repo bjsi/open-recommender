@@ -3,7 +3,7 @@ import { execSync } from "child_process";
 import { existsSync, readFileSync } from "fs";
 import path from "path";
 import { dataFolder } from "../filesystem";
-import { parseSync } from "subtitle";
+import { parseSync, stringifySync } from "subtitle";
 import { tokenize } from "../tokenize";
 
 export interface Transcript {
@@ -112,6 +112,16 @@ async function parseTranscript(args: {
   return chunks;
 }
 
+export const transcriptCuesToVtt = (cues: TranscriptCue[]) => {
+  return stringifySync(
+    cues.map((cue) => ({
+      data: { text: cue.text, start: cue.start * 1000, end: cue.end * 1000 },
+      type: "cue",
+    })),
+    { format: "WebVTT" }
+  );
+};
+
 async function mergeChunks(chunks: TranscriptCue[], videoTitle: string) {
   let mergedChunks: TranscriptCue[] = [];
   let tempText = "";
@@ -160,6 +170,9 @@ if (require.main === module) {
     process.exit(1);
   }
   fetchTranscript(videoId, "Test video").then((result) => {
+    console.log("CUES");
     console.log(result?.cues);
+    // console.log("WEBVTT");
+    // console.log(transcriptCuesToVtt(result?.cues || []));
   });
 }

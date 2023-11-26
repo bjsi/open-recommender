@@ -21,6 +21,7 @@
     "yt:transcript": "npx ts-node ./src/youtube/transcript.ts",
     "yt:queries": "npx ts-node ./src/recommender/createQueries.ts",
     "yt:filter": "npx ts-node ./src/recommender/filterSearchResults.ts",
+    "yt:chunk": "npx ts-node ./src/recommender/chunkTranscript.ts",
     "main": "npx ts-node -T ./src/main.ts"
   }
 }

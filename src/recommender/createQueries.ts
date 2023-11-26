@@ -25,6 +25,7 @@ export const parseCreateQueriesOutput = (output: string) => {
         .replace(/^- /, "")
         .replace(/^\d+\. /, "")
         .replace(/\"/g, "")
+        .replace(/`/g, "")
     )
     .filter(Boolean);
   return queries;

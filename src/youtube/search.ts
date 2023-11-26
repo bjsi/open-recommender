@@ -16,8 +16,8 @@ const searchResultSchema = z.object({
   duration: z.number(),
   view_count: z.number(),
   average_rating: z.any(),
-  categories: z.array(z.string()),
-  tags: z.any(),
+  categories: z.array(z.string()).nullable(),
+  tags: z.string().array().nullable(),
   comment_count: z.number().nullable(),
   chapters: z
     .array(
@@ -30,13 +30,13 @@ const searchResultSchema = z.object({
     .nullable(),
   like_count: z.number().nullable(),
   channel: z.string(),
-  channel_follower_count: z.number(),
+  channel_follower_count: z.number().nullable(),
   upload_date: z.string(),
   playlist: z.string(),
   playlist_id: z.string(),
   display_id: z.string(),
   fulltitle: z.string(),
-  language: z.string(),
+  language: z.string().nullable(),
 });
 
 export type SearchResult = z.infer<typeof searchResultSchema>;
