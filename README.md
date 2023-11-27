@@ -29,6 +29,9 @@ Welcome to Open Recommender, an open source recommendation system for YouTube.
 - `git clone` this repo
 - `cd open-recommender`
 - `npm i`
+- `python3 -m venv env`
+- `source env/bin/activate`
+- `pip install -r requirements.txt`
 - Install [yt-dlp](https://github.com/yt-dlp/yt-dlp)
 - `cp .env.example .env` and fill in the values
 

@@ -10,6 +10,8 @@
     "openai": "^4.19.1",
     "openpipe": "^0.6.3",
     "promptfoo": "^0.28.1",
+    "pybridge": "^1.1.0",
+    "rxjs": "^7.8.1",
     "subtitle": "^4.2.1",
     "ts-node": "^10.9.1",
     "zod": "^3.22.4",
@@ -22,6 +24,10 @@
     "yt:queries": "npx ts-node ./src/recommender/createQueries.ts",
     "yt:filter": "npx ts-node ./src/recommender/filterSearchResults.ts",
     "yt:chunk": "npx ts-node ./src/recommender/chunkTranscript.ts",
+    "twitter:context": "npx ts-node ./src/twitter/getUserContext.ts",
     "main": "npx ts-node -T ./src/main.ts"
+  },
+  "devDependencies": {
+    "@deepkit/type-compiler": "^1.0.1-alpha.108"
   }
 }
