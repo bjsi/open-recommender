@@ -12,6 +12,7 @@ import {
   exampleSearchResults1,
   exampleSearchResults2,
   exampleTranscript,
+  exampleTranscript2,
 } from "./exampleData";
 import {
   FilterSearchResultsInputVars,
@@ -58,7 +59,14 @@ const promptTests: Record<string, EvaluateTestSuite> = {
         vars: {
           transcript: transcriptToString(exampleTranscript.cues),
           videoTitle: exampleTranscript.videoTitle,
-          userContext: "The user is interested in learning software.",
+        } satisfies AppraiseTranscriptInputVars,
+        assert: [assertValidSchema(appraiseTranscript.function!.schema)],
+      },
+      {
+        vars: {
+          transcript: exampleTranscript2,
+          videoTitle:
+            "The 10 AI Innovations Expected to Revolutionize 2024 - 2025",
         } satisfies AppraiseTranscriptInputVars,
         assert: [assertValidSchema(appraiseTranscript.function!.schema)],
       },
@@ -97,6 +105,21 @@ const promptTests: Record<string, EvaluateTestSuite> = {
       },
     ],
   },
+  // "infer-interests": {
+  //   ...plainTextTestOptions({
+  //     model: createYouTubeSearchQueries.model,
+  //     prompt: createYouTubeSearchQueries.prompt,
+  //   }),
+  //   tests: [
+  //     {
+  //       vars: {
+  //         userContext:
+  //           "The user is interested in software to assist with learning like Anki.",
+  //       } satisfies CreateQueriesInputVars,
+  //       assert: [],
+  //     },
+  //   ],
+  // },
 };
 
 const main = async () => {

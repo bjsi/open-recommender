@@ -14,9 +14,6 @@ import { tokenize } from "../tokenize";
  * We could use YouTube's chapters, but they are not always available, accurate or granular enough.
  */
 
-// TODO: a way to tag adverts / sponsorships / intro / outro / etc and ignore them
-// TODO: filter out videos that are entirely adverts / sponsorships
-
 const prompt: ChatCompletionMessageParam[] = [
   {
     role: "system",
@@ -43,7 +40,15 @@ const chapterSchema = z.object({
   summary: z.string().describe("A one sentence summary of the section."),
   start: z.string(), // TODO: format?
   end: z.string(), // TODO: format?
-  tags: z.array(z.string()),
+  tags: z.array(
+    z.union([
+      z.literal("Intro"),
+      z.literal("Outro"),
+      z.literal("Advert"),
+      z.literal("Sponsor"),
+      z.string(),
+    ])
+  ),
 });
 
 export type TranscriptChunk = z.infer<typeof chapterSchema>;

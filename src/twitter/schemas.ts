@@ -1,26 +1,4 @@
-import { PyBridge, RemoteController } from "pybridge";
 import { z } from "zod";
-
-interface API {
-  get_user_info(user_login: string): Promise<string>; // Tweet[];
-  hello(): string;
-}
-
-class PythonController {
-  api: RemoteController<API>;
-
-  constructor(protected python: PyBridge) {
-    this.python = python;
-    this.api = this.python.controller<API>("twitter.py");
-  }
-}
-
-export const twitter = new PythonController(
-  new PyBridge({
-    python: "python3",
-    cwd: __dirname,
-  })
-);
 
 const CoordinatesSchema = z.object({
   longitude: z.number(),
@@ -119,7 +97,7 @@ const MediaSchema = z.object({
 
 type Media = z.infer<typeof MediaSchema>;
 
-interface Tweet {
+export interface Tweet {
   id: number;
   id_str: string;
   url: string;

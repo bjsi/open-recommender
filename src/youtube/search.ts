@@ -1,7 +1,6 @@
 import { execSync } from "child_process";
 import dotenv from "dotenv";
 import dayjs from "dayjs";
-import { writeFileSync } from "fs";
 import { z } from "zod";
 
 dotenv.config();
