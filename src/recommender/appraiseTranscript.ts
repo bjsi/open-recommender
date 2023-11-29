@@ -8,12 +8,6 @@ import OpenAI from "openai";
  * We run some quality and "taste" checks on the transcript to
  * check that the video meets our standards before further processing.
  * We don't need to input the entire transcript, just a few paragraphs.
- *
- * User context will initially be information taken from the user's Twitter profile.
- * Later we can use the user's video viewing history.
- *
- * TODO: filter out videos that are entirely adverts / sponsorships
- * TODO: filter low quality videos
  */
 
 const prompt: ChatCompletionMessageParam[] = [
@@ -29,7 +23,7 @@ Given a transcript of a video, evaluate whether the video is likely to be low-qu
 - **Overpromising and Excessive Speculation**: Assess whether the transcript makes unrealistic promises about the future or engages in speculation without acknowledging the uncertainty.
 - **Lack of Originality or Unique Insights**: Evaluate if the content offers any new perspectives, insights, or unique information, or if it simply rehashes commonly known information.
 
-Based on these criteria, provide an assessment of whether the video should be recommended to the user.
+Based on these criteria, provide an assessment of whether the video should be recommended to the user. Include one sentence explaining your reasoning.
 `.trim(),
   },
   {
@@ -45,7 +39,6 @@ Title: {{ videoTitle }}
 const inputSchema = z.object({
   transcript: z.string(),
   videoTitle: z.string(),
-  // userContext: z.string(),
 });
 
 export type AppraiseTranscriptInputVars = z.infer<typeof inputSchema>;

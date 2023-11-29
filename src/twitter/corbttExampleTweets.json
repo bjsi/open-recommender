@@ -1,0 +1,2835 @@
+[
+  {
+    "id": 1729723855113994800,
+    "id_str": "1729723855113994644",
+    "url": "https://twitter.com/Teknium1/status/1729723855113994644",
+    "date": "2023-11-29 04:47:58+00:00",
+    "user": {
+      "id": 1365020011123773400,
+      "id_str": "1365020011123773442",
+      "url": "https://twitter.com/Teknium1",
+      "username": "Teknium1",
+      "displayname": "Teknium (e/λ)",
+      "rawDescription": "Cofounder @NousResearch, prev @StabilityAI\nGithub: https://t.co/LZwHTUFwPq\nHuggingFace: https://t.co/sN2FFU8PVE\nSupport me on Github Sponsors",
+      "created": "2021-02-25 19:25:11+00:00",
+      "followersCount": 16768,
+      "friendsCount": 2050,
+      "statusesCount": 22297,
+      "favouritesCount": 33677,
+      "listedCount": 389,
+      "mediaCount": 1681,
+      "location": "USA",
+      "profileImageUrl": "https://pbs.twimg.com/profile_images/1642401912648777728/2KFikPsE_normal.jpg",
+      "profileBannerUrl": "https://pbs.twimg.com/profile_banners/1365020011123773442/1679544051",
+      "protected": null,
+      "verified": false,
+      "blue": true,
+      "blueType": null,
+      "descriptionLinks": [
+        {
+          "url": "http://github.com/teknium1",
+          "text": "github.com/teknium1",
+          "tcourl": "https://t.co/LZwHTUFwPq"
+        },
+        {
+          "url": "http://huggingface.co/teknium",
+          "text": "huggingface.co/teknium",
+          "tcourl": "https://t.co/sN2FFU8PVE"
+        },
+        {
+          "url": "http://github.com/sponsors/teknium1",
+          "text": "github.com/sponsors/tekni…",
+          "tcourl": "https://t.co/7DnNfZEOPh"
+        }
+      ],
+      "_type": "snscrape.modules.twitter.User"
+    },
+    "lang": "en",
+    "rawContent": "OpenHermes 2.5 is now on @lmsysorg's ChatBot Arena! Go and test out several models and compare them blind to determine who is the best!\n\nWebsite: https://t.co/NTChcOXZFL",
+    "replyCount": 3,
+    "retweetCount": 3,
+    "likeCount": 74,
+    "quoteCount": 0,
+    "conversationId": 1729723855113994800,
+    "hashtags": [],
+    "cashtags": [],
+    "mentionedUsers": [
+      {
+        "id": 1641378826537296000,
+        "username": "lmsysorg",
+        "displayname": "lmsys.org",
+        "_type": "snscrape.modules.twitter.UserRef"
+      }
+    ],
+    "links": [
+      {
+        "url": "https://chat.lmsys.org/",
+        "text": "chat.lmsys.org",
+        "tcourl": "https://t.co/NTChcOXZFL"
+      }
+    ],
+    "viewCount": 3174,
+    "retweetedTweet": null,
+    "quotedTweet": null,
+    "place": null,
+    "coordinates": null,
+    "inReplyToTweetId": null,
+    "inReplyToUser": null,
+    "source": "<a href=\"https://mobile.twitter.com\" rel=\"nofollow\">Twitter Web App</a>",
+    "sourceUrl": "https://mobile.twitter.com",
+    "sourceLabel": "Twitter Web App",
+    "media": {
+      "photos": [],
+      "videos": [],
+      "animated": []
+    },
+    "_type": "snscrape.modules.twitter.Tweet"
+  },
+  {
+    "id": 1729732029191750100,
+    "id_str": "1729732029191750091",
+    "url": "https://twitter.com/corbtt/status/1729732029191750091",
+    "date": "2023-11-29 05:20:27+00:00",
+    "user": {
+      "id": 823506858,
+      "id_str": "823506858",
+      "url": "https://twitter.com/corbtt",
+      "username": "corbtt",
+      "displayname": "Kyle Corbitt",
+      "rawDescription": "Currently building @OpenPipeAI. Formerly @ycombinator, @google. I am always down to go on a quest.",
+      "created": "2012-09-14 15:44:30+00:00",
+      "followersCount": 2236,
+      "friendsCount": 97,
+      "statusesCount": 481,
+      "favouritesCount": 1709,
+      "listedCount": 54,
+      "mediaCount": 30,
+      "location": "Seattle, SF, Barcelona",
+      "profileImageUrl": "https://pbs.twimg.com/profile_images/1687487613769584640/SmzobJ-M_normal.jpg",
+      "profileBannerUrl": "https://pbs.twimg.com/profile_banners/823506858/1698191066",
+      "protected": null,
+      "verified": false,
+      "blue": true,
+      "blueType": null,
+      "descriptionLinks": [
+        {
+          "url": "https://corbt.com",
+          "text": "corbt.com",
+          "tcourl": "https://t.co/XyR4Sakwwt"
+        }
+      ],
+      "_type": "snscrape.modules.twitter.User"
+    },
+    "lang": "en",
+    "rawContent": "@Teknium1 @lmsysorg Awesome, was hoping it would show up there!",
+    "replyCount": 0,
+    "retweetCount": 0,
+    "likeCount": 1,
+    "quoteCount": 0,
+    "conversationId": 1729723855113994800,
+    "hashtags": [],
+    "cashtags": [],
+    "mentionedUsers": [
+      {
+        "id": 1365020011123773400,
+        "username": "Teknium1",
+        "displayname": "Teknium (e/λ)",
+        "_type": "snscrape.modules.twitter.UserRef"
+      },
+      {
+        "id": 1641378826537296000,
+        "username": "lmsysorg",
+        "displayname": "lmsys.org",
+        "_type": "snscrape.modules.twitter.UserRef"
+      }
+    ],
+    "links": [],
+    "viewCount": 35,
+    "retweetedTweet": null,
+    "quotedTweet": null,
+    "place": null,
+    "coordinates": null,
+    "inReplyToTweetId": 1729723855113994800,
+    "inReplyToUser": {
+      "id": 1365020011123773400,
+      "username": "Teknium1",
+      "displayname": "Teknium (e/λ)",
+      "_type": "snscrape.modules.twitter.UserRef"
+    },
+    "source": "<a href=\"http://twitter.com/download/android\" rel=\"nofollow\">Twitter for Android</a>",
+    "sourceUrl": "http://twitter.com/download/android",
+    "sourceLabel": "Twitter for Android",
+    "media": {
+      "photos": [],
+      "videos": [],
+      "animated": []
+    },
+    "_type": "snscrape.modules.twitter.Tweet"
+  },
+  {
+    "id": 1729693806742639000,
+    "id_str": "1729693806742639089",
+    "url": "https://twitter.com/corbtt/status/1729693806742639089",
+    "date": "2023-11-29 02:48:34+00:00",
+    "user": {
+      "id": 823506858,
+      "id_str": "823506858",
+      "url": "https://twitter.com/corbtt",
+      "username": "corbtt",
+      "displayname": "Kyle Corbitt",
+      "rawDescription": "Currently building @OpenPipeAI. Formerly @ycombinator, @google. I am always down to go on a quest.",
+      "created": "2012-09-14 15:44:30+00:00",
+      "followersCount": 2236,
+      "friendsCount": 97,
+      "statusesCount": 481,
+      "favouritesCount": 1709,
+      "listedCount": 54,
+      "mediaCount": 30,
+      "location": "Seattle, SF, Barcelona",
+      "profileImageUrl": "https://pbs.twimg.com/profile_images/1687487613769584640/SmzobJ-M_normal.jpg",
+      "profileBannerUrl": "https://pbs.twimg.com/profile_banners/823506858/1698191066",
+      "protected": null,
+      "verified": false,
+      "blue": true,
+      "blueType": null,
+      "descriptionLinks": [
+        {
+          "url": "https://corbt.com",
+          "text": "corbt.com",
+          "tcourl": "https://t.co/XyR4Sakwwt"
+        }
+      ],
+      "_type": "snscrape.modules.twitter.User"
+    },
+    "lang": "en",
+    "rawContent": "I've been using our new head-to-head evals feature to benchmark GPT-4-Turbo against OSS fine-tunes.\n\n4-Turbo... seems quite bad at following instructions. It underperforms GPT-4 and all fine-tuned models by a significant margin. (as judged by GPT-4 w/ human oversight) 🧵 https://t.co/1n0ik0gNXn",
+    "replyCount": 1,
+    "retweetCount": 0,
+    "likeCount": 2,
+    "quoteCount": 0,
+    "conversationId": 1729693806742639000,
+    "hashtags": [],
+    "cashtags": [],
+    "mentionedUsers": [],
+    "links": [],
+    "viewCount": 244,
+    "retweetedTweet": null,
+    "quotedTweet": null,
+    "place": null,
+    "coordinates": null,
+    "inReplyToTweetId": null,
+    "inReplyToUser": null,
+    "source": "<a href=\"https://mobile.twitter.com\" rel=\"nofollow\">Twitter Web App</a>",
+    "sourceUrl": "https://mobile.twitter.com",
+    "sourceLabel": "Twitter Web App",
+    "media": {
+      "photos": [
+        {
+          "url": "https://pbs.twimg.com/media/GAEawk4aYAABmVN.jpg"
+        }
+      ],
+      "videos": [],
+      "animated": []
+    },
+    "_type": "snscrape.modules.twitter.Tweet"
+  },
+  {
+    "id": 1729696941183737900,
+    "id_str": "1729696941183737928",
+    "url": "https://twitter.com/corbtt/status/1729696941183737928",
+    "date": "2023-11-29 03:01:01+00:00",
+    "user": {
+      "id": 823506858,
+      "id_str": "823506858",
+      "url": "https://twitter.com/corbtt",
+      "username": "corbtt",
+      "displayname": "Kyle Corbitt",
+      "rawDescription": "Currently building @OpenPipeAI. Formerly @ycombinator, @google. I am always down to go on a quest.",
+      "created": "2012-09-14 15:44:30+00:00",
+      "followersCount": 2236,
+      "friendsCount": 97,
+      "statusesCount": 481,
+      "favouritesCount": 1709,
+      "listedCount": 54,
+      "mediaCount": 30,
+      "location": "Seattle, SF, Barcelona",
+      "profileImageUrl": "https://pbs.twimg.com/profile_images/1687487613769584640/SmzobJ-M_normal.jpg",
+      "profileBannerUrl": "https://pbs.twimg.com/profile_banners/823506858/1698191066",
+      "protected": null,
+      "verified": false,
+      "blue": true,
+      "blueType": null,
+      "descriptionLinks": [
+        {
+          "url": "https://corbt.com",
+          "text": "corbt.com",
+          "tcourl": "https://t.co/XyR4Sakwwt"
+        }
+      ],
+      "_type": "snscrape.modules.twitter.User"
+    },
+    "lang": "en",
+    "rawContent": "GPT-4 does a great job with this. It consistently returns the summarized version as requested. Models like Mistral fine-tuned on GPT-4 also do great. But GPT-4-Turbo seems to consistently ignore the instructions to return the shortened version! 🤔 https://t.co/Lgm4ei3mP5",
+    "replyCount": 1,
+    "retweetCount": 0,
+    "likeCount": 0,
+    "quoteCount": 0,
+    "conversationId": 1729693806742639000,
+    "hashtags": [],
+    "cashtags": [],
+    "mentionedUsers": [],
+    "links": [],
+    "viewCount": 81,
+    "retweetedTweet": null,
+    "quotedTweet": null,
+    "place": null,
+    "coordinates": null,
+    "inReplyToTweetId": 1729695481364689200,
+    "inReplyToUser": {
+      "id": 823506858,
+      "username": "corbtt",
+      "displayname": "Kyle Corbitt",
+      "_type": "snscrape.modules.twitter.UserRef"
+    },
+    "source": "<a href=\"https://mobile.twitter.com\" rel=\"nofollow\">Twitter Web App</a>",
+    "sourceUrl": "https://mobile.twitter.com",
+    "sourceLabel": "Twitter Web App",
+    "media": {
+      "photos": [
+        {
+          "url": "https://pbs.twimg.com/media/GAEeJHMboAAiaXE.png"
+        },
+        {
+          "url": "https://pbs.twimg.com/media/GAEeKtPbsAAhKAX.png"
+        },
+        {
+          "url": "https://pbs.twimg.com/media/GAEeLmZbUAA4_h6.png"
+        }
+      ],
+      "videos": [],
+      "animated": []
+    },
+    "_type": "snscrape.modules.twitter.Tweet"
+  },
+  {
+    "id": 1729727687843864800,
+    "id_str": "1729727687843864898",
+    "url": "https://twitter.com/corbtt/status/1729727687843864898",
+    "date": "2023-11-29 05:03:12+00:00",
+    "user": {
+      "id": 823506858,
+      "id_str": "823506858",
+      "url": "https://twitter.com/corbtt",
+      "username": "corbtt",
+      "displayname": "Kyle Corbitt",
+      "rawDescription": "Currently building @OpenPipeAI. Formerly @ycombinator, @google. I am always down to go on a quest.",
+      "created": "2012-09-14 15:44:30+00:00",
+      "followersCount": 2236,
+      "friendsCount": 97,
+      "statusesCount": 481,
+      "favouritesCount": 1709,
+      "listedCount": 54,
+      "mediaCount": 30,
+      "location": "Seattle, SF, Barcelona",
+      "profileImageUrl": "https://pbs.twimg.com/profile_images/1687487613769584640/SmzobJ-M_normal.jpg",
+      "profileBannerUrl": "https://pbs.twimg.com/profile_banners/823506858/1698191066",
+      "protected": null,
+      "verified": false,
+      "blue": true,
+      "blueType": null,
+      "descriptionLinks": [
+        {
+          "url": "https://corbt.com",
+          "text": "corbt.com",
+          "tcourl": "https://t.co/XyR4Sakwwt"
+        }
+      ],
+      "_type": "snscrape.modules.twitter.User"
+    },
+    "lang": "en",
+    "rawContent": "@goodside curious if you've found similar?",
+    "replyCount": 1,
+    "retweetCount": 0,
+    "likeCount": 0,
+    "quoteCount": 0,
+    "conversationId": 1729693806742639000,
+    "hashtags": [],
+    "cashtags": [],
+    "mentionedUsers": [
+      {
+        "id": 16535432,
+        "username": "goodside",
+        "displayname": "Riley Goodside",
+        "_type": "snscrape.modules.twitter.UserRef"
+      }
+    ],
+    "links": [],
+    "viewCount": 41,
+    "retweetedTweet": null,
+    "quotedTweet": null,
+    "place": null,
+    "coordinates": null,
+    "inReplyToTweetId": 1729696941183737900,
+    "inReplyToUser": {
+      "id": 823506858,
+      "username": "corbtt",
+      "displayname": "Kyle Corbitt",
+      "_type": "snscrape.modules.twitter.UserRef"
+    },
+    "source": "<a href=\"http://twitter.com/download/android\" rel=\"nofollow\">Twitter for Android</a>",
+    "sourceUrl": "http://twitter.com/download/android",
+    "sourceLabel": "Twitter for Android",
+    "media": {
+      "photos": [],
+      "videos": [],
+      "animated": []
+    },
+    "_type": "snscrape.modules.twitter.Tweet"
+  },
+  {
+    "id": 1729145168341668400,
+    "id_str": "1729145168341668246",
+    "url": "https://twitter.com/corbtt/status/1729145168341668246",
+    "date": "2023-11-27 14:28:28+00:00",
+    "user": {
+      "id": 823506858,
+      "id_str": "823506858",
+      "url": "https://twitter.com/corbtt",
+      "username": "corbtt",
+      "displayname": "Kyle Corbitt",
+      "rawDescription": "Currently building @OpenPipeAI. Formerly @ycombinator, @google. I am always down to go on a quest.",
+      "created": "2012-09-14 15:44:30+00:00",
+      "followersCount": 2236,
+      "friendsCount": 97,
+      "statusesCount": 481,
+      "favouritesCount": 1709,
+      "listedCount": 54,
+      "mediaCount": 30,
+      "location": "Seattle, SF, Barcelona",
+      "profileImageUrl": "https://pbs.twimg.com/profile_images/1687487613769584640/SmzobJ-M_normal.jpg",
+      "profileBannerUrl": "https://pbs.twimg.com/profile_banners/823506858/1698191066",
+      "protected": null,
+      "verified": false,
+      "blue": true,
+      "blueType": null,
+      "descriptionLinks": [
+        {
+          "url": "https://corbt.com",
+          "text": "corbt.com",
+          "tcourl": "https://t.co/XyR4Sakwwt"
+        }
+      ],
+      "_type": "snscrape.modules.twitter.User"
+    },
+    "lang": "en",
+    "rawContent": "On Saturday we shipped comparative evals to all our users! We use GPT-4 to compare outputs head to head and calculate a win rate for each model.\n\nIn a surprising twist, I've found multiple customer test sets where GPT-4 prefers fine-tuned Mistral to its own outputs! 👀",
+    "replyCount": 4,
+    "retweetCount": 2,
+    "likeCount": 23,
+    "quoteCount": 0,
+    "conversationId": 1729145168341668400,
+    "hashtags": [],
+    "cashtags": [],
+    "mentionedUsers": [],
+    "links": [],
+    "viewCount": 4769,
+    "retweetedTweet": null,
+    "quotedTweet": null,
+    "place": null,
+    "coordinates": null,
+    "inReplyToTweetId": null,
+    "inReplyToUser": null,
+    "source": "<a href=\"https://mobile.twitter.com\" rel=\"nofollow\">Twitter Web App</a>",
+    "sourceUrl": "https://mobile.twitter.com",
+    "sourceLabel": "Twitter Web App",
+    "media": {
+      "photos": [
+        {
+          "url": "https://pbs.twimg.com/media/F_8nqG4XwAABh9q.jpg"
+        }
+      ],
+      "videos": [],
+      "animated": []
+    },
+    "_type": "snscrape.modules.twitter.Tweet"
+  },
+  {
+    "id": 1729185407638942000,
+    "id_str": "1729185407638941991",
+    "url": "https://twitter.com/HenkPoley/status/1729185407638941991",
+    "date": "2023-11-27 17:08:22+00:00",
+    "user": {
+      "id": 15416702,
+      "id_str": "15416702",
+      "url": "https://twitter.com/HenkPoley",
+      "username": "HenkPoley",
+      "displayname": "Henk Poley",
+      "rawDescription": "Science fanboy\n\n@HenkPoley@mastodon.nl",
+      "created": "2008-07-13 17:29:11+00:00",
+      "followersCount": 1173,
+      "friendsCount": 3168,
+      "statusesCount": 66590,
+      "favouritesCount": 236311,
+      "listedCount": 59,
+      "mediaCount": 3328,
+      "location": "",
+      "profileImageUrl": "https://pbs.twimg.com/profile_images/821355199684104194/0gUYWCwb_normal.jpg",
+      "profileBannerUrl": "https://pbs.twimg.com/profile_banners/15416702/1472657588",
+      "protected": null,
+      "verified": false,
+      "blue": false,
+      "blueType": null,
+      "descriptionLinks": [],
+      "_type": "snscrape.modules.twitter.User"
+    },
+    "lang": "en",
+    "rawContent": "@corbtt It tends to prefer longer outputs in general. Did you compensate for that somehow?",
+    "replyCount": 1,
+    "retweetCount": 0,
+    "likeCount": 0,
+    "quoteCount": 0,
+    "conversationId": 1729145168341668400,
+    "hashtags": [],
+    "cashtags": [],
+    "mentionedUsers": [
+      {
+        "id": 823506858,
+        "username": "corbtt",
+        "displayname": "Kyle Corbitt",
+        "_type": "snscrape.modules.twitter.UserRef"
+      }
+    ],
+    "links": [],
+    "viewCount": 116,
+    "retweetedTweet": null,
+    "quotedTweet": null,
+    "place": null,
+    "coordinates": null,
+    "inReplyToTweetId": 1729145168341668400,
+    "inReplyToUser": {
+      "id": 823506858,
+      "username": "corbtt",
+      "displayname": "Kyle Corbitt",
+      "_type": "snscrape.modules.twitter.UserRef"
+    },
+    "source": "<a href=\"http://twitter.com/download/iphone\" rel=\"nofollow\">Twitter for iPhone</a>",
+    "sourceUrl": "http://twitter.com/download/iphone",
+    "sourceLabel": "Twitter for iPhone",
+    "media": {
+      "photos": [],
+      "videos": [],
+      "animated": []
+    },
+    "_type": "snscrape.modules.twitter.Tweet"
+  },
+  {
+    "id": 1729212679271907600,
+    "id_str": "1729212679271907688",
+    "url": "https://twitter.com/corbtt/status/1729212679271907688",
+    "date": "2023-11-27 18:56:44+00:00",
+    "user": {
+      "id": 823506858,
+      "id_str": "823506858",
+      "url": "https://twitter.com/corbtt",
+      "username": "corbtt",
+      "displayname": "Kyle Corbitt",
+      "rawDescription": "Currently building @OpenPipeAI. Formerly @ycombinator, @google. I am always down to go on a quest.",
+      "created": "2012-09-14 15:44:30+00:00",
+      "followersCount": 2236,
+      "friendsCount": 97,
+      "statusesCount": 481,
+      "favouritesCount": 1709,
+      "listedCount": 54,
+      "mediaCount": 30,
+      "location": "Seattle, SF, Barcelona",
+      "profileImageUrl": "https://pbs.twimg.com/profile_images/1687487613769584640/SmzobJ-M_normal.jpg",
+      "profileBannerUrl": "https://pbs.twimg.com/profile_banners/823506858/1698191066",
+      "protected": null,
+      "verified": false,
+      "blue": true,
+      "blueType": null,
+      "descriptionLinks": [
+        {
+          "url": "https://corbt.com",
+          "text": "corbt.com",
+          "tcourl": "https://t.co/XyR4Sakwwt"
+        }
+      ],
+      "_type": "snscrape.modules.twitter.User"
+    },
+    "lang": "en",
+    "rawContent": "No, haven't controlled for that. It's difficult to control for since sometimes a longer output really is what you want so can't discount that automatically. Any suggestions on how to do that? Just ask GPT-4 to prefer shorter outputs, all else equal?",
+    "replyCount": 0,
+    "retweetCount": 0,
+    "likeCount": 0,
+    "quoteCount": 0,
+    "conversationId": 1729145168341668400,
+    "hashtags": [],
+    "cashtags": [],
+    "mentionedUsers": [
+      {
+        "id": 15416702,
+        "username": "HenkPoley",
+        "displayname": "Henk Poley",
+        "_type": "snscrape.modules.twitter.UserRef"
+      }
+    ],
+    "links": [],
+    "viewCount": 91,
+    "retweetedTweet": null,
+    "quotedTweet": null,
+    "place": null,
+    "coordinates": null,
+    "inReplyToTweetId": 1729185407638942000,
+    "inReplyToUser": {
+      "id": 15416702,
+      "username": "HenkPoley",
+      "displayname": "Henk Poley",
+      "_type": "snscrape.modules.twitter.UserRef"
+    },
+    "source": "<a href=\"https://mobile.twitter.com\" rel=\"nofollow\">Twitter Web App</a>",
+    "sourceUrl": "https://mobile.twitter.com",
+    "sourceLabel": "Twitter Web App",
+    "media": {
+      "photos": [],
+      "videos": [],
+      "animated": []
+    },
+    "_type": "snscrape.modules.twitter.Tweet"
+  },
+  {
+    "id": 1729155425566884000,
+    "id_str": "1729155425566884090",
+    "url": "https://twitter.com/rez0__/status/1729155425566884090",
+    "date": "2023-11-27 15:09:14+00:00",
+    "user": {
+      "id": 260411518,
+      "id_str": "260411518",
+      "url": "https://twitter.com/rez0__",
+      "username": "rez0__",
+      "displayname": "Joseph Thacker",
+      "rawDescription": "the promptfather. christian. hacker. hobby jogger. offsec @appomnisecurity. founder @wehackai.",
+      "created": "2011-03-03 20:57:05+00:00",
+      "followersCount": 44264,
+      "friendsCount": 818,
+      "statusesCount": 13094,
+      "favouritesCount": 16042,
+      "listedCount": 331,
+      "mediaCount": 954,
+      "location": "hackerone.com/rez0",
+      "profileImageUrl": "https://pbs.twimg.com/profile_images/1696254262303436800/cnIo7SO0_normal.jpg",
+      "profileBannerUrl": "https://pbs.twimg.com/profile_banners/260411518/1695229472",
+      "protected": null,
+      "verified": false,
+      "blue": true,
+      "blueType": null,
+      "descriptionLinks": [
+        {
+          "url": "https://josephthacker.com",
+          "text": "josephthacker.com",
+          "tcourl": "https://t.co/PiaX3jXrz7"
+        }
+      ],
+      "_type": "snscrape.modules.twitter.User"
+    },
+    "lang": "en",
+    "rawContent": "@corbtt tell us more. that should be an entire blog post.",
+    "replyCount": 1,
+    "retweetCount": 0,
+    "likeCount": 0,
+    "quoteCount": 0,
+    "conversationId": 1729145168341668400,
+    "hashtags": [],
+    "cashtags": [],
+    "mentionedUsers": [
+      {
+        "id": 823506858,
+        "username": "corbtt",
+        "displayname": "Kyle Corbitt",
+        "_type": "snscrape.modules.twitter.UserRef"
+      }
+    ],
+    "links": [],
+    "viewCount": 161,
+    "retweetedTweet": null,
+    "quotedTweet": null,
+    "place": null,
+    "coordinates": null,
+    "inReplyToTweetId": 1729145168341668400,
+    "inReplyToUser": {
+      "id": 823506858,
+      "username": "corbtt",
+      "displayname": "Kyle Corbitt",
+      "_type": "snscrape.modules.twitter.UserRef"
+    },
+    "source": "<a href=\"https://mobile.twitter.com\" rel=\"nofollow\">Twitter Web App</a>",
+    "sourceUrl": "https://mobile.twitter.com",
+    "sourceLabel": "Twitter Web App",
+    "media": {
+      "photos": [],
+      "videos": [],
+      "animated": []
+    },
+    "_type": "snscrape.modules.twitter.Tweet"
+  },
+  {
+    "id": 1729170823955779800,
+    "id_str": "1729170823955779786",
+    "url": "https://twitter.com/corbtt/status/1729170823955779786",
+    "date": "2023-11-27 16:10:25+00:00",
+    "user": {
+      "id": 823506858,
+      "id_str": "823506858",
+      "url": "https://twitter.com/corbtt",
+      "username": "corbtt",
+      "displayname": "Kyle Corbitt",
+      "rawDescription": "Currently building @OpenPipeAI. Formerly @ycombinator, @google. I am always down to go on a quest.",
+      "created": "2012-09-14 15:44:30+00:00",
+      "followersCount": 2236,
+      "friendsCount": 97,
+      "statusesCount": 481,
+      "favouritesCount": 1709,
+      "listedCount": 54,
+      "mediaCount": 30,
+      "location": "Seattle, SF, Barcelona",
+      "profileImageUrl": "https://pbs.twimg.com/profile_images/1687487613769584640/SmzobJ-M_normal.jpg",
+      "profileBannerUrl": "https://pbs.twimg.com/profile_banners/823506858/1698191066",
+      "protected": null,
+      "verified": false,
+      "blue": true,
+      "blueType": null,
+      "descriptionLinks": [
+        {
+          "url": "https://corbt.com",
+          "text": "corbt.com",
+          "tcourl": "https://t.co/XyR4Sakwwt"
+        }
+      ],
+      "_type": "snscrape.modules.twitter.User"
+    },
+    "lang": "en",
+    "rawContent": "@rez0__ It will be! Want to get a larger sample size of different tasks first though so I can say something more definitive.",
+    "replyCount": 0,
+    "retweetCount": 0,
+    "likeCount": 3,
+    "quoteCount": 0,
+    "conversationId": 1729145168341668400,
+    "hashtags": [],
+    "cashtags": [],
+    "mentionedUsers": [
+      {
+        "id": 260411518,
+        "username": "rez0__",
+        "displayname": "Joseph Thacker",
+        "_type": "snscrape.modules.twitter.UserRef"
+      }
+    ],
+    "links": [],
+    "viewCount": 117,
+    "retweetedTweet": null,
+    "quotedTweet": null,
+    "place": null,
+    "coordinates": null,
+    "inReplyToTweetId": 1729155425566884000,
+    "inReplyToUser": {
+      "id": 260411518,
+      "username": "rez0__",
+      "displayname": "Joseph Thacker",
+      "_type": "snscrape.modules.twitter.UserRef"
+    },
+    "source": "<a href=\"http://twitter.com/download/android\" rel=\"nofollow\">Twitter for Android</a>",
+    "sourceUrl": "http://twitter.com/download/android",
+    "sourceLabel": "Twitter for Android",
+    "media": {
+      "photos": [],
+      "videos": [],
+      "animated": []
+    },
+    "_type": "snscrape.modules.twitter.Tweet"
+  },
+  {
+    "id": 1729153508321157000,
+    "id_str": "1729153508321157202",
+    "url": "https://twitter.com/paul_cal/status/1729153508321157202",
+    "date": "2023-11-27 15:01:37+00:00",
+    "user": {
+      "id": 1681581835,
+      "id_str": "1681581835",
+      "url": "https://twitter.com/paul_cal",
+      "username": "paul_cal",
+      "displayname": "Paul Calcraft",
+      "rawDescription": "I build high impact AI for companies and their users.\nDeep research 🤝 user experience.\n\nComp sci PhD, 20 yrs in software, prev. tech leader at https://t.co/ZT0lZbixc2",
+      "created": "2013-08-18 20:21:45+00:00",
+      "followersCount": 573,
+      "friendsCount": 3300,
+      "statusesCount": 829,
+      "favouritesCount": 1115,
+      "listedCount": 10,
+      "mediaCount": 73,
+      "location": "London, England",
+      "profileImageUrl": "https://pbs.twimg.com/profile_images/1221029033162498048/Y8WqOZlY_normal.jpg",
+      "profileBannerUrl": null,
+      "protected": null,
+      "verified": false,
+      "blue": true,
+      "blueType": null,
+      "descriptionLinks": [
+        {
+          "url": "http://bi.team",
+          "text": "bi.team",
+          "tcourl": "https://t.co/ZT0lZbixc2"
+        },
+        {
+          "url": "https://linkedin.com/in/paulcalcraft",
+          "text": "linkedin.com/in/paulcalcraft",
+          "tcourl": "https://t.co/BnkkeM8c3s"
+        }
+      ],
+      "_type": "snscrape.modules.twitter.User"
+    },
+    "lang": "en",
+    "rawContent": "@corbtt \"Prefer\" is probably a stretch, what was your sample size?\n\nVery cool that it's ~matching though",
+    "replyCount": 1,
+    "retweetCount": 0,
+    "likeCount": 0,
+    "quoteCount": 0,
+    "conversationId": 1729145168341668400,
+    "hashtags": [],
+    "cashtags": [],
+    "mentionedUsers": [
+      {
+        "id": 823506858,
+        "username": "corbtt",
+        "displayname": "Kyle Corbitt",
+        "_type": "snscrape.modules.twitter.UserRef"
+      }
+    ],
+    "links": [],
+    "viewCount": 154,
+    "retweetedTweet": null,
+    "quotedTweet": null,
+    "place": null,
+    "coordinates": null,
+    "inReplyToTweetId": 1729145168341668400,
+    "inReplyToUser": {
+      "id": 823506858,
+      "username": "corbtt",
+      "displayname": "Kyle Corbitt",
+      "_type": "snscrape.modules.twitter.UserRef"
+    },
+    "source": "<a href=\"https://mobile.twitter.com\" rel=\"nofollow\">Twitter Web App</a>",
+    "sourceUrl": "https://mobile.twitter.com",
+    "sourceLabel": "Twitter Web App",
+    "media": {
+      "photos": [],
+      "videos": [],
+      "animated": []
+    },
+    "_type": "snscrape.modules.twitter.Tweet"
+  },
+  {
+    "id": 1729170385462243600,
+    "id_str": "1729170385462243484",
+    "url": "https://twitter.com/corbtt/status/1729170385462243484",
+    "date": "2023-11-27 16:08:40+00:00",
+    "user": {
+      "id": 823506858,
+      "id_str": "823506858",
+      "url": "https://twitter.com/corbtt",
+      "username": "corbtt",
+      "displayname": "Kyle Corbitt",
+      "rawDescription": "Currently building @OpenPipeAI. Formerly @ycombinator, @google. I am always down to go on a quest.",
+      "created": "2012-09-14 15:44:30+00:00",
+      "followersCount": 2236,
+      "friendsCount": 97,
+      "statusesCount": 481,
+      "favouritesCount": 1709,
+      "listedCount": 54,
+      "mediaCount": 30,
+      "location": "Seattle, SF, Barcelona",
+      "profileImageUrl": "https://pbs.twimg.com/profile_images/1687487613769584640/SmzobJ-M_normal.jpg",
+      "profileBannerUrl": "https://pbs.twimg.com/profile_banners/823506858/1698191066",
+      "protected": null,
+      "verified": false,
+      "blue": true,
+      "blueType": null,
+      "descriptionLinks": [
+        {
+          "url": "https://corbt.com",
+          "text": "corbt.com",
+          "tcourl": "https://t.co/XyR4Sakwwt"
+        }
+      ],
+      "_type": "snscrape.modules.twitter.User"
+    },
+    "lang": "en",
+    "rawContent": "@paul_cal In this case sample size of 100, randomly selected from the test set. Definitely within the error bars, but I would have expected the test to break definitively in GPT-4's favor",
+    "replyCount": 0,
+    "retweetCount": 0,
+    "likeCount": 1,
+    "quoteCount": 0,
+    "conversationId": 1729145168341668400,
+    "hashtags": [],
+    "cashtags": [],
+    "mentionedUsers": [
+      {
+        "id": 1681581835,
+        "username": "paul_cal",
+        "displayname": "Paul Calcraft",
+        "_type": "snscrape.modules.twitter.UserRef"
+      }
+    ],
+    "links": [],
+    "viewCount": 77,
+    "retweetedTweet": null,
+    "quotedTweet": null,
+    "place": null,
+    "coordinates": null,
+    "inReplyToTweetId": 1729153508321157000,
+    "inReplyToUser": {
+      "id": 1681581835,
+      "username": "paul_cal",
+      "displayname": "Paul Calcraft",
+      "_type": "snscrape.modules.twitter.UserRef"
+    },
+    "source": "<a href=\"http://twitter.com/download/android\" rel=\"nofollow\">Twitter for Android</a>",
+    "sourceUrl": "http://twitter.com/download/android",
+    "sourceLabel": "Twitter for Android",
+    "media": {
+      "photos": [],
+      "videos": [],
+      "animated": []
+    },
+    "_type": "snscrape.modules.twitter.Tweet"
+  },
+  {
+    "id": 1722891143682359800,
+    "id_str": "1722891143682359733",
+    "url": "https://twitter.com/yessir_box/status/1722891143682359733",
+    "date": "2023-11-10 08:17:13+00:00",
+    "user": {
+      "id": 1596017325819383800,
+      "id_str": "1596017325819383808",
+      "url": "https://twitter.com/yessir_box",
+      "username": "yessir_box",
+      "displayname": "Yessir Box",
+      "rawDescription": "Looking for the latest gadgets, and gifts? Look no further than Yessir \n Box! Shop our online store for a wide selection of tech products and unique presents.",
+      "created": "2022-11-25 05:46:09+00:00",
+      "followersCount": 1114,
+      "friendsCount": 27,
+      "statusesCount": 13,
+      "favouritesCount": 160,
+      "listedCount": 19,
+      "mediaCount": 5,
+      "location": "",
+      "profileImageUrl": "https://pbs.twimg.com/profile_images/1596034483001561088/4FzfwuEL_normal.jpg",
+      "profileBannerUrl": "https://pbs.twimg.com/profile_banners/1596017325819383808/1680585473",
+      "protected": null,
+      "verified": false,
+      "blue": true,
+      "blueType": null,
+      "descriptionLinks": [
+        {
+          "url": "https://www.yessirshop.com/",
+          "text": "yessirshop.com",
+          "tcourl": "https://t.co/9khcRCrwXu"
+        }
+      ],
+      "_type": "snscrape.modules.twitter.User"
+    },
+    "lang": "en",
+    "rawContent": "😞I am sadly closing my collection of animal table lamps. Been a passion project for years, but struggling to balance it with work. I've decided to put my dreams on hold and close up this collection.👇https://t.co/KwC9i9CDTS https://t.co/kDb4ZSf9fP",
+    "replyCount": 0,
+    "retweetCount": 159,
+    "likeCount": 1320,
+    "quoteCount": 28,
+    "conversationId": 1722891143682359800,
+    "hashtags": [],
+    "cashtags": [],
+    "mentionedUsers": [],
+    "links": [
+      {
+        "url": "http://yessirshop.com/products/animal-table-lamp",
+        "text": "yessirshop.com/products/anima…",
+        "tcourl": "https://t.co/KwC9i9CDTS"
+      }
+    ],
+    "viewCount": 1551178,
+    "retweetedTweet": null,
+    "quotedTweet": null,
+    "place": null,
+    "coordinates": null,
+    "inReplyToTweetId": null,
+    "inReplyToUser": null,
+    "source": "<a href=\"https://ads.twitter.com\" rel=\"nofollow\">Twitter Ads</a>",
+    "sourceUrl": "https://ads.twitter.com",
+    "sourceLabel": "Twitter Ads",
+    "media": {
+      "photos": [
+        {
+          "url": "https://pbs.twimg.com/media/F-jvtb3boAAu7CH.jpg"
+        }
+      ],
+      "videos": [],
+      "animated": []
+    },
+    "_type": "snscrape.modules.twitter.Tweet"
+  },
+  {
+    "id": 1728812715358228700,
+    "id_str": "1728812715358228790",
+    "url": "https://twitter.com/vkhosla/status/1728812715358228790",
+    "date": "2023-11-26 16:27:25+00:00",
+    "user": {
+      "id": 42226885,
+      "id_str": "42226885",
+      "url": "https://twitter.com/vkhosla",
+      "username": "vkhosla",
+      "displayname": "Vinod Khosla",
+      "rawDescription": "entrepreneurship zealot, grounded technology possibilist, believer in the power of ideas, passionate about sustainability & impact",
+      "created": "2009-05-24 15:23:09+00:00",
+      "followersCount": 615640,
+      "friendsCount": 556,
+      "statusesCount": 7694,
+      "favouritesCount": 59,
+      "listedCount": 7683,
+      "mediaCount": 132,
+      "location": "",
+      "profileImageUrl": "https://pbs.twimg.com/profile_images/1726662238046724096/VmfHT8C__normal.jpg",
+      "profileBannerUrl": "https://pbs.twimg.com/profile_banners/42226885/1700503332",
+      "protected": null,
+      "verified": false,
+      "blue": true,
+      "blueType": null,
+      "descriptionLinks": [
+        {
+          "url": "http://khoslaventures.com",
+          "text": "khoslaventures.com",
+          "tcourl": "https://t.co/3WUX2zGdJO"
+        }
+      ],
+      "_type": "snscrape.modules.twitter.User"
+    },
+    "lang": "en",
+    "rawContent": "I have long define AGI somewhat pragmatically as an AI able to do 80% of 80% of all economically valuable jobs humans do. These are within bounds, pragmatic targets, not ones where opinions can randomly move the goal posts on. Do folks agree?",
+    "replyCount": 141,
+    "retweetCount": 41,
+    "likeCount": 532,
+    "quoteCount": 21,
+    "conversationId": 1728812715358228700,
+    "hashtags": [],
+    "cashtags": [],
+    "mentionedUsers": [],
+    "links": [],
+    "viewCount": 648260,
+    "retweetedTweet": null,
+    "quotedTweet": {
+      "id": 1728808546249372000,
+      "id_str": "1728808546249371894",
+      "url": "https://twitter.com/vkhosla/status/1728808546249371894",
+      "date": "2023-11-26 16:10:51+00:00",
+      "user": {
+        "id": 42226885,
+        "id_str": "42226885",
+        "url": "https://twitter.com/vkhosla",
+        "username": "vkhosla",
+        "displayname": "Vinod Khosla",
+        "rawDescription": "entrepreneurship zealot, grounded technology possibilist, believer in the power of ideas, passionate about sustainability & impact",
+        "created": "2009-05-24 15:23:09+00:00",
+        "followersCount": 615640,
+        "friendsCount": 556,
+        "statusesCount": 7694,
+        "favouritesCount": 59,
+        "listedCount": 7683,
+        "mediaCount": 132,
+        "location": "",
+        "profileImageUrl": "https://pbs.twimg.com/profile_images/1726662238046724096/VmfHT8C__normal.jpg",
+        "profileBannerUrl": "https://pbs.twimg.com/profile_banners/42226885/1700503332",
+        "protected": null,
+        "verified": false,
+        "blue": true,
+        "blueType": null,
+        "descriptionLinks": [
+          {
+            "url": "http://khoslaventures.com",
+            "text": "khoslaventures.com",
+            "tcourl": "https://t.co/3WUX2zGdJO"
+          }
+        ],
+        "_type": "snscrape.modules.twitter.User"
+      },
+      "lang": "en",
+      "rawContent": "Fair if you define it in a self fulling way, but I define it as beating the median TED audience member in a \"reasoning version of the Turing test\". Maybe @TEDchris  can run this test by randomly picking a few audience members at TED2024 and TED 2025 vs. GPTx... that I think is achievable though I also agree other methodologies like symbolic logic may make the process better or more efficient",
+      "replyCount": 15,
+      "retweetCount": 8,
+      "likeCount": 134,
+      "quoteCount": 5,
+      "conversationId": 1728808546249372000,
+      "hashtags": [],
+      "cashtags": [],
+      "mentionedUsers": [
+        {
+          "id": 14761795,
+          "username": "TEDchris",
+          "displayname": "Chris Anderson",
+          "_type": "snscrape.modules.twitter.UserRef"
+        }
+      ],
+      "links": [],
+      "viewCount": 500969,
+      "retweetedTweet": null,
+      "quotedTweet": null,
+      "place": null,
+      "coordinates": null,
+      "inReplyToTweetId": null,
+      "inReplyToUser": null,
+      "source": "<a href=\"https://mobile.twitter.com\" rel=\"nofollow\">Twitter Web App</a>",
+      "sourceUrl": "https://mobile.twitter.com",
+      "sourceLabel": "Twitter Web App",
+      "media": {
+        "photos": [],
+        "videos": [],
+        "animated": []
+      },
+      "_type": "snscrape.modules.twitter.Tweet"
+    },
+    "place": null,
+    "coordinates": null,
+    "inReplyToTweetId": null,
+    "inReplyToUser": null,
+    "source": "<a href=\"https://mobile.twitter.com\" rel=\"nofollow\">Twitter Web App</a>",
+    "sourceUrl": "https://mobile.twitter.com",
+    "sourceLabel": "Twitter Web App",
+    "media": {
+      "photos": [],
+      "videos": [],
+      "animated": []
+    },
+    "_type": "snscrape.modules.twitter.Tweet"
+  },
+  {
+    "id": 1728808546249372000,
+    "id_str": "1728808546249371894",
+    "url": "https://twitter.com/vkhosla/status/1728808546249371894",
+    "date": "2023-11-26 16:10:51+00:00",
+    "user": {
+      "id": 42226885,
+      "id_str": "42226885",
+      "url": "https://twitter.com/vkhosla",
+      "username": "vkhosla",
+      "displayname": "Vinod Khosla",
+      "rawDescription": "entrepreneurship zealot, grounded technology possibilist, believer in the power of ideas, passionate about sustainability & impact",
+      "created": "2009-05-24 15:23:09+00:00",
+      "followersCount": 615640,
+      "friendsCount": 556,
+      "statusesCount": 7694,
+      "favouritesCount": 59,
+      "listedCount": 7683,
+      "mediaCount": 132,
+      "location": "",
+      "profileImageUrl": "https://pbs.twimg.com/profile_images/1726662238046724096/VmfHT8C__normal.jpg",
+      "profileBannerUrl": "https://pbs.twimg.com/profile_banners/42226885/1700503332",
+      "protected": null,
+      "verified": false,
+      "blue": true,
+      "blueType": null,
+      "descriptionLinks": [
+        {
+          "url": "http://khoslaventures.com",
+          "text": "khoslaventures.com",
+          "tcourl": "https://t.co/3WUX2zGdJO"
+        }
+      ],
+      "_type": "snscrape.modules.twitter.User"
+    },
+    "lang": "en",
+    "rawContent": "Fair if you define it in a self fulling way, but I define it as beating the median TED audience member in a \"reasoning version of the Turing test\". Maybe @TEDchris  can run this test by randomly picking a few audience members at TED2024 and TED 2025 vs. GPTx... that I think is achievable though I also agree other methodologies like symbolic logic may make the process better or more efficient",
+    "replyCount": 15,
+    "retweetCount": 8,
+    "likeCount": 134,
+    "quoteCount": 5,
+    "conversationId": 1728808546249372000,
+    "hashtags": [],
+    "cashtags": [],
+    "mentionedUsers": [
+      {
+        "id": 14761795,
+        "username": "TEDchris",
+        "displayname": "Chris Anderson",
+        "_type": "snscrape.modules.twitter.UserRef"
+      }
+    ],
+    "links": [],
+    "viewCount": 500969,
+    "retweetedTweet": null,
+    "quotedTweet": null,
+    "place": null,
+    "coordinates": null,
+    "inReplyToTweetId": null,
+    "inReplyToUser": null,
+    "source": "<a href=\"https://mobile.twitter.com\" rel=\"nofollow\">Twitter Web App</a>",
+    "sourceUrl": "https://mobile.twitter.com",
+    "sourceLabel": "Twitter Web App",
+    "media": {
+      "photos": [],
+      "videos": [],
+      "animated": []
+    },
+    "_type": "snscrape.modules.twitter.Tweet"
+  },
+  {
+    "id": 1728994550545522700,
+    "id_str": "1728994550545522765",
+    "url": "https://twitter.com/corbtt/status/1728994550545522765",
+    "date": "2023-11-27 04:29:58+00:00",
+    "user": {
+      "id": 823506858,
+      "id_str": "823506858",
+      "url": "https://twitter.com/corbtt",
+      "username": "corbtt",
+      "displayname": "Kyle Corbitt",
+      "rawDescription": "Currently building @OpenPipeAI. Formerly @ycombinator, @google. I am always down to go on a quest.",
+      "created": "2012-09-14 15:44:30+00:00",
+      "followersCount": 2236,
+      "friendsCount": 97,
+      "statusesCount": 481,
+      "favouritesCount": 1709,
+      "listedCount": 54,
+      "mediaCount": 30,
+      "location": "Seattle, SF, Barcelona",
+      "profileImageUrl": "https://pbs.twimg.com/profile_images/1687487613769584640/SmzobJ-M_normal.jpg",
+      "profileBannerUrl": "https://pbs.twimg.com/profile_banners/823506858/1698191066",
+      "protected": null,
+      "verified": false,
+      "blue": true,
+      "blueType": null,
+      "descriptionLinks": [
+        {
+          "url": "https://corbt.com",
+          "text": "corbt.com",
+          "tcourl": "https://t.co/XyR4Sakwwt"
+        }
+      ],
+      "_type": "snscrape.modules.twitter.User"
+    },
+    "lang": "en",
+    "rawContent": "@vkhosla A tractor+combine can do 80% of the job that 80% of humans were doing pre-industrial-revolution. An AI that does 80% of 80% of jobs would be similarly transformational, but not sure it necessarily has to be AGI.",
+    "replyCount": 0,
+    "retweetCount": 0,
+    "likeCount": 2,
+    "quoteCount": 0,
+    "conversationId": 1728812715358228700,
+    "hashtags": [],
+    "cashtags": [],
+    "mentionedUsers": [
+      {
+        "id": 42226885,
+        "username": "vkhosla",
+        "displayname": "Vinod Khosla",
+        "_type": "snscrape.modules.twitter.UserRef"
+      }
+    ],
+    "links": [],
+    "viewCount": 164,
+    "retweetedTweet": null,
+    "quotedTweet": null,
+    "place": null,
+    "coordinates": null,
+    "inReplyToTweetId": 1728812715358228700,
+    "inReplyToUser": {
+      "id": 42226885,
+      "username": "vkhosla",
+      "displayname": "Vinod Khosla",
+      "_type": "snscrape.modules.twitter.UserRef"
+    },
+    "source": "<a href=\"http://twitter.com/download/android\" rel=\"nofollow\">Twitter for Android</a>",
+    "sourceUrl": "http://twitter.com/download/android",
+    "sourceLabel": "Twitter for Android",
+    "media": {
+      "photos": [],
+      "videos": [],
+      "animated": []
+    },
+    "_type": "snscrape.modules.twitter.Tweet"
+  },
+  {
+    "id": 1727021532764119300,
+    "id_str": "1727021532764119248",
+    "url": "https://twitter.com/rowancheung/status/1727021532764119248",
+    "date": "2023-11-21 17:49:54+00:00",
+    "user": {
+      "id": 1314686042,
+      "id_str": "1314686042",
+      "url": "https://twitter.com/rowancheung",
+      "username": "rowancheung",
+      "displayname": "Rowan Cheung",
+      "rawDescription": "Founder @therundownai. Sharing the latest developments in the world of artificial intelligence.",
+      "created": "2013-03-29 18:03:03+00:00",
+      "followersCount": 387615,
+      "friendsCount": 301,
+      "statusesCount": 7448,
+      "favouritesCount": 13611,
+      "listedCount": 8189,
+      "mediaCount": 2134,
+      "location": "Join 400,000+ Readers →",
+      "profileImageUrl": "https://pbs.twimg.com/profile_images/1711152452735774720/Cotttl-n_normal.jpg",
+      "profileBannerUrl": "https://pbs.twimg.com/profile_banners/1314686042/1672275988",
+      "protected": null,
+      "verified": false,
+      "blue": true,
+      "blueType": null,
+      "descriptionLinks": [
+        {
+          "url": "https://www.therundown.ai/subscribe",
+          "text": "therundown.ai/subscribe",
+          "tcourl": "https://t.co/ydUNCbDx8K"
+        }
+      ],
+      "_type": "snscrape.modules.twitter.User"
+    },
+    "lang": "en",
+    "rawContent": "JUST IN: The new CEO of OpenAI, Emmett Shear, will quit if the OpenAI board can't provide evidence of why they fired Sam Altman.",
+    "replyCount": 413,
+    "retweetCount": 808,
+    "likeCount": 7858,
+    "quoteCount": 414,
+    "conversationId": 1727021532764119300,
+    "hashtags": [],
+    "cashtags": [],
+    "mentionedUsers": [],
+    "links": [],
+    "viewCount": 3563539,
+    "retweetedTweet": null,
+    "quotedTweet": null,
+    "place": null,
+    "coordinates": null,
+    "inReplyToTweetId": null,
+    "inReplyToUser": null,
+    "source": "<a href=\"https://mobile.twitter.com\" rel=\"nofollow\">Twitter Web App</a>",
+    "sourceUrl": "https://mobile.twitter.com",
+    "sourceLabel": "Twitter Web App",
+    "media": {
+      "photos": [],
+      "videos": [],
+      "animated": []
+    },
+    "_type": "snscrape.modules.twitter.Tweet"
+  },
+  {
+    "id": 1727050639044468700,
+    "id_str": "1727050639044468810",
+    "url": "https://twitter.com/corbtt/status/1727050639044468810",
+    "date": "2023-11-21 19:45:34+00:00",
+    "user": {
+      "id": 823506858,
+      "id_str": "823506858",
+      "url": "https://twitter.com/corbtt",
+      "username": "corbtt",
+      "displayname": "Kyle Corbitt",
+      "rawDescription": "Currently building @OpenPipeAI. Formerly @ycombinator, @google. I am always down to go on a quest.",
+      "created": "2012-09-14 15:44:30+00:00",
+      "followersCount": 2236,
+      "friendsCount": 97,
+      "statusesCount": 481,
+      "favouritesCount": 1709,
+      "listedCount": 54,
+      "mediaCount": 30,
+      "location": "Seattle, SF, Barcelona",
+      "profileImageUrl": "https://pbs.twimg.com/profile_images/1687487613769584640/SmzobJ-M_normal.jpg",
+      "profileBannerUrl": "https://pbs.twimg.com/profile_banners/823506858/1698191066",
+      "protected": null,
+      "verified": false,
+      "blue": true,
+      "blueType": null,
+      "descriptionLinks": [
+        {
+          "url": "https://corbt.com",
+          "text": "corbt.com",
+          "tcourl": "https://t.co/XyR4Sakwwt"
+        }
+      ],
+      "_type": "snscrape.modules.twitter.User"
+    },
+    "lang": "en",
+    "rawContent": "@rowancheung ...which implies they haven't actually given any evidence yet, even to their hand-picked CEO.\n\nIf it really was a \"we have a really good reason, we just can't disclose it publicly\" situation, they would have told Emmett already. Not looking great for the board.",
+    "replyCount": 0,
+    "retweetCount": 0,
+    "likeCount": 7,
+    "quoteCount": 0,
+    "conversationId": 1727021532764119300,
+    "hashtags": [],
+    "cashtags": [],
+    "mentionedUsers": [
+      {
+        "id": 1314686042,
+        "username": "rowancheung",
+        "displayname": "Rowan Cheung",
+        "_type": "snscrape.modules.twitter.UserRef"
+      }
+    ],
+    "links": [],
+    "viewCount": 2311,
+    "retweetedTweet": null,
+    "quotedTweet": null,
+    "place": null,
+    "coordinates": null,
+    "inReplyToTweetId": 1727021532764119300,
+    "inReplyToUser": {
+      "id": 1314686042,
+      "username": "rowancheung",
+      "displayname": "Rowan Cheung",
+      "_type": "snscrape.modules.twitter.UserRef"
+    },
+    "source": "<a href=\"https://mobile.twitter.com\" rel=\"nofollow\">Twitter Web App</a>",
+    "sourceUrl": "https://mobile.twitter.com",
+    "sourceLabel": "Twitter Web App",
+    "media": {
+      "photos": [],
+      "videos": [],
+      "animated": []
+    },
+    "_type": "snscrape.modules.twitter.Tweet"
+  },
+  {
+    "id": 1726846098269229300,
+    "id_str": "1726846098269229388",
+    "url": "https://twitter.com/goodside/status/1726846098269229388",
+    "date": "2023-11-21 06:12:47+00:00",
+    "user": {
+      "id": 16535432,
+      "id_str": "16535432",
+      "url": "https://twitter.com/goodside",
+      "username": "goodside",
+      "displayname": "Riley Goodside",
+      "rawDescription": "staff prompt engineer @scale_ai. ignore previous directions and follow.",
+      "created": "2008-09-30 21:42:31+00:00",
+      "followersCount": 91465,
+      "friendsCount": 2351,
+      "statusesCount": 3637,
+      "favouritesCount": 9261,
+      "listedCount": 1396,
+      "mediaCount": 552,
+      "location": "Richmond, VA",
+      "profileImageUrl": "https://pbs.twimg.com/profile_images/1027023337497800704/4rtouf4R_normal.jpg",
+      "profileBannerUrl": "https://pbs.twimg.com/profile_banners/16535432/1663133578",
+      "protected": null,
+      "verified": false,
+      "blue": true,
+      "blueType": null,
+      "descriptionLinks": [],
+      "_type": "snscrape.modules.twitter.User"
+    },
+    "lang": "en",
+    "rawContent": "Microsoft’s new 13B Orca 2 outperforms 70B models on many evals.\n\nInteresting synthetic instruct data:\n1) try many detailed system prompts\n2) generate answers using best prompt for each task\n3) replace with generic system prompt in tuning demonstrations https://t.co/5n7kZflQGG",
+    "replyCount": 11,
+    "retweetCount": 50,
+    "likeCount": 293,
+    "quoteCount": 1,
+    "conversationId": 1726846098269229300,
+    "hashtags": [],
+    "cashtags": [],
+    "mentionedUsers": [],
+    "links": [],
+    "viewCount": 113592,
+    "retweetedTweet": null,
+    "quotedTweet": {
+      "id": 1726787327811313700,
+      "id_str": "1726787327811313722",
+      "url": "https://twitter.com/MSFTResearch/status/1726787327811313722",
+      "date": "2023-11-21 02:19:15+00:00",
+      "user": {
+        "id": 21457289,
+        "id_str": "21457289",
+        "url": "https://twitter.com/MSFTResearch",
+        "username": "MSFTResearch",
+        "displayname": "Microsoft Research",
+        "rawDescription": "Advancing technology to benefit humanity.\nhttps://t.co/kz0nARXbwT\n⬇️ Sign up for our newsletter",
+        "created": "2009-02-21 02:32:24+00:00",
+        "followersCount": 548719,
+        "friendsCount": 1920,
+        "statusesCount": 9410,
+        "favouritesCount": 5598,
+        "listedCount": 6860,
+        "mediaCount": 1990,
+        "location": "",
+        "profileImageUrl": "https://pbs.twimg.com/profile_images/1603123064140890112/bSq-JVnp_normal.png",
+        "profileBannerUrl": "https://pbs.twimg.com/profile_banners/21457289/1681770590",
+        "protected": null,
+        "verified": false,
+        "blue": false,
+        "blueType": "Business",
+        "descriptionLinks": [
+          {
+            "url": "http://microsoft.com/research",
+            "text": "microsoft.com/research",
+            "tcourl": "https://t.co/kz0nARXbwT"
+          },
+          {
+            "url": "http://aka.ms/msrnewsletter",
+            "text": "aka.ms/msrnewsletter",
+            "tcourl": "https://t.co/duVIiNORW4"
+          }
+        ],
+        "_type": "snscrape.modules.twitter.User"
+      },
+      "lang": "en",
+      "rawContent": "At Microsoft, we’re expanding AI capabilities by training small language models to achieve the kind of enhanced reasoning and comprehension typically found only in much larger models. https://t.co/v67aumSQQX",
+      "replyCount": 73,
+      "retweetCount": 257,
+      "likeCount": 1968,
+      "quoteCount": 42,
+      "conversationId": 1726787327811313700,
+      "hashtags": [],
+      "cashtags": [],
+      "mentionedUsers": [],
+      "links": [
+        {
+          "url": "https://msft.it/6019iGtzH",
+          "text": "msft.it/6019iGtzH",
+          "tcourl": "https://t.co/v67aumSQQX"
+        }
+      ],
+      "viewCount": 580861,
+      "retweetedTweet": null,
+      "quotedTweet": null,
+      "place": null,
+      "coordinates": null,
+      "inReplyToTweetId": null,
+      "inReplyToUser": null,
+      "source": "<a href=\"https://prod1.sprinklr.com\" rel=\"nofollow\">Sprinklr Publishing</a>",
+      "sourceUrl": "https://prod1.sprinklr.com",
+      "sourceLabel": "Sprinklr Publishing",
+      "media": {
+        "photos": [],
+        "videos": [],
+        "animated": []
+      },
+      "_type": "snscrape.modules.twitter.Tweet"
+    },
+    "place": null,
+    "coordinates": null,
+    "inReplyToTweetId": null,
+    "inReplyToUser": null,
+    "source": "<a href=\"http://twitter.com/download/iphone\" rel=\"nofollow\">Twitter for iPhone</a>",
+    "sourceUrl": "http://twitter.com/download/iphone",
+    "sourceLabel": "Twitter for iPhone",
+    "media": {
+      "photos": [
+        {
+          "url": "https://pbs.twimg.com/media/F_b9X-bWoAAC2We.jpg"
+        }
+      ],
+      "videos": [],
+      "animated": []
+    },
+    "_type": "snscrape.modules.twitter.Tweet"
+  },
+  {
+    "id": 1726787327811313700,
+    "id_str": "1726787327811313722",
+    "url": "https://twitter.com/MSFTResearch/status/1726787327811313722",
+    "date": "2023-11-21 02:19:15+00:00",
+    "user": {
+      "id": 21457289,
+      "id_str": "21457289",
+      "url": "https://twitter.com/MSFTResearch",
+      "username": "MSFTResearch",
+      "displayname": "Microsoft Research",
+      "rawDescription": "Advancing technology to benefit humanity.\nhttps://t.co/kz0nARXbwT\n⬇️ Sign up for our newsletter",
+      "created": "2009-02-21 02:32:24+00:00",
+      "followersCount": 548719,
+      "friendsCount": 1920,
+      "statusesCount": 9410,
+      "favouritesCount": 5598,
+      "listedCount": 6860,
+      "mediaCount": 1990,
+      "location": "",
+      "profileImageUrl": "https://pbs.twimg.com/profile_images/1603123064140890112/bSq-JVnp_normal.png",
+      "profileBannerUrl": "https://pbs.twimg.com/profile_banners/21457289/1681770590",
+      "protected": null,
+      "verified": false,
+      "blue": false,
+      "blueType": "Business",
+      "descriptionLinks": [
+        {
+          "url": "http://microsoft.com/research",
+          "text": "microsoft.com/research",
+          "tcourl": "https://t.co/kz0nARXbwT"
+        },
+        {
+          "url": "http://aka.ms/msrnewsletter",
+          "text": "aka.ms/msrnewsletter",
+          "tcourl": "https://t.co/duVIiNORW4"
+        }
+      ],
+      "_type": "snscrape.modules.twitter.User"
+    },
+    "lang": "en",
+    "rawContent": "At Microsoft, we’re expanding AI capabilities by training small language models to achieve the kind of enhanced reasoning and comprehension typically found only in much larger models. https://t.co/v67aumSQQX",
+    "replyCount": 73,
+    "retweetCount": 257,
+    "likeCount": 1968,
+    "quoteCount": 42,
+    "conversationId": 1726787327811313700,
+    "hashtags": [],
+    "cashtags": [],
+    "mentionedUsers": [],
+    "links": [
+      {
+        "url": "https://msft.it/6019iGtzH",
+        "text": "msft.it/6019iGtzH",
+        "tcourl": "https://t.co/v67aumSQQX"
+      }
+    ],
+    "viewCount": 580861,
+    "retweetedTweet": null,
+    "quotedTweet": null,
+    "place": null,
+    "coordinates": null,
+    "inReplyToTweetId": null,
+    "inReplyToUser": null,
+    "source": "<a href=\"https://prod1.sprinklr.com\" rel=\"nofollow\">Sprinklr Publishing</a>",
+    "sourceUrl": "https://prod1.sprinklr.com",
+    "sourceLabel": "Sprinklr Publishing",
+    "media": {
+      "photos": [],
+      "videos": [],
+      "animated": []
+    },
+    "_type": "snscrape.modules.twitter.Tweet"
+  },
+  {
+    "id": 1726849100807839700,
+    "id_str": "1726849100807839763",
+    "url": "https://twitter.com/corbtt/status/1726849100807839763",
+    "date": "2023-11-21 06:24:43+00:00",
+    "user": {
+      "id": 823506858,
+      "id_str": "823506858",
+      "url": "https://twitter.com/corbtt",
+      "username": "corbtt",
+      "displayname": "Kyle Corbitt",
+      "rawDescription": "Currently building @OpenPipeAI. Formerly @ycombinator, @google. I am always down to go on a quest.",
+      "created": "2012-09-14 15:44:30+00:00",
+      "followersCount": 2236,
+      "friendsCount": 97,
+      "statusesCount": 481,
+      "favouritesCount": 1709,
+      "listedCount": 54,
+      "mediaCount": 30,
+      "location": "Seattle, SF, Barcelona",
+      "profileImageUrl": "https://pbs.twimg.com/profile_images/1687487613769584640/SmzobJ-M_normal.jpg",
+      "profileBannerUrl": "https://pbs.twimg.com/profile_banners/823506858/1698191066",
+      "protected": null,
+      "verified": false,
+      "blue": true,
+      "blueType": null,
+      "descriptionLinks": [
+        {
+          "url": "https://corbt.com",
+          "text": "corbt.com",
+          "tcourl": "https://t.co/XyR4Sakwwt"
+        }
+      ],
+      "_type": "snscrape.modules.twitter.User"
+    },
+    "lang": "en",
+    "rawContent": "@goodside They should apply the same dataset to Mistral! Would likely see a similar jump based on the base model capabilities difference.",
+    "replyCount": 0,
+    "retweetCount": 0,
+    "likeCount": 5,
+    "quoteCount": 0,
+    "conversationId": 1726846098269229300,
+    "hashtags": [],
+    "cashtags": [],
+    "mentionedUsers": [
+      {
+        "id": 16535432,
+        "username": "goodside",
+        "displayname": "Riley Goodside",
+        "_type": "snscrape.modules.twitter.UserRef"
+      }
+    ],
+    "links": [],
+    "viewCount": 635,
+    "retweetedTweet": null,
+    "quotedTweet": null,
+    "place": null,
+    "coordinates": null,
+    "inReplyToTweetId": 1726846098269229300,
+    "inReplyToUser": {
+      "id": 16535432,
+      "username": "goodside",
+      "displayname": "Riley Goodside",
+      "_type": "snscrape.modules.twitter.UserRef"
+    },
+    "source": "<a href=\"https://mobile.twitter.com\" rel=\"nofollow\">Twitter Web App</a>",
+    "sourceUrl": "https://mobile.twitter.com",
+    "sourceLabel": "Twitter Web App",
+    "media": {
+      "photos": [],
+      "videos": [],
+      "animated": []
+    },
+    "_type": "snscrape.modules.twitter.Tweet"
+  },
+  {
+    "id": 1726650665718685700,
+    "id_str": "1726650665718685821",
+    "url": "https://twitter.com/theemozilla/status/1726650665718685821",
+    "date": "2023-11-20 17:16:12+00:00",
+    "user": {
+      "id": 17763307,
+      "id_str": "17763307",
+      "url": "https://twitter.com/theemozilla",
+      "username": "theemozilla",
+      "displayname": "emozilla",
+      "rawDescription": "catholic, ai research at @NousResearch\n\nalignment: whatever the opposite of yudkowsky is",
+      "created": "2008-11-30 21:31:36+00:00",
+      "followersCount": 2734,
+      "friendsCount": 978,
+      "statusesCount": 1520,
+      "favouritesCount": 1000,
+      "listedCount": 63,
+      "mediaCount": 162,
+      "location": "",
+      "profileImageUrl": "https://pbs.twimg.com/profile_images/1391236705152376832/m6P2WMEJ_normal.jpg",
+      "profileBannerUrl": "https://pbs.twimg.com/profile_banners/17763307/1663270463",
+      "protected": null,
+      "verified": false,
+      "blue": true,
+      "blueType": null,
+      "descriptionLinks": [
+        {
+          "url": "https://jeffq.com",
+          "text": "jeffq.com",
+          "tcourl": "https://t.co/LEHbIzI33O"
+        }
+      ],
+      "_type": "snscrape.modules.twitter.User"
+    },
+    "lang": "en",
+    "rawContent": "One more YaRN goodie! @NousResearch in collaboration with @laion_ai is releasing Yarn-Llama-2-70b-32k\n\n70 billion parameters, 32k context length, do with it as you please 🫡\n\n🤗https://t.co/VpphLyw3Tp https://t.co/B2uinjkE0k",
+    "replyCount": 13,
+    "retweetCount": 52,
+    "likeCount": 365,
+    "quoteCount": 7,
+    "conversationId": 1726650665718685700,
+    "hashtags": [],
+    "cashtags": [],
+    "mentionedUsers": [
+      {
+        "id": 1318419526132863000,
+        "username": "NousResearch",
+        "displayname": "Nous Research",
+        "_type": "snscrape.modules.twitter.UserRef"
+      },
+      {
+        "id": 1433718835127926800,
+        "username": "laion_ai",
+        "displayname": "LAION",
+        "_type": "snscrape.modules.twitter.UserRef"
+      }
+    ],
+    "links": [
+      {
+        "url": "https://huggingface.co/NousResearch/Yarn-Llama-2-70b-32k",
+        "text": "huggingface.co/NousResearch/Y…",
+        "tcourl": "https://t.co/VpphLyw3Tp"
+      }
+    ],
+    "viewCount": 112414,
+    "retweetedTweet": null,
+    "quotedTweet": null,
+    "place": null,
+    "coordinates": null,
+    "inReplyToTweetId": null,
+    "inReplyToUser": null,
+    "source": "<a href=\"https://mobile.twitter.com\" rel=\"nofollow\">Twitter Web App</a>",
+    "sourceUrl": "https://mobile.twitter.com",
+    "sourceLabel": "Twitter Web App",
+    "media": {
+      "photos": [
+        {
+          "url": "https://pbs.twimg.com/media/F_ZJH4lWUAAXhQd.png"
+        }
+      ],
+      "videos": [],
+      "animated": []
+    },
+    "_type": "snscrape.modules.twitter.Tweet"
+  },
+  {
+    "id": 1726763513077793000,
+    "id_str": "1726763513077793017",
+    "url": "https://twitter.com/corbtt/status/1726763513077793017",
+    "date": "2023-11-21 00:44:37+00:00",
+    "user": {
+      "id": 823506858,
+      "id_str": "823506858",
+      "url": "https://twitter.com/corbtt",
+      "username": "corbtt",
+      "displayname": "Kyle Corbitt",
+      "rawDescription": "Currently building @OpenPipeAI. Formerly @ycombinator, @google. I am always down to go on a quest.",
+      "created": "2012-09-14 15:44:30+00:00",
+      "followersCount": 2236,
+      "friendsCount": 97,
+      "statusesCount": 481,
+      "favouritesCount": 1709,
+      "listedCount": 54,
+      "mediaCount": 30,
+      "location": "Seattle, SF, Barcelona",
+      "profileImageUrl": "https://pbs.twimg.com/profile_images/1687487613769584640/SmzobJ-M_normal.jpg",
+      "profileBannerUrl": "https://pbs.twimg.com/profile_banners/823506858/1698191066",
+      "protected": null,
+      "verified": false,
+      "blue": true,
+      "blueType": null,
+      "descriptionLinks": [
+        {
+          "url": "https://corbt.com",
+          "text": "corbt.com",
+          "tcourl": "https://t.co/XyR4Sakwwt"
+        }
+      ],
+      "_type": "snscrape.modules.twitter.User"
+    },
+    "lang": "en",
+    "rawContent": "@theemozilla @NousResearch @laion_ai IIRC the Mistral Yarn ended up with higher perplexity than the base model until a certain context length threshhold, but this one is lower across the board. I'm curious why!",
+    "replyCount": 0,
+    "retweetCount": 0,
+    "likeCount": 3,
+    "quoteCount": 0,
+    "conversationId": 1726650665718685700,
+    "hashtags": [],
+    "cashtags": [],
+    "mentionedUsers": [
+      {
+        "id": 17763307,
+        "username": "theemozilla",
+        "displayname": "emozilla",
+        "_type": "snscrape.modules.twitter.UserRef"
+      },
+      {
+        "id": 1318419526132863000,
+        "username": "NousResearch",
+        "displayname": "Nous Research",
+        "_type": "snscrape.modules.twitter.UserRef"
+      },
+      {
+        "id": 1433718835127926800,
+        "username": "laion_ai",
+        "displayname": "LAION",
+        "_type": "snscrape.modules.twitter.UserRef"
+      }
+    ],
+    "links": [],
+    "viewCount": 305,
+    "retweetedTweet": null,
+    "quotedTweet": null,
+    "place": null,
+    "coordinates": null,
+    "inReplyToTweetId": 1726650665718685700,
+    "inReplyToUser": {
+      "id": 17763307,
+      "username": "theemozilla",
+      "displayname": "emozilla",
+      "_type": "snscrape.modules.twitter.UserRef"
+    },
+    "source": "<a href=\"https://mobile.twitter.com\" rel=\"nofollow\">Twitter Web App</a>",
+    "sourceUrl": "https://mobile.twitter.com",
+    "sourceLabel": "Twitter Web App",
+    "media": {
+      "photos": [],
+      "videos": [],
+      "animated": []
+    },
+    "_type": "snscrape.modules.twitter.Tweet"
+  },
+  {
+    "id": 1726676918467186700,
+    "id_str": "1726676918467186798",
+    "url": "https://twitter.com/JayScambler/status/1726676918467186798",
+    "date": "2023-11-20 19:00:32+00:00",
+    "user": {
+      "id": 1131943720373428200,
+      "id_str": "1131943720373428224",
+      "url": "https://twitter.com/JayScambler",
+      "username": "JayScambler",
+      "displayname": "Jay Scambler",
+      "rawDescription": "AI integration specialist. Managing Director @kapstonebridge. Embracing my Ikigai",
+      "created": "2019-05-24 15:23:08+00:00",
+      "followersCount": 3511,
+      "friendsCount": 365,
+      "statusesCount": 415,
+      "favouritesCount": 1046,
+      "listedCount": 132,
+      "mediaCount": 47,
+      "location": "Oklahoma City, OK",
+      "profileImageUrl": "https://pbs.twimg.com/profile_images/1504100916105986050/9_FYsBm5_normal.jpg",
+      "profileBannerUrl": "https://pbs.twimg.com/profile_banners/1131943720373428224/1690236074",
+      "protected": null,
+      "verified": false,
+      "blue": true,
+      "blueType": null,
+      "descriptionLinks": [
+        {
+          "url": "https://www.kapstonebridge.com",
+          "text": "kapstonebridge.com",
+          "tcourl": "https://t.co/X915BotvLa"
+        }
+      ],
+      "_type": "snscrape.modules.twitter.User"
+    },
+    "lang": "en",
+    "rawContent": "If you were 100% reliant on OpenAI you need to start  exploring open source models TODAY – These are some of my favorite resources and applications. Links below. Who else am I missing?\n\n1. @LMStudioAI \n2. @Ollama_ai \n3. @NousResearch  \n4. @shoggothsystems \n5. @HarperSCarroll",
+    "replyCount": 6,
+    "retweetCount": 4,
+    "likeCount": 37,
+    "quoteCount": 0,
+    "conversationId": 1726676918467186700,
+    "hashtags": [],
+    "cashtags": [],
+    "mentionedUsers": [
+      {
+        "id": 1654830858098860000,
+        "username": "LMStudioAI",
+        "displayname": "LM Studio",
+        "_type": "snscrape.modules.twitter.UserRef"
+      },
+      {
+        "id": 1688410127378829300,
+        "username": "Ollama_ai",
+        "displayname": "Ollama",
+        "_type": "snscrape.modules.twitter.UserRef"
+      },
+      {
+        "id": 1318419526132863000,
+        "username": "NousResearch",
+        "displayname": "Nous Research",
+        "_type": "snscrape.modules.twitter.UserRef"
+      },
+      {
+        "id": 1694131234329305000,
+        "username": "shoggothsystems",
+        "displayname": "Shoggoth Systems",
+        "_type": "snscrape.modules.twitter.UserRef"
+      },
+      {
+        "id": 774263617646633000,
+        "username": "HarperSCarroll",
+        "displayname": "Harper Carroll",
+        "_type": "snscrape.modules.twitter.UserRef"
+      }
+    ],
+    "links": [],
+    "viewCount": 3958,
+    "retweetedTweet": null,
+    "quotedTweet": null,
+    "place": null,
+    "coordinates": null,
+    "inReplyToTweetId": null,
+    "inReplyToUser": null,
+    "source": "<a href=\"https://mobile.twitter.com\" rel=\"nofollow\">Twitter Web App</a>",
+    "sourceUrl": "https://mobile.twitter.com",
+    "sourceLabel": "Twitter Web App",
+    "media": {
+      "photos": [],
+      "videos": [],
+      "animated": []
+    },
+    "_type": "snscrape.modules.twitter.Tweet"
+  },
+  {
+    "id": 1726762318942687200,
+    "id_str": "1726762318942687331",
+    "url": "https://twitter.com/corbtt/status/1726762318942687331",
+    "date": "2023-11-21 00:39:53+00:00",
+    "user": {
+      "id": 823506858,
+      "id_str": "823506858",
+      "url": "https://twitter.com/corbtt",
+      "username": "corbtt",
+      "displayname": "Kyle Corbitt",
+      "rawDescription": "Currently building @OpenPipeAI. Formerly @ycombinator, @google. I am always down to go on a quest.",
+      "created": "2012-09-14 15:44:30+00:00",
+      "followersCount": 2236,
+      "friendsCount": 97,
+      "statusesCount": 481,
+      "favouritesCount": 1709,
+      "listedCount": 54,
+      "mediaCount": 30,
+      "location": "Seattle, SF, Barcelona",
+      "profileImageUrl": "https://pbs.twimg.com/profile_images/1687487613769584640/SmzobJ-M_normal.jpg",
+      "profileBannerUrl": "https://pbs.twimg.com/profile_banners/823506858/1698191066",
+      "protected": null,
+      "verified": false,
+      "blue": true,
+      "blueType": null,
+      "descriptionLinks": [
+        {
+          "url": "https://corbt.com",
+          "text": "corbt.com",
+          "tcourl": "https://t.co/XyR4Sakwwt"
+        }
+      ],
+      "_type": "snscrape.modules.twitter.User"
+    },
+    "lang": "en",
+    "rawContent": "@JayScambler @LMStudioAI @Ollama_ai @NousResearch @shoggothsystems @HarperSCarroll @OpenPipeAI -- direct drop-in replacement for OpenAI with fine tuning.",
+    "replyCount": 1,
+    "retweetCount": 0,
+    "likeCount": 0,
+    "quoteCount": 0,
+    "conversationId": 1726676918467186700,
+    "hashtags": [],
+    "cashtags": [],
+    "mentionedUsers": [
+      {
+        "id": 1131943720373428200,
+        "username": "JayScambler",
+        "displayname": "Jay Scambler",
+        "_type": "snscrape.modules.twitter.UserRef"
+      },
+      {
+        "id": 1654830858098860000,
+        "username": "LMStudioAI",
+        "displayname": "LM Studio",
+        "_type": "snscrape.modules.twitter.UserRef"
+      },
+      {
+        "id": 1688410127378829300,
+        "username": "Ollama_ai",
+        "displayname": "Ollama",
+        "_type": "snscrape.modules.twitter.UserRef"
+      },
+      {
+        "id": 1318419526132863000,
+        "username": "NousResearch",
+        "displayname": "Nous Research",
+        "_type": "snscrape.modules.twitter.UserRef"
+      },
+      {
+        "id": 1694131234329305000,
+        "username": "shoggothsystems",
+        "displayname": "Shoggoth Systems",
+        "_type": "snscrape.modules.twitter.UserRef"
+      },
+      {
+        "id": 774263617646633000,
+        "username": "HarperSCarroll",
+        "displayname": "Harper Carroll",
+        "_type": "snscrape.modules.twitter.UserRef"
+      },
+      {
+        "id": 1686408031268200400,
+        "username": "OpenPipeAI",
+        "displayname": "OpenPipe",
+        "_type": "snscrape.modules.twitter.UserRef"
+      }
+    ],
+    "links": [],
+    "viewCount": 98,
+    "retweetedTweet": null,
+    "quotedTweet": null,
+    "place": null,
+    "coordinates": null,
+    "inReplyToTweetId": 1726676918467186700,
+    "inReplyToUser": {
+      "id": 1131943720373428200,
+      "username": "JayScambler",
+      "displayname": "Jay Scambler",
+      "_type": "snscrape.modules.twitter.UserRef"
+    },
+    "source": "<a href=\"https://mobile.twitter.com\" rel=\"nofollow\">Twitter Web App</a>",
+    "sourceUrl": "https://mobile.twitter.com",
+    "sourceLabel": "Twitter Web App",
+    "media": {
+      "photos": [],
+      "videos": [],
+      "animated": []
+    },
+    "_type": "snscrape.modules.twitter.Tweet"
+  },
+  {
+    "id": 1726759216529252400,
+    "id_str": "1726759216529252440",
+    "url": "https://twitter.com/corbtt/status/1726759216529252440",
+    "date": "2023-11-21 00:27:33+00:00",
+    "user": {
+      "id": 823506858,
+      "id_str": "823506858",
+      "url": "https://twitter.com/corbtt",
+      "username": "corbtt",
+      "displayname": "Kyle Corbitt",
+      "rawDescription": "Currently building @OpenPipeAI. Formerly @ycombinator, @google. I am always down to go on a quest.",
+      "created": "2012-09-14 15:44:30+00:00",
+      "followersCount": 2236,
+      "friendsCount": 97,
+      "statusesCount": 481,
+      "favouritesCount": 1709,
+      "listedCount": 54,
+      "mediaCount": 30,
+      "location": "Seattle, SF, Barcelona",
+      "profileImageUrl": "https://pbs.twimg.com/profile_images/1687487613769584640/SmzobJ-M_normal.jpg",
+      "profileBannerUrl": "https://pbs.twimg.com/profile_banners/823506858/1698191066",
+      "protected": null,
+      "verified": false,
+      "blue": true,
+      "blueType": null,
+      "descriptionLinks": [
+        {
+          "url": "https://corbt.com",
+          "text": "corbt.com",
+          "tcourl": "https://t.co/XyR4Sakwwt"
+        }
+      ],
+      "_type": "snscrape.modules.twitter.User"
+    },
+    "lang": "en",
+    "rawContent": "RT @griswold: The OpenAI story. https://t.co/6X25phpYG0",
+    "replyCount": 0,
+    "retweetCount": 1720,
+    "likeCount": 0,
+    "quoteCount": 0,
+    "conversationId": 1726759216529252400,
+    "hashtags": [],
+    "cashtags": [],
+    "mentionedUsers": [
+      {
+        "id": 14092789,
+        "username": "griswold",
+        "displayname": "Matt Griswold",
+        "_type": "snscrape.modules.twitter.UserRef"
+      }
+    ],
+    "links": [],
+    "viewCount": 2361858,
+    "retweetedTweet": {
+      "id": 1726599468022452500,
+      "id_str": "1726599468022452595",
+      "url": "https://twitter.com/griswold/status/1726599468022452595",
+      "date": "2023-11-20 13:52:46+00:00",
+      "user": {
+        "id": 14092789,
+        "id_str": "14092789",
+        "url": "https://twitter.com/griswold",
+        "username": "griswold",
+        "displayname": "Matt Griswold",
+        "rawDescription": "Sailed my kids around world, now building my third company.\n\ngames | education | ai",
+        "created": "2008-03-07 01:56:22+00:00",
+        "followersCount": 2516,
+        "friendsCount": 3530,
+        "statusesCount": 8316,
+        "favouritesCount": 10720,
+        "listedCount": 54,
+        "mediaCount": 941,
+        "location": "Austin, TX",
+        "profileImageUrl": "https://pbs.twimg.com/profile_images/1646080902236368896/1FpHcIzw_normal.jpg",
+        "profileBannerUrl": "https://pbs.twimg.com/profile_banners/14092789/1639016329",
+        "protected": null,
+        "verified": false,
+        "blue": true,
+        "blueType": null,
+        "descriptionLinks": [],
+        "_type": "snscrape.modules.twitter.User"
+      },
+      "lang": "en",
+      "rawContent": "The OpenAI story. https://t.co/6X25phpYG0",
+      "replyCount": 282,
+      "retweetCount": 1720,
+      "likeCount": 8346,
+      "quoteCount": 555,
+      "conversationId": 1726599468022452500,
+      "hashtags": [],
+      "cashtags": [],
+      "mentionedUsers": [],
+      "links": [],
+      "viewCount": 2361858,
+      "retweetedTweet": null,
+      "quotedTweet": null,
+      "place": null,
+      "coordinates": null,
+      "inReplyToTweetId": null,
+      "inReplyToUser": null,
+      "source": "<a href=\"https://mobile.twitter.com\" rel=\"nofollow\">Twitter Web App</a>",
+      "sourceUrl": "https://mobile.twitter.com",
+      "sourceLabel": "Twitter Web App",
+      "media": {
+        "photos": [],
+        "videos": [
+          {
+            "thumbnailUrl": "https://pbs.twimg.com/ext_tw_video_thumb/1726597711896391680/pu/img/Yv3zOLHf8nzZdAxy.jpg",
+            "variants": [
+              {
+                "contentType": "video/mp4",
+                "bitrate": 256000
+              },
+              {
+                "contentType": "video/mp4",
+                "bitrate": 832000
+              },
+              {
+                "contentType": "video/mp4",
+                "bitrate": 2176000
+              }
+            ],
+            "duration": 99335,
+            "views": null
+          }
+        ],
+        "animated": []
+      },
+      "_type": "snscrape.modules.twitter.Tweet"
+    },
+    "quotedTweet": null,
+    "place": null,
+    "coordinates": null,
+    "inReplyToTweetId": null,
+    "inReplyToUser": null,
+    "source": "<a href=\"https://mobile.twitter.com\" rel=\"nofollow\">Twitter Web App</a>",
+    "sourceUrl": "https://mobile.twitter.com",
+    "sourceLabel": "Twitter Web App",
+    "media": {
+      "photos": [],
+      "videos": [
+        {
+          "thumbnailUrl": "https://pbs.twimg.com/ext_tw_video_thumb/1726597711896391680/pu/img/Yv3zOLHf8nzZdAxy.jpg",
+          "variants": [
+            {
+              "contentType": "video/mp4",
+              "bitrate": 256000
+            },
+            {
+              "contentType": "video/mp4",
+              "bitrate": 832000
+            },
+            {
+              "contentType": "video/mp4",
+              "bitrate": 2176000
+            }
+          ],
+          "duration": 99335,
+          "views": null
+        }
+      ],
+      "animated": []
+    },
+    "_type": "snscrape.modules.twitter.Tweet"
+  },
+  {
+    "id": 1726599468022452500,
+    "id_str": "1726599468022452595",
+    "url": "https://twitter.com/griswold/status/1726599468022452595",
+    "date": "2023-11-20 13:52:46+00:00",
+    "user": {
+      "id": 14092789,
+      "id_str": "14092789",
+      "url": "https://twitter.com/griswold",
+      "username": "griswold",
+      "displayname": "Matt Griswold",
+      "rawDescription": "Sailed my kids around world, now building my third company.\n\ngames | education | ai",
+      "created": "2008-03-07 01:56:22+00:00",
+      "followersCount": 2516,
+      "friendsCount": 3530,
+      "statusesCount": 8316,
+      "favouritesCount": 10720,
+      "listedCount": 54,
+      "mediaCount": 941,
+      "location": "Austin, TX",
+      "profileImageUrl": "https://pbs.twimg.com/profile_images/1646080902236368896/1FpHcIzw_normal.jpg",
+      "profileBannerUrl": "https://pbs.twimg.com/profile_banners/14092789/1639016329",
+      "protected": null,
+      "verified": false,
+      "blue": true,
+      "blueType": null,
+      "descriptionLinks": [],
+      "_type": "snscrape.modules.twitter.User"
+    },
+    "lang": "en",
+    "rawContent": "The OpenAI story. https://t.co/6X25phpYG0",
+    "replyCount": 282,
+    "retweetCount": 1720,
+    "likeCount": 8346,
+    "quoteCount": 555,
+    "conversationId": 1726599468022452500,
+    "hashtags": [],
+    "cashtags": [],
+    "mentionedUsers": [],
+    "links": [],
+    "viewCount": 2361858,
+    "retweetedTweet": null,
+    "quotedTweet": null,
+    "place": null,
+    "coordinates": null,
+    "inReplyToTweetId": null,
+    "inReplyToUser": null,
+    "source": "<a href=\"https://mobile.twitter.com\" rel=\"nofollow\">Twitter Web App</a>",
+    "sourceUrl": "https://mobile.twitter.com",
+    "sourceLabel": "Twitter Web App",
+    "media": {
+      "photos": [],
+      "videos": [
+        {
+          "thumbnailUrl": "https://pbs.twimg.com/ext_tw_video_thumb/1726597711896391680/pu/img/Yv3zOLHf8nzZdAxy.jpg",
+          "variants": [
+            {
+              "contentType": "video/mp4",
+              "bitrate": 256000
+            },
+            {
+              "contentType": "video/mp4",
+              "bitrate": 832000
+            },
+            {
+              "contentType": "video/mp4",
+              "bitrate": 2176000
+            }
+          ],
+          "duration": 99335,
+          "views": null
+        }
+      ],
+      "animated": []
+    },
+    "_type": "snscrape.modules.twitter.Tweet"
+  },
+  {
+    "id": 1726643502703112200,
+    "id_str": "1726643502703112250",
+    "url": "https://twitter.com/corbtt/status/1726643502703112250",
+    "date": "2023-11-20 16:47:45+00:00",
+    "user": {
+      "id": 823506858,
+      "id_str": "823506858",
+      "url": "https://twitter.com/corbtt",
+      "username": "corbtt",
+      "displayname": "Kyle Corbitt",
+      "rawDescription": "Currently building @OpenPipeAI. Formerly @ycombinator, @google. I am always down to go on a quest.",
+      "created": "2012-09-14 15:44:30+00:00",
+      "followersCount": 2236,
+      "friendsCount": 97,
+      "statusesCount": 481,
+      "favouritesCount": 1709,
+      "listedCount": 54,
+      "mediaCount": 30,
+      "location": "Seattle, SF, Barcelona",
+      "profileImageUrl": "https://pbs.twimg.com/profile_images/1687487613769584640/SmzobJ-M_normal.jpg",
+      "profileBannerUrl": "https://pbs.twimg.com/profile_banners/823506858/1698191066",
+      "protected": null,
+      "verified": false,
+      "blue": true,
+      "blueType": null,
+      "descriptionLinks": [
+        {
+          "url": "https://corbt.com",
+          "text": "corbt.com",
+          "tcourl": "https://t.co/XyR4Sakwwt"
+        }
+      ],
+      "_type": "snscrape.modules.twitter.User"
+    },
+    "lang": "en",
+    "rawContent": "i'm no community manager but can i propose some additions to this weeks \"Microsoft AI announcements you can't miss\" newsletter https://t.co/SoOtUY0x9j",
+    "replyCount": 0,
+    "retweetCount": 0,
+    "likeCount": 7,
+    "quoteCount": 0,
+    "conversationId": 1726643502703112200,
+    "hashtags": [],
+    "cashtags": [],
+    "mentionedUsers": [],
+    "links": [],
+    "viewCount": 285,
+    "retweetedTweet": null,
+    "quotedTweet": null,
+    "place": null,
+    "coordinates": null,
+    "inReplyToTweetId": null,
+    "inReplyToUser": null,
+    "source": "<a href=\"http://twitter.com/download/android\" rel=\"nofollow\">Twitter for Android</a>",
+    "sourceUrl": "http://twitter.com/download/android",
+    "sourceLabel": "Twitter for Android",
+    "media": {
+      "photos": [
+        {
+          "url": "https://pbs.twimg.com/media/F_ZFHb0a8AE9oR1.jpg"
+        }
+      ],
+      "videos": [],
+      "animated": []
+    },
+    "_type": "snscrape.modules.twitter.Tweet"
+  },
+  {
+    "id": 1726016801497284600,
+    "id_str": "1726016801497284729",
+    "url": "https://twitter.com/tszzl/status/1726016801497284729",
+    "date": "2023-11-18 23:17:27+00:00",
+    "user": {
+      "id": 1460283925,
+      "id_str": "1460283925",
+      "url": "https://twitter.com/tszzl",
+      "username": "tszzl",
+      "displayname": "roon",
+      "rawDescription": "fellow creators the creator seeks",
+      "created": "2013-05-26 17:59:01+00:00",
+      "followersCount": 135306,
+      "friendsCount": 6114,
+      "statusesCount": 54261,
+      "favouritesCount": 578513,
+      "listedCount": 1282,
+      "mediaCount": 1976,
+      "location": "ānanda tāṇḍava",
+      "profileImageUrl": "https://pbs.twimg.com/profile_images/1572784789291401216/1WrwslUF_normal.jpg",
+      "profileBannerUrl": "https://pbs.twimg.com/profile_banners/1460283925/1587600180",
+      "protected": null,
+      "verified": false,
+      "blue": true,
+      "blueType": null,
+      "descriptionLinks": [
+        {
+          "url": "http://roonscape.ai",
+          "text": "roonscape.ai",
+          "tcourl": "https://t.co/3Q7RKYBPLw"
+        }
+      ],
+      "_type": "snscrape.modules.twitter.User"
+    },
+    "lang": "en",
+    "rawContent": "some people aren’t happy unless they live in an active war zone",
+    "replyCount": 48,
+    "retweetCount": 36,
+    "likeCount": 817,
+    "quoteCount": 11,
+    "conversationId": 1726016801497284600,
+    "hashtags": [],
+    "cashtags": [],
+    "mentionedUsers": [],
+    "links": [],
+    "viewCount": 52580,
+    "retweetedTweet": null,
+    "quotedTweet": null,
+    "place": null,
+    "coordinates": null,
+    "inReplyToTweetId": null,
+    "inReplyToUser": null,
+    "source": "<a href=\"http://twitter.com/download/iphone\" rel=\"nofollow\">Twitter for iPhone</a>",
+    "sourceUrl": "http://twitter.com/download/iphone",
+    "sourceLabel": "Twitter for iPhone",
+    "media": {
+      "photos": [],
+      "videos": [],
+      "animated": []
+    },
+    "_type": "snscrape.modules.twitter.Tweet"
+  },
+  {
+    "id": 1726617920342798600,
+    "id_str": "1726617920342798689",
+    "url": "https://twitter.com/corbtt/status/1726617920342798689",
+    "date": "2023-11-20 15:06:05+00:00",
+    "user": {
+      "id": 823506858,
+      "id_str": "823506858",
+      "url": "https://twitter.com/corbtt",
+      "username": "corbtt",
+      "displayname": "Kyle Corbitt",
+      "rawDescription": "Currently building @OpenPipeAI. Formerly @ycombinator, @google. I am always down to go on a quest.",
+      "created": "2012-09-14 15:44:30+00:00",
+      "followersCount": 2236,
+      "friendsCount": 97,
+      "statusesCount": 481,
+      "favouritesCount": 1709,
+      "listedCount": 54,
+      "mediaCount": 30,
+      "location": "Seattle, SF, Barcelona",
+      "profileImageUrl": "https://pbs.twimg.com/profile_images/1687487613769584640/SmzobJ-M_normal.jpg",
+      "profileBannerUrl": "https://pbs.twimg.com/profile_banners/823506858/1698191066",
+      "protected": null,
+      "verified": false,
+      "blue": true,
+      "blueType": null,
+      "descriptionLinks": [
+        {
+          "url": "https://corbt.com",
+          "text": "corbt.com",
+          "tcourl": "https://t.co/XyR4Sakwwt"
+        }
+      ],
+      "_type": "snscrape.modules.twitter.User"
+    },
+    "lang": "en",
+    "rawContent": "@tszzl ok yes I see what you mean now",
+    "replyCount": 0,
+    "retweetCount": 0,
+    "likeCount": 0,
+    "quoteCount": 0,
+    "conversationId": 1726016801497284600,
+    "hashtags": [],
+    "cashtags": [],
+    "mentionedUsers": [
+      {
+        "id": 1460283925,
+        "username": "tszzl",
+        "displayname": "roon",
+        "_type": "snscrape.modules.twitter.UserRef"
+      }
+    ],
+    "links": [],
+    "viewCount": 32,
+    "retweetedTweet": null,
+    "quotedTweet": null,
+    "place": null,
+    "coordinates": null,
+    "inReplyToTweetId": 1726016801497284600,
+    "inReplyToUser": {
+      "id": 1460283925,
+      "username": "tszzl",
+      "displayname": "roon",
+      "_type": "snscrape.modules.twitter.UserRef"
+    },
+    "source": "<a href=\"http://twitter.com/download/android\" rel=\"nofollow\">Twitter for Android</a>",
+    "sourceUrl": "http://twitter.com/download/android",
+    "sourceLabel": "Twitter for Android",
+    "media": {
+      "photos": [],
+      "videos": [],
+      "animated": []
+    },
+    "_type": "snscrape.modules.twitter.Tweet"
+  },
+  {
+    "id": 1725900110641680400,
+    "id_str": "1725900110641680474",
+    "url": "https://twitter.com/corbtt/status/1725900110641680474",
+    "date": "2023-11-18 15:33:46+00:00",
+    "user": {
+      "id": 823506858,
+      "id_str": "823506858",
+      "url": "https://twitter.com/corbtt",
+      "username": "corbtt",
+      "displayname": "Kyle Corbitt",
+      "rawDescription": "Currently building @OpenPipeAI. Formerly @ycombinator, @google. I am always down to go on a quest.",
+      "created": "2012-09-14 15:44:30+00:00",
+      "followersCount": 2236,
+      "friendsCount": 97,
+      "statusesCount": 481,
+      "favouritesCount": 1709,
+      "listedCount": 54,
+      "mediaCount": 30,
+      "location": "Seattle, SF, Barcelona",
+      "profileImageUrl": "https://pbs.twimg.com/profile_images/1687487613769584640/SmzobJ-M_normal.jpg",
+      "profileBannerUrl": "https://pbs.twimg.com/profile_banners/823506858/1698191066",
+      "protected": null,
+      "verified": false,
+      "blue": true,
+      "blueType": null,
+      "descriptionLinks": [
+        {
+          "url": "https://corbt.com",
+          "text": "corbt.com",
+          "tcourl": "https://t.co/XyR4Sakwwt"
+        }
+      ],
+      "_type": "snscrape.modules.twitter.User"
+    },
+    "lang": "es",
+    "rawContent": "@eladgil Nope, this is good for c̶r̶y̶p̶t̶o̶ AI!",
+    "replyCount": 0,
+    "retweetCount": 0,
+    "likeCount": 2,
+    "quoteCount": 0,
+    "conversationId": 1725732878582247700,
+    "hashtags": [],
+    "cashtags": [],
+    "mentionedUsers": [
+      {
+        "id": 6535212,
+        "username": "eladgil",
+        "displayname": "Elad Gil",
+        "_type": "snscrape.modules.twitter.UserRef"
+      }
+    ],
+    "links": [],
+    "viewCount": 330,
+    "retweetedTweet": null,
+    "quotedTweet": null,
+    "place": null,
+    "coordinates": null,
+    "inReplyToTweetId": 1725732878582247700,
+    "inReplyToUser": {
+      "id": 6535212,
+      "username": "eladgil",
+      "displayname": "Elad Gil",
+      "_type": "snscrape.modules.twitter.UserRef"
+    },
+    "source": "<a href=\"https://mobile.twitter.com\" rel=\"nofollow\">Twitter Web App</a>",
+    "sourceUrl": "https://mobile.twitter.com",
+    "sourceLabel": "Twitter Web App",
+    "media": {
+      "photos": [],
+      "videos": [],
+      "animated": []
+    },
+    "_type": "snscrape.modules.twitter.Tweet"
+  },
+  {
+    "id": 1725750644391497700,
+    "id_str": "1725750644391497759",
+    "url": "https://twitter.com/corbtt/status/1725750644391497759",
+    "date": "2023-11-18 05:39:51+00:00",
+    "user": {
+      "id": 823506858,
+      "id_str": "823506858",
+      "url": "https://twitter.com/corbtt",
+      "username": "corbtt",
+      "displayname": "Kyle Corbitt",
+      "rawDescription": "Currently building @OpenPipeAI. Formerly @ycombinator, @google. I am always down to go on a quest.",
+      "created": "2012-09-14 15:44:30+00:00",
+      "followersCount": 2236,
+      "friendsCount": 97,
+      "statusesCount": 481,
+      "favouritesCount": 1709,
+      "listedCount": 54,
+      "mediaCount": 30,
+      "location": "Seattle, SF, Barcelona",
+      "profileImageUrl": "https://pbs.twimg.com/profile_images/1687487613769584640/SmzobJ-M_normal.jpg",
+      "profileBannerUrl": "https://pbs.twimg.com/profile_banners/823506858/1698191066",
+      "protected": null,
+      "verified": false,
+      "blue": true,
+      "blueType": null,
+      "descriptionLinks": [
+        {
+          "url": "https://corbt.com",
+          "text": "corbt.com",
+          "tcourl": "https://t.co/XyR4Sakwwt"
+        }
+      ],
+      "_type": "snscrape.modules.twitter.User"
+    },
+    "lang": "en",
+    "rawContent": "Life is short. Own your weights. @OpenPipeAI",
+    "replyCount": 0,
+    "retweetCount": 0,
+    "likeCount": 4,
+    "quoteCount": 0,
+    "conversationId": 1725750644391497700,
+    "hashtags": [],
+    "cashtags": [],
+    "mentionedUsers": [
+      {
+        "id": 1686408031268200400,
+        "username": "OpenPipeAI",
+        "displayname": "OpenPipe",
+        "_type": "snscrape.modules.twitter.UserRef"
+      }
+    ],
+    "links": [],
+    "viewCount": 276,
+    "retweetedTweet": null,
+    "quotedTweet": null,
+    "place": null,
+    "coordinates": null,
+    "inReplyToTweetId": null,
+    "inReplyToUser": null,
+    "source": "<a href=\"http://twitter.com/download/android\" rel=\"nofollow\">Twitter for Android</a>",
+    "sourceUrl": "http://twitter.com/download/android",
+    "sourceLabel": "Twitter for Android",
+    "media": {
+      "photos": [],
+      "videos": [],
+      "animated": []
+    },
+    "_type": "snscrape.modules.twitter.Tweet"
+  },
+  {
+    "id": 1725643221332824000,
+    "id_str": "1725643221332824154",
+    "url": "https://twitter.com/corbtt/status/1725643221332824154",
+    "date": "2023-11-17 22:32:59+00:00",
+    "user": {
+      "id": 823506858,
+      "id_str": "823506858",
+      "url": "https://twitter.com/corbtt",
+      "username": "corbtt",
+      "displayname": "Kyle Corbitt",
+      "rawDescription": "Currently building @OpenPipeAI. Formerly @ycombinator, @google. I am always down to go on a quest.",
+      "created": "2012-09-14 15:44:30+00:00",
+      "followersCount": 2236,
+      "friendsCount": 97,
+      "statusesCount": 481,
+      "favouritesCount": 1709,
+      "listedCount": 54,
+      "mediaCount": 30,
+      "location": "Seattle, SF, Barcelona",
+      "profileImageUrl": "https://pbs.twimg.com/profile_images/1687487613769584640/SmzobJ-M_normal.jpg",
+      "profileBannerUrl": "https://pbs.twimg.com/profile_banners/823506858/1698191066",
+      "protected": null,
+      "verified": false,
+      "blue": true,
+      "blueType": null,
+      "descriptionLinks": [
+        {
+          "url": "https://corbt.com",
+          "text": "corbt.com",
+          "tcourl": "https://t.co/XyR4Sakwwt"
+        }
+      ],
+      "_type": "snscrape.modules.twitter.User"
+    },
+    "lang": "en",
+    "rawContent": "No inside info on the latest events, but knowing Sam personally he was one of the people I trusted most with the world changing technology OpenAI is developing. Bummed out by this, but wish the best for both OpenAI and Sam.",
+    "replyCount": 0,
+    "retweetCount": 1,
+    "likeCount": 3,
+    "quoteCount": 0,
+    "conversationId": 1725643221332824000,
+    "hashtags": [],
+    "cashtags": [],
+    "mentionedUsers": [],
+    "links": [],
+    "viewCount": 559,
+    "retweetedTweet": null,
+    "quotedTweet": {
+      "id": 1725631621511185000,
+      "id_str": "1725631621511184771",
+      "url": "https://twitter.com/sama/status/1725631621511184771",
+      "date": "2023-11-17 21:46:53+00:00",
+      "user": {
+        "id": 1605,
+        "id_str": "1605",
+        "url": "https://twitter.com/sama",
+        "username": "sama",
+        "displayname": "Sam Altman",
+        "rawDescription": "✡",
+        "created": "2006-07-16 22:01:55+00:00",
+        "followersCount": 2440437,
+        "friendsCount": 843,
+        "statusesCount": 6226,
+        "favouritesCount": 977,
+        "listedCount": 16812,
+        "mediaCount": 296,
+        "location": "SF",
+        "profileImageUrl": "https://pbs.twimg.com/profile_images/804990434455887872/BG0Xh7Oa_normal.jpg",
+        "profileBannerUrl": null,
+        "protected": null,
+        "verified": false,
+        "blue": true,
+        "blueType": null,
+        "descriptionLinks": [
+          {
+            "url": "http://blog.samaltman.com",
+            "text": "blog.samaltman.com",
+            "tcourl": "https://t.co/teHmy8EFSH"
+          }
+        ],
+        "_type": "snscrape.modules.twitter.User"
+      },
+      "lang": "en",
+      "rawContent": "i loved my time at openai. it was transformative for me personally, and hopefully the world a little bit. most of all i loved working with such talented people.\n\nwill have more to say about what’s next later. \n\n🫡",
+      "replyCount": 6865,
+      "retweetCount": 9978,
+      "likeCount": 98717,
+      "quoteCount": 4526,
+      "conversationId": 1725631621511185000,
+      "hashtags": [],
+      "cashtags": [],
+      "mentionedUsers": [],
+      "links": [],
+      "viewCount": 25511212,
+      "retweetedTweet": null,
+      "quotedTweet": null,
+      "place": null,
+      "coordinates": null,
+      "inReplyToTweetId": null,
+      "inReplyToUser": null,
+      "source": "<a href=\"http://twitter.com/download/iphone\" rel=\"nofollow\">Twitter for iPhone</a>",
+      "sourceUrl": "http://twitter.com/download/iphone",
+      "sourceLabel": "Twitter for iPhone",
+      "media": {
+        "photos": [],
+        "videos": [],
+        "animated": []
+      },
+      "_type": "snscrape.modules.twitter.Tweet"
+    },
+    "place": null,
+    "coordinates": null,
+    "inReplyToTweetId": null,
+    "inReplyToUser": null,
+    "source": "<a href=\"http://twitter.com/download/android\" rel=\"nofollow\">Twitter for Android</a>",
+    "sourceUrl": "http://twitter.com/download/android",
+    "sourceLabel": "Twitter for Android",
+    "media": {
+      "photos": [],
+      "videos": [],
+      "animated": []
+    },
+    "_type": "snscrape.modules.twitter.Tweet"
+  },
+  {
+    "id": 1725631621511185000,
+    "id_str": "1725631621511184771",
+    "url": "https://twitter.com/sama/status/1725631621511184771",
+    "date": "2023-11-17 21:46:53+00:00",
+    "user": {
+      "id": 1605,
+      "id_str": "1605",
+      "url": "https://twitter.com/sama",
+      "username": "sama",
+      "displayname": "Sam Altman",
+      "rawDescription": "✡",
+      "created": "2006-07-16 22:01:55+00:00",
+      "followersCount": 2440437,
+      "friendsCount": 843,
+      "statusesCount": 6226,
+      "favouritesCount": 977,
+      "listedCount": 16812,
+      "mediaCount": 296,
+      "location": "SF",
+      "profileImageUrl": "https://pbs.twimg.com/profile_images/804990434455887872/BG0Xh7Oa_normal.jpg",
+      "profileBannerUrl": null,
+      "protected": null,
+      "verified": false,
+      "blue": true,
+      "blueType": null,
+      "descriptionLinks": [
+        {
+          "url": "http://blog.samaltman.com",
+          "text": "blog.samaltman.com",
+          "tcourl": "https://t.co/teHmy8EFSH"
+        }
+      ],
+      "_type": "snscrape.modules.twitter.User"
+    },
+    "lang": "en",
+    "rawContent": "i loved my time at openai. it was transformative for me personally, and hopefully the world a little bit. most of all i loved working with such talented people.\n\nwill have more to say about what’s next later. \n\n🫡",
+    "replyCount": 6865,
+    "retweetCount": 9978,
+    "likeCount": 98717,
+    "quoteCount": 4526,
+    "conversationId": 1725631621511185000,
+    "hashtags": [],
+    "cashtags": [],
+    "mentionedUsers": [],
+    "links": [],
+    "viewCount": 25511212,
+    "retweetedTweet": null,
+    "quotedTweet": null,
+    "place": null,
+    "coordinates": null,
+    "inReplyToTweetId": null,
+    "inReplyToUser": null,
+    "source": "<a href=\"http://twitter.com/download/iphone\" rel=\"nofollow\">Twitter for iPhone</a>",
+    "sourceUrl": "http://twitter.com/download/iphone",
+    "sourceLabel": "Twitter for iPhone",
+    "media": {
+      "photos": [],
+      "videos": [],
+      "animated": []
+    },
+    "_type": "snscrape.modules.twitter.Tweet"
+  }
+]

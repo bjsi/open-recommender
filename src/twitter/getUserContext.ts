@@ -8,7 +8,7 @@
  * TODO: bios of recent follows?
  */
 
-import { readFileSync } from "fs";
+import { readFileSync, write, writeFileSync } from "fs";
 import { TweetSchema, Tweet } from "./schemas";
 import path from "path";
 import { TwitterAPI, initTwitterAPI } from "./twitterAPI";
@@ -157,31 +157,45 @@ const parseTweets = (tweetsStr: string) => {
   return tweets.filter((tweet) => !isAdvert(tweet));
 };
 
-const getUserTweetHistory = async (api: TwitterAPI, user_login: string) => {
+export const getUserTweetHistory = async (
+  api: TwitterAPI,
+  user_login: string
+) => {
   const tweetsStr = await api.get_user_info(user_login);
   return parseTweets(tweetsStr);
 };
 
-export const loadExampleTweetHistory = () => {
-  const tweetsStr = readFileSync(
-    path.join(__dirname, "exampleTweets.json"),
-    "utf-8"
-  );
-  return parseTweets(tweetsStr);
+export const loadExampleTweetHistory = (user: string) => {
+  try {
+    const tweetsStr = readFileSync(
+      path.join(__dirname, `${user}ExampleTweets.json`),
+      "utf-8"
+    );
+    return parseTweets(tweetsStr);
+  } catch {
+    return null;
+  }
 };
 
 if (require.main === module) {
   (async () => {
-    const user = process.argv[2] || "experilearning";
+    const user = (process.argv[2] || "experilearning").replace("@", "");
     const tweets =
-      user === "experilearning"
-        ? loadExampleTweetHistory()
-        : await (async () => {
-            const { api, bridge } = initTwitterAPI();
-            const tweets = await getUserTweetHistory(api, user);
-            bridge.close();
-            return tweets;
-          })();
+      loadExampleTweetHistory(user) ||
+      (await (async () => {
+        const { api, bridge } = initTwitterAPI();
+        const tweets = await getUserTweetHistory(api, user);
+        bridge.close();
+        return tweets;
+      })());
+    if (!tweets || tweets.length === 0) {
+      console.log("No tweets found");
+      return;
+    }
+    writeFileSync(
+      path.join(__dirname, `${user}ExampleTweets.json`),
+      JSON.stringify(tweets, null, 2)
+    );
     const str = tweetsToString(tweets, user);
     console.log(str);
   })();

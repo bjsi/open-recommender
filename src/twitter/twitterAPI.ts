@@ -9,7 +9,7 @@ class PythonController {
 
   constructor(protected python: PyBridge) {
     this.python = python;
-    this.api = this.python.controller<TwitterAPI>("twitter.py");
+    this.api = this.python.controller<TwitterAPI>("twitterAPI.py");
   }
 }
 

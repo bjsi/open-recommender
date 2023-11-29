@@ -11,8 +11,8 @@ import { transcriptToString } from "../../youtube/transcript";
 import {
   exampleSearchResults1,
   exampleSearchResults2,
-  exampleTranscript,
-  exampleTranscript2,
+  learningVideoTranscript,
+  spamVideoTranscript,
 } from "./exampleData";
 import {
   FilterSearchResultsInputVars,
@@ -27,7 +27,15 @@ import {
 import {
   CreateQueriesInputVars,
   createYouTubeSearchQueries,
+  createYouTubeSearchQueriesPrompts,
 } from "../createQueries";
+import {
+  loadExampleTweetHistory,
+  tweetsToString,
+} from "../../twitter/getUserContext";
+import { writeFileSync } from "fs";
+import path from "path";
+import { exec, execSync } from "child_process";
 
 dotenv.config();
 
@@ -35,14 +43,14 @@ const promptTests: Record<string, EvaluateTestSuite> = {
   "chunk-transcript": {
     ...functionCallOptions({
       model: chunkTranscript.model,
-      prompt: chunkTranscript.prompt,
+      prompts: [chunkTranscript.prompt],
       functions: [chunkTranscript.function!.function],
     }),
     tests: [
       {
         vars: {
-          transcript: transcriptToString(exampleTranscript.cues),
-          videoTitle: exampleTranscript.videoTitle,
+          transcript: transcriptToString(learningVideoTranscript.cues),
+          videoTitle: learningVideoTranscript.videoTitle,
         } satisfies ChunkTranscriptVars,
         assert: [assertValidSchema(chunkTranscript.function!.schema)],
       },
@@ -51,20 +59,23 @@ const promptTests: Record<string, EvaluateTestSuite> = {
   "appraise-transcript": {
     ...functionCallOptions({
       model: appraiseTranscript.model,
-      prompt: appraiseTranscript.prompt,
+      prompts: [appraiseTranscript.prompt],
       functions: [appraiseTranscript.function!.function],
     }),
     tests: [
       {
         vars: {
-          transcript: transcriptToString(exampleTranscript.cues),
-          videoTitle: exampleTranscript.videoTitle,
+          transcript: transcriptToString(learningVideoTranscript.cues).slice(
+            0,
+            5000
+          ),
+          videoTitle: learningVideoTranscript.videoTitle,
         } satisfies AppraiseTranscriptInputVars,
         assert: [assertValidSchema(appraiseTranscript.function!.schema)],
       },
       {
         vars: {
-          transcript: exampleTranscript2,
+          transcript: spamVideoTranscript,
           videoTitle:
             "The 10 AI Innovations Expected to Revolutionize 2024 - 2025",
         } satisfies AppraiseTranscriptInputVars,
@@ -75,7 +86,7 @@ const promptTests: Record<string, EvaluateTestSuite> = {
   "filter-search-results": {
     ...functionCallOptions({
       model: filterSearchResults.model,
-      prompt: filterSearchResults.prompt,
+      prompts: [filterSearchResults.prompt],
       functions: [filterSearchResults.function!.function],
     }),
     tests: [
@@ -91,15 +102,27 @@ const promptTests: Record<string, EvaluateTestSuite> = {
     ],
   },
   "create-queries": {
-    ...plainTextTestOptions({
+    ...functionCallOptions({
       model: createYouTubeSearchQueries.model,
-      prompt: createYouTubeSearchQueries.prompt,
+      prompts: createYouTubeSearchQueriesPrompts,
+      functions: [createYouTubeSearchQueries.function!.function],
     }),
     tests: [
       {
         vars: {
-          userContext:
-            "The user is interested in software to assist with learning like Anki.",
+          tweets: tweetsToString(
+            loadExampleTweetHistory("experilearning") || [],
+            "experilearning"
+          ),
+        } satisfies CreateQueriesInputVars,
+        assert: [],
+      },
+      {
+        vars: {
+          tweets: tweetsToString(
+            loadExampleTweetHistory("corbtt") || [],
+            "corbtt"
+          ),
         } satisfies CreateQueriesInputVars,
         assert: [],
       },
@@ -145,7 +168,7 @@ const main = async () => {
         showProgressBar: true,
       }
     );
-    console.log(generateTable(results, Number.MAX_SAFE_INTEGER).toString());
+    console.log(generateTable(results, 500).toString());
   }
 };
 

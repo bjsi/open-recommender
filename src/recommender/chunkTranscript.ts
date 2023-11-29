@@ -3,7 +3,7 @@ import { z } from "zod";
 import zodToJsonSchema from "zod-to-json-schema";
 import { Prompt } from "./prompt";
 import OpenAI from "openai";
-import { exampleTranscript } from "./tests/exampleData";
+import { learningVideoTranscript } from "./tests/exampleData";
 import { transcriptCuesToVtt } from "../youtube/transcript";
 import dotenv from "dotenv";
 import { RecursiveCharacterTextSplitter } from "./textSplitter";
@@ -92,7 +92,7 @@ export const splitTranscript = async (text: string) => {
 if (require.main === module) {
   (async () => {
     dotenv.config();
-    const webvttText = transcriptCuesToVtt(exampleTranscript.cues);
+    const webvttText = transcriptCuesToVtt(learningVideoTranscript.cues);
     const parts = await splitTranscript(webvttText);
     const fstPart = parts[0];
     console.log(fstPart);
@@ -100,7 +100,7 @@ if (require.main === module) {
     chunkTranscript
       .run({
         transcript: fstPart,
-        videoTitle: exampleTranscript.videoTitle,
+        videoTitle: learningVideoTranscript.videoTitle,
       })
       .then((result) => {
         console.log(JSON.stringify(result, null, 2));
