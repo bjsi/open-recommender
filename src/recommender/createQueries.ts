@@ -79,7 +79,9 @@ if (require.main === module) {
   const tweetsStr = tweetsToString(tweets, user);
   createYouTubeSearchQueries
     .run({
-      tweets: tweetsStr,
+      promptVars: {
+        tweets: tweetsStr,
+      },
     })
     .then((results) => {
       console.log(results);

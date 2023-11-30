@@ -22,18 +22,25 @@ const prompt: ChatCompletionMessageParam[] = [
 - Aim to make the length of each chapter between 1 and 2 minutes.
 - Include a one sentence summary of the section.
 - Include tags.
-
-Video Info:
-{{ videoInfo}}
 `.trim(),
   },
   {
     role: "user",
     content: `
+Title: {{ title }}
 {{ transcript }}
   `.trim(),
   },
 ];
+
+const inputSchema = z.object({
+  transcript: z.string(),
+  title: z.string(),
+});
+
+export type ChunkTranscriptVars = z.infer<typeof inputSchema>;
+
+export const rejectedChunkTags = ["Intro", "Outro", "Advert", "Sponsor"];
 
 const chapterSchema = z.object({
   title: z.string(),
@@ -62,13 +69,6 @@ const functionCall: OpenAI.ChatCompletionCreateParams.Function = {
   description: "Chunk a video transcript into logical sections with metadata.",
   parameters: zodToJsonSchema(outputSchema),
 };
-
-const inputSchema = z.object({
-  transcript: z.string(),
-  videoTitle: z.string(),
-});
-
-export type ChunkTranscriptVars = z.infer<typeof inputSchema>;
 
 export const chunkTranscript = new Prompt({
   function: {
@@ -99,8 +99,10 @@ if (require.main === module) {
 
     chunkTranscript
       .run({
-        transcript: fstPart,
-        videoTitle: learningVideoTranscript.videoTitle,
+        promptVars: {
+          transcript: fstPart,
+          title: learningVideoTranscript.videoTitle,
+        },
       })
       .then((result) => {
         console.log(JSON.stringify(result, null, 2));

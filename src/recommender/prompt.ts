@@ -34,19 +34,19 @@ export class Prompt<
     this.model = args.model;
   }
 
-  run = async (
-    vars: z.infer<InputSchema>,
-    verbose = false
-  ): Promise<OutputSchema extends ZodType<infer U> ? U : string | null> => {
-    const messages = compilePrompt(this.prompt, vars);
-    if (verbose) console.log(messages);
+  run = async (args: {
+    promptVars: z.infer<InputSchema>;
+    verbose?: boolean;
+  }): Promise<OutputSchema extends ZodType<infer U> ? U : string | null> => {
+    const messages = compilePrompt(this.prompt, args.promptVars);
+    if (args.verbose) console.log(messages);
     const response = await new OpenAI().chat.completions.create({
       messages,
       model: this.model,
       function_call: this.function?.function,
       functions: this.function?.function ? [this.function.function] : undefined,
     });
-    if (verbose) console.log(response.choices[0]);
+    if (args.verbose) console.log(response.choices[0]);
     if (this.function?.schema) {
       const args = JSON.parse(
         response.choices[0].message.function_call?.arguments || "{}"

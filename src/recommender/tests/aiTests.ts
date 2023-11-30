@@ -9,8 +9,8 @@ import {
 import { assertValidSchema } from "./helpers";
 import { transcriptToString } from "../../youtube/transcript";
 import {
-  exampleSearchResults1,
-  exampleSearchResults2,
+  remnoteFlashcardsSearchResults,
+  elonMuskSearchResults,
   learningVideoTranscript,
   spamVideoTranscript,
 } from "./exampleData";
@@ -50,7 +50,7 @@ const promptTests: Record<string, EvaluateTestSuite> = {
       {
         vars: {
           transcript: transcriptToString(learningVideoTranscript.cues),
-          videoTitle: learningVideoTranscript.videoTitle,
+          title: learningVideoTranscript.videoTitle,
         } satisfies ChunkTranscriptVars,
         assert: [assertValidSchema(chunkTranscript.function!.schema)],
       },
@@ -69,15 +69,14 @@ const promptTests: Record<string, EvaluateTestSuite> = {
             0,
             5000
           ),
-          videoTitle: learningVideoTranscript.videoTitle,
+          title: learningVideoTranscript.videoTitle,
         } satisfies AppraiseTranscriptInputVars,
         assert: [assertValidSchema(appraiseTranscript.function!.schema)],
       },
       {
         vars: {
           transcript: spamVideoTranscript,
-          videoTitle:
-            "The 10 AI Innovations Expected to Revolutionize 2024 - 2025",
+          title: "The 10 AI Innovations Expected to Revolutionize 2024 - 2025",
         } satisfies AppraiseTranscriptInputVars,
         assert: [assertValidSchema(appraiseTranscript.function!.schema)],
       },
@@ -92,10 +91,13 @@ const promptTests: Record<string, EvaluateTestSuite> = {
     tests: [
       {
         vars: {
-          searchResults: searchResultsToString(
-            interleaveArrays(exampleSearchResults1, exampleSearchResults2)
+          results: searchResultsToString(
+            interleaveArrays(
+              remnoteFlashcardsSearchResults,
+              elonMuskSearchResults
+            )
           ),
-          userContext: "The user is interested in learning software.",
+          queries: ["learning software."],
         } satisfies FilterSearchResultsInputVars,
         assert: [assertValidSchema(filterSearchResults.function!.schema)],
       },

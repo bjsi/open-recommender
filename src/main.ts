@@ -1,114 +1,173 @@
+import { writeFileSync } from "fs";
 import { recommender } from "./recommender";
-import { splitTranscript } from "./recommender/chunkTranscript";
-import { parseCreateQueriesOutput } from "./recommender/createQueries";
-import { searchResultsToString } from "./recommender/filterSearchResults";
+import { TranscriptChunk } from "./recommender/chunkTranscript";
+import { twitter } from "./twitter";
 import { yt } from "./youtube";
 import { SearchResult } from "./youtube/search";
-import {
-  TranscriptCue,
-  transcriptToString as cuesToString,
-  transcriptCuesToVtt,
-} from "./youtube/transcript";
+import { TranscriptCue } from "./youtube/transcript";
 import chalk from "chalk";
 
 (async () => {
-  const userContext =
-    process.argv[2] ||
-    "The user is interested in software to assist learning, like RemNote and Anki.";
-  console.log(chalk.blue("User context: " + userContext));
+  const user = process.argv[2] || "experilearning";
+  console.log(chalk.blue(`Creating recommendations for Twitter user @${user}`));
 
-  const searchQueries = parseCreateQueriesOutput(
-    (await recommender.search.createQueries({
-      userContext,
-    })) || ""
-  );
-  if (!searchQueries.length) {
+  // get user context
+
+  console.log(chalk.blue("Fetching tweets..."));
+  const tweets = await twitter.tweets.fetch({
+    user,
+  });
+  if (!tweets.length) {
+    console.log(chalk.red("No tweets found"));
+    return;
+  } else {
+    console.log(chalk.green(tweets.length + " tweets fetched successfully"));
+  }
+
+  // search for videos
+
+  console.log(chalk.blue("Creating search queries..."));
+  const { queries } = await recommender.queries.create({
+    tweets,
+    user,
+  });
+  if (!queries.length) {
     console.log(chalk.red("No search queries generated"));
     return;
   } else {
     console.log(chalk.green("Search queries:"));
-    console.log(
-      searchQueries.map((query, idx) => `${idx + 1}. ${query}`).join("\n")
-    );
+    console.log(queries.map((query, idx) => `${idx + 1}. ${query}`).join("\n"));
   }
 
   console.log(chalk.blue("Searching YouTube..."));
-  const searchResults = (
-    await Promise.all(searchQueries.map((query) => yt.search(query)))
-  ).flat();
-  if (!searchResults.length) {
+  const results: SearchResult[] = [];
+  for (const query of queries) {
+    const queryResults = await yt.search(query);
+    console.log(
+      chalk.blue(
+        queryResults
+          .map((result, idx) => `${idx + 1}. ${result.title}`)
+          .join("\n")
+      )
+    );
+    results.push(...queryResults);
+  }
+  if (!results.length) {
     console.log(chalk.red("No results found"));
     return;
   } else {
-    console.log(chalk.green(searchResults.length + " search results:"));
-    console.log(
-      searchResults
-        .map((result, idx) => `${idx + 1}. ${result.title}`)
-        .join("\n")
-    );
+    console.log(chalk.green(results.length + " total search results"));
   }
 
-  const { recommendedVideos } = await recommender.search.filter({
-    searchResults: searchResultsToString(searchResults),
-    userContext,
+  // pre-filter search results
+
+  console.log(chalk.blue("Filtering search results..."));
+  const filteredResults = await recommender.search.filter({
+    results,
+    queries,
   });
-  if (!recommendedVideos.length) {
+  if (!filteredResults.length) {
     console.log("No search results passed the search filter");
     return;
   }
-
-  const filteredResults = recommendedVideos.map((id) => searchResults[id]);
-  console.log(chalk.green("Search results that passed the search filter:"));
+  console.log(
+    chalk.green("Search results that passed the initial search filter:")
+  );
   console.log(
     filteredResults
       .map((result, idx) => `${idx + 1}. ${result.title}`)
       .join("\n")
   );
 
-  type SearchResultWithTranscript = SearchResult & {
+  type SearchResultWithTranscript = {
+    searchResult: SearchResult;
     cues: TranscriptCue[];
   };
+
+  // fetch transcripts
+
   console.log(chalk.blue(`Fetching ${filteredResults.length} transcripts...`));
-  const resultsWithTranscripts = (
-    await Promise.all(
-      filteredResults.map(async (result) => {
-        const fetchResult = await yt.transcript.fetch(result.id, result.title);
-        if (!fetchResult || !fetchResult.cues.length) {
-          console.log("Skipping video without transcript");
-          return;
-        } else {
-          return { ...result, cues: fetchResult.cues };
-        }
-      })
-    )
-  ).filter(Boolean) as SearchResultWithTranscript[];
+  const resultsWithTranscripts: SearchResultWithTranscript[] = [];
+  for (const result of filteredResults) {
+    const { id, title } = result;
+    const fetchResult = await yt.transcript.fetch({ id, title });
+    if (!fetchResult || !fetchResult.cues.length) {
+      console.log("Skipping video without transcript");
+      continue;
+    }
+    resultsWithTranscripts.push({
+      searchResult: result,
+      cues: fetchResult.cues,
+    });
+  }
   console.log(
     chalk.green(
       resultsWithTranscripts.length + " transcripts fetched successfully"
     )
   );
 
-  if (!resultsWithTranscripts.length) {
-    console.log("No results passed the transcript appraisal filter");
-    return;
+  // appraise transcripts
+
+  console.log(chalk.blue("Appraising transcripts..."));
+  const appraisedResults: SearchResultWithTranscript[] = [];
+  for (const result of resultsWithTranscripts) {
+    const { recommend, reasoning } = await recommender.transcript.appraise({
+      transcript: result.cues,
+      title: result.searchResult.title,
+    });
+    if (!recommend) {
+      console.log(
+        chalk.blue(`Rejecting video ${result.searchResult.title}. ${reasoning}`)
+      );
+      continue;
+    } else {
+      console.log(
+        chalk.green(
+          `Accepting video ${result.searchResult.title}. ${reasoning}`
+        )
+      );
+      appraisedResults.push({ ...result });
+    }
   }
 
-  for (const result of resultsWithTranscripts.slice(0, 1)) {
-    const webvttText = transcriptCuesToVtt(result.cues);
-    const parts = await splitTranscript(webvttText);
-    console.log(chalk.blue(`Generating chapters for "${result.title}"...`));
-    const chapters = (
-      await Promise.all(
-        parts.map(async (part) => {
-          const chunked = await recommender.transcript.chunk({
-            transcript: part,
-            videoTitle: result.title,
-          });
-          return chunked.sections;
-        })
-      )
-    ).flat();
-    console.log(chalk.green(chapters.length + " chapters generated"));
-    console.log(JSON.stringify(chapters, null, 2));
+  // chunk transcripts
+  type SearchResultWithTranscriptAndChunks = {
+    searchResult: SearchResult;
+    cues: TranscriptCue[];
+    chunks: TranscriptChunk[];
+  };
+
+  const chunkedTranscripts: SearchResultWithTranscriptAndChunks[] = [];
+  for (const result of resultsWithTranscripts) {
+    console.log(
+      chalk.blue(`Generating chapters for "${result.searchResult.title}"...`)
+    );
+    const chunks = await recommender.transcript.chunk({
+      transcript: result.cues,
+      title: result.searchResult.title,
+    });
+    if (!chunks.length) {
+      console.log(
+        chalk.red("No chapters generated for " + result.searchResult.title)
+      );
+      continue;
+    } else {
+      console.log(
+        chalk.green(
+          `${chunks.length} chapters generated for "${result.searchResult.title}"`
+        )
+      );
+      console.log(chunks);
+      chunkedTranscripts.push({
+        ...result,
+        chunks,
+      });
+    }
   }
+
+  writeFileSync(
+    "chunkedTranscripts.json",
+    JSON.stringify(chunkedTranscripts, null, 2),
+    "utf-8"
+  );
 })();

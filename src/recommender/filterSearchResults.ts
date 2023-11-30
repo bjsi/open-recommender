@@ -4,7 +4,7 @@ import zodToJsonSchema from "zod-to-json-schema";
 import { SearchResult } from "../youtube/search";
 import { Prompt } from "./prompt";
 import OpenAI from "openai";
-import { exampleSearchResults1 } from "./tests/exampleData";
+import { remnoteFlashcardsSearchResults } from "./tests/exampleData";
 import dotenv from "dotenv";
 
 const prompt: ChatCompletionMessageParam[] = [
@@ -37,12 +37,12 @@ Chapters:
 ${r.chapters?.map((c, idx) => idx + 1 + ". " + c.title).join("\n")}
 `.trim()
     )
-    .join("\n\n");
+    .join("\n---\n");
 };
 
 const inputSchema = z.object({
-  searchResults: z.string(),
-  userContext: z.string(),
+  results: z.string(),
+  queries: z.string().array(),
 });
 
 export type FilterSearchResultsInputVars = z.infer<typeof inputSchema>;
@@ -70,14 +70,13 @@ export const filterSearchResults = new Prompt({
 
 if (require.main === module) {
   dotenv.config();
-  const searchResults = searchResultsToString(exampleSearchResults1);
+  const searchResults = searchResultsToString(remnoteFlashcardsSearchResults);
   console.log(searchResults);
-  filterSearchResults.run(
-    {
-      searchResults,
-      //"The user is interested in learning more about RemNote's flashcard home project.",
-      userContext: "The user is interested in space.",
+  filterSearchResults.run({
+    promptVars: {
+      results: searchResults,
+      queries: ["videos about space and planets"],
     },
-    true
-  );
+    verbose: true,
+  });
 }

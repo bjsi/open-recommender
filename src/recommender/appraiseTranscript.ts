@@ -29,7 +29,7 @@ Based on these criteria, provide an assessment of whether the video should be re
   {
     role: "user",
     content: `
-Title: {{ videoTitle }}
+Title: {{ title }}
 
 {{ transcript }}
 `.trim(),
@@ -38,7 +38,7 @@ Title: {{ videoTitle }}
 
 const inputSchema = z.object({
   transcript: z.string(),
-  videoTitle: z.string(),
+  title: z.string(),
 });
 
 export type AppraiseTranscriptInputVars = z.infer<typeof inputSchema>;
