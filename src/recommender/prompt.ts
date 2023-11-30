@@ -38,7 +38,8 @@ export class Prompt<
     promptVars: z.infer<InputSchema>;
     verbose?: boolean;
   }): Promise<OutputSchema extends ZodType<infer U> ? U : string | null> => {
-    const messages = compilePrompt(this.prompt, args.promptVars);
+    const promptVars = this.inputSchema.parse(args.promptVars);
+    const messages = compilePrompt(this.prompt, promptVars);
     if (args.verbose) console.log(messages);
     const response = await new OpenAI().chat.completions.create({
       messages,
