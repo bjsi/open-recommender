@@ -63,25 +63,24 @@ import chalk from "chalk";
   }
 
   // pre-filter search results
-  // TODO: unreliable! need to fix
 
-  // console.log(chalk.blue("Filtering search results..."));
-  // const filteredResults = await recommender.search.filter({
-  //   results,
-  //   queries,
-  // });
-  // if (!filteredResults.length) {
-  //   console.log("No search results passed the search filter");
-  //   return;
-  // }
-  // console.log(
-  //   chalk.green("Search results that passed the initial search filter:")
-  // );
-  // console.log(
-  //   filteredResults
-  //     .map((result, idx) => `${idx + 1}. ${result.title}`)
-  //     .join("\n")
-  // );
+  console.log(chalk.blue("Filtering search results..."));
+  const filteredResults = await recommender.search.filter({
+    results,
+    queries,
+  });
+  if (!filteredResults.length) {
+    console.log("No search results passed the search filter");
+    return;
+  }
+  console.log(
+    chalk.green("Search results that passed the initial search filter:")
+  );
+  console.log(
+    filteredResults
+      .map((result, idx) => `${idx + 1}. ${result.title}`)
+      .join("\n")
+  );
 
   type SearchResultWithTranscript = {
     searchResult: SearchResult;
