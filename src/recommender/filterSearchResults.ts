@@ -11,19 +11,28 @@ const prompt: ChatCompletionMessageParam[] = [
   {
     role: "system",
     content: `
-- Which of the following videos would be most relevant to the user based on their interests.
+- You are a YouTube video recommender system choosing which videos to recommend to a user.
 - You should not recommend videos that are not relevant to the user.
-- User's interests: {{ userContext }}
-- Videos:
-{{ searchResults }}
+- Output an array of video IDs in order of relevance.
 `.trim(),
   },
   {
     role: "user",
     content: `
+Here are the kind of videos I'm interested in:
+{{ queries }}
+Search results:
+{{ results }}
 `.trim(),
   },
 ];
+
+const inputSchema = z.object({
+  results: z.string(),
+  queries: z.string().array(),
+});
+
+export type FilterSearchResultsInputVars = z.infer<typeof inputSchema>;
 
 export const searchResultsToString = (results: SearchResult[]) => {
   return results
@@ -39,13 +48,6 @@ ${r.chapters?.map((c, idx) => idx + 1 + ". " + c.title).join("\n")}
     )
     .join("\n---\n");
 };
-
-const inputSchema = z.object({
-  results: z.string(),
-  queries: z.string().array(),
-});
-
-export type FilterSearchResultsInputVars = z.infer<typeof inputSchema>;
 
 const outputSchema = z.object({
   // array of ids
@@ -72,13 +74,15 @@ if (require.main === module) {
   (async () => {
     dotenv.config();
     const searchResults = searchResultsToString(remnoteFlashcardsSearchResults);
-    console.log(searchResults);
-    await filterSearchResults.run({
+    const { recommendedVideos } = await filterSearchResults.run({
       promptVars: {
         results: searchResults,
-        queries: ["videos about space and planets"],
+        queries: ["remnote flashcard home feature"],
       },
       verbose: true,
     });
+    console.log(
+      recommendedVideos.map((id) => remnoteFlashcardsSearchResults[id])
+    );
   })();
 }
