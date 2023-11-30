@@ -63,6 +63,7 @@ import chalk from "chalk";
   }
 
   // pre-filter search results
+  // TODO: unreliable! need to fix
 
   // console.log(chalk.blue("Filtering search results..."));
   // const filteredResults = await recommender.search.filter({
