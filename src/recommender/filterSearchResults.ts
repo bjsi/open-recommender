@@ -69,14 +69,16 @@ export const filterSearchResults = new Prompt({
 });
 
 if (require.main === module) {
-  dotenv.config();
-  const searchResults = searchResultsToString(remnoteFlashcardsSearchResults);
-  console.log(searchResults);
-  filterSearchResults.run({
-    promptVars: {
-      results: searchResults,
-      queries: ["videos about space and planets"],
-    },
-    verbose: true,
-  });
+  (async () => {
+    dotenv.config();
+    const searchResults = searchResultsToString(remnoteFlashcardsSearchResults);
+    console.log(searchResults);
+    await filterSearchResults.run({
+      promptVars: {
+        results: searchResults,
+        queries: ["videos about space and planets"],
+      },
+      verbose: true,
+    });
+  })();
 }

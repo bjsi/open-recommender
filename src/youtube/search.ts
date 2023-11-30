@@ -53,11 +53,19 @@ ${result.chapters?.map((c, idx) => idx + 1 + ". " + c.title).join("\n")}
   // Rating: ${result.average_rating} // always seems to be null
 };
 
-export async function search(
-  query: string,
-  n_results: number = 3
-): Promise<SearchResult[]> {
-  const searchCommand = `yt-dlp "ytsearch${n_results}:${query}" --dump-json`;
+interface YouTubeSearchArgs {
+  query: string;
+  randomlyAppendTerms?: string[];
+  n_results?: number;
+}
+
+const pickRandom = <T>(arr: T[]) => arr[Math.floor(Math.random() * arr.length)];
+
+export async function search(args: YouTubeSearchArgs): Promise<SearchResult[]> {
+  const searchCommand = `yt-dlp "ytsearch${args.n_results || 3}:${
+    args.query +
+    (args.randomlyAppendTerms ? " " + pickRandom(args.randomlyAppendTerms) : "")
+  }" --dump-json`;
   const rawOutput = execSync(searchCommand, {
     maxBuffer: 10 * 1024 * 1024, // 10 MB
   })
@@ -76,7 +84,7 @@ if (require.main === module) {
     console.error("Please provide a query");
     process.exit(1);
   }
-  search(query, 3).then((results) => {
+  search({ query }).then((results) => {
     console.log(results.map(formatSearchResult).join("\n\n"));
   });
 }

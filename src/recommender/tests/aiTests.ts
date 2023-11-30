@@ -20,10 +20,7 @@ import {
   searchResultsToString,
 } from "../filterSearchResults";
 import { interleaveArrays } from "./utils";
-import {
-  functionCallTestOptions as functionCallOptions,
-  plainTextTestOptions,
-} from "./options";
+import { functionCallTestOptions as functionCallOptions } from "./options";
 import {
   CreateQueriesInputVars,
   createYouTubeSearchQueries,
@@ -33,9 +30,6 @@ import {
   loadExampleTweetHistory,
   tweetsToString,
 } from "../../twitter/getUserContext";
-import { writeFileSync } from "fs";
-import path from "path";
-import { exec, execSync } from "child_process";
 
 dotenv.config();
 

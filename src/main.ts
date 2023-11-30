@@ -42,7 +42,10 @@ import chalk from "chalk";
   console.log(chalk.blue("Searching YouTube..."));
   const results: SearchResult[] = [];
   for (const query of queries) {
-    const queryResults = await yt.search(query);
+    const queryResults = await yt.search({
+      query,
+      randomlyAppendTerms: ["podcast", "discussion"],
+    });
     console.log(
       chalk.blue(
         queryResults
@@ -61,23 +64,23 @@ import chalk from "chalk";
 
   // pre-filter search results
 
-  console.log(chalk.blue("Filtering search results..."));
-  const filteredResults = await recommender.search.filter({
-    results,
-    queries,
-  });
-  if (!filteredResults.length) {
-    console.log("No search results passed the search filter");
-    return;
-  }
-  console.log(
-    chalk.green("Search results that passed the initial search filter:")
-  );
-  console.log(
-    filteredResults
-      .map((result, idx) => `${idx + 1}. ${result.title}`)
-      .join("\n")
-  );
+  // console.log(chalk.blue("Filtering search results..."));
+  // const filteredResults = await recommender.search.filter({
+  //   results,
+  //   queries,
+  // });
+  // if (!filteredResults.length) {
+  //   console.log("No search results passed the search filter");
+  //   return;
+  // }
+  // console.log(
+  //   chalk.green("Search results that passed the initial search filter:")
+  // );
+  // console.log(
+  //   filteredResults
+  //     .map((result, idx) => `${idx + 1}. ${result.title}`)
+  //     .join("\n")
+  // );
 
   type SearchResultWithTranscript = {
     searchResult: SearchResult;
@@ -86,9 +89,9 @@ import chalk from "chalk";
 
   // fetch transcripts
 
-  console.log(chalk.blue(`Fetching ${filteredResults.length} transcripts...`));
+  console.log(chalk.blue(`Fetching ${results.length} transcripts...`));
   const resultsWithTranscripts: SearchResultWithTranscript[] = [];
-  for (const result of filteredResults) {
+  for (const result of results) {
     const { id, title } = result;
     const fetchResult = await yt.transcript.fetch({ id, title });
     if (!fetchResult || !fetchResult.cues.length) {
