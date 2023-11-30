@@ -6,7 +6,7 @@ import {
   AppraiseTranscriptInputVars,
   appraiseTranscript,
 } from "../appraiseTranscript";
-import { assertValidSchema } from "./helpers";
+import { assertJSON, assertValidSchema } from "./helpers";
 import { transcriptToString } from "../../youtube/transcript";
 import {
   remnoteFlashcardsSearchResults,
@@ -46,7 +46,31 @@ const promptTests: Record<string, EvaluateTestSuite> = {
           transcript: transcriptToString(learningVideoTranscript.cues),
           title: learningVideoTranscript.videoTitle,
         } satisfies ChunkTranscriptVars,
-        assert: [assertValidSchema(chunkTranscript.function!.schema)],
+        assert: [
+          assertValidSchema(chunkTranscript.function!.schema),
+          assertJSON(chunkTranscript.function!.schema, (data) => {
+            const intro = data.sections.find((section) =>
+              section.tags.includes("Intro")
+            );
+            console.log(intro);
+            return {
+              pass: !!intro,
+              score: intro ? 1 : 0,
+              reason: "Intro section found",
+            };
+          }),
+          assertJSON(chunkTranscript.function!.schema, (data) => {
+            const outro = data.sections.find((section) =>
+              section.tags.includes("Outro")
+            );
+            console.log(outro);
+            return {
+              pass: !!outro,
+              score: outro ? 1 : 0,
+              reason: "Outro section found",
+            };
+          }),
+        ],
       },
     ],
   },

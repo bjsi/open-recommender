@@ -1,6 +1,9 @@
 import { z } from "zod";
 
-export const assertValidSchema = (schema: z.ZodSchema<any>) => {
+export const assertJSON = <T>(
+  schema: z.ZodSchema<T>,
+  test: (data: T) => { pass: boolean; score: number; reason: string }
+) => {
   return {
     type: "javascript",
     value: (output: any) => {
@@ -13,12 +16,18 @@ export const assertValidSchema = (schema: z.ZodSchema<any>) => {
           reason: validation.error.message,
         };
       } else {
-        return {
-          pass: true,
-          score: 1,
-          reason: "Successfully parsed JSON using zod schema.",
-        };
+        return test(validation.data);
       }
     },
   } as const;
+};
+
+export const assertValidSchema = (schema: z.ZodSchema<any>) => {
+  return assertJSON(schema, (data) => {
+    return {
+      pass: true,
+      score: 1,
+      reason: "Successfully parsed JSON using zod schema.",
+    };
+  });
 };
