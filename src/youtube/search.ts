@@ -2,6 +2,7 @@ import { execSync } from "child_process";
 import dotenv from "dotenv";
 import dayjs from "dayjs";
 import { z } from "zod";
+import { writeFileSync } from "fs";
 
 dotenv.config();
 
@@ -46,11 +47,9 @@ Title: ${result.title}
 Channel: ${result.channel}
 Views: ${result.view_count}
 Duration: ${dayjs().startOf("day").second(result.duration).format("H:mm:ss")}
-Likes: ${result.like_count}
 Chapters:
 ${result.chapters?.map((c, idx) => idx + 1 + ". " + c.title).join("\n")}
 `.trim();
-  // Rating: ${result.average_rating} // always seems to be null
 };
 
 interface YouTubeSearchArgs {
@@ -79,12 +78,15 @@ export async function search(args: YouTubeSearchArgs): Promise<SearchResult[]> {
 }
 
 if (require.main === module) {
-  const query = process.argv[2];
-  if (!query) {
-    console.error("Please provide a query");
-    process.exit(1);
-  }
-  search({ query }).then((results) => {
-    console.log(results.map(formatSearchResult).join("\n\n"));
-  });
+  (async () => {
+    const query = process.argv[2];
+    const n_results = Number.parseInt(process.argv[3]) || 3;
+    if (!query) {
+      console.error("Please provide a query");
+      process.exit(1);
+    }
+    const results = await search({ query, n_results });
+    writeFileSync("searchResults.json", JSON.stringify(results, null, 2));
+    console.log(results.map(formatSearchResult).join("\n---\n"));
+  })();
 }

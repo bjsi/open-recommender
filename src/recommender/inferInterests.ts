@@ -75,8 +75,11 @@ export const inferInterests = new Prompt({
 if (require.main === module) {
   (async () => {
     dotenv.config();
-    const tweets = loadExampleTweetHistory();
-    const user = "experilearning";
+    const user = process.argv[2] || "experilearning";
+    const tweets = loadExampleTweetHistory(user);
+    if (!tweets) {
+      throw new Error("No tweet history found");
+    }
     const tweetsStr = tweetsToString(tweets, user);
     const parts = await splitTweetHistory(tweetsStr);
     for (const part of parts) {
