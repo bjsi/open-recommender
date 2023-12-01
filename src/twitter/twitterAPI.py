@@ -19,16 +19,16 @@ def hello() -> str:
     return "Hello World!"
 
 
-async def _get_user_info(user_login: str) -> Awaitable[str]:
+async def _get_tweets(user_login: str, n_tweets: int) -> Awaitable[str]:
     global api
     if not api:
         api = await login()
     user = await api.user_by_login(user_login)
     tweets_and_replies = await gather(
-        api.user_tweets_and_replies(user.id, limit=20)
+        api.user_tweets_and_replies(user.id, limit=n_tweets)
     )  # list[Tweet]
     return "[" + ", ".join([tweet.json() for tweet in tweets_and_replies]) + "]"
 
 
-def get_user_info(user_login: str) -> List[str]:
-    return asyncio.run(_get_user_info(user_login))
+def get_tweets(user_login: str, n_tweets=20) -> List[str]:
+    return asyncio.run(_get_tweets(user_login, n_tweets))

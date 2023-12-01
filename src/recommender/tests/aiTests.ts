@@ -128,15 +128,15 @@ const promptTests: Record<string, EvaluateTestSuite> = {
       functions: [createYouTubeSearchQueries.function!.function],
     }),
     tests: [
-      {
-        vars: {
-          tweets: tweetsToString(
-            loadExampleTweetHistory("experilearning") || [],
-            "experilearning"
-          ),
-        } satisfies CreateQueriesInputVars,
-        assert: [],
-      },
+      // {
+      //   vars: {
+      //     tweets: tweetsToString(
+      //       loadExampleTweetHistory("experilearning") || [],
+      //       "experilearning"
+      //     ),
+      //   } satisfies CreateQueriesInputVars,
+      //   assert: [],
+      // },
       {
         vars: {
           tweets: tweetsToString(
@@ -188,7 +188,8 @@ const main = async () => {
         showProgressBar: true,
       }
     );
-    console.log(generateTable(results, 500).toString());
+    console.log(results);
+    console.log(generateTable(results).toString());
   }
 };
 

@@ -16,6 +16,7 @@ import chalk from "chalk";
   console.log(chalk.blue("Fetching tweets..."));
   const tweets = await twitter.tweets.fetch({
     user,
+    n_tweets: 20,
   });
   if (!tweets.length) {
     console.log(chalk.red("No tweets found"));
@@ -30,21 +31,24 @@ import chalk from "chalk";
   const { queries } = await recommender.queries.create({
     tweets,
     user,
+    verbose: true,
   });
   if (!queries.length) {
     console.log(chalk.red("No search queries generated"));
     return;
   } else {
     console.log(chalk.green("Search queries:"));
-    console.log(queries.map((query, idx) => `${idx + 1}. ${query}`).join("\n"));
+    console.log(
+      queries.map((query, idx) => `${idx + 1}. ${query.join(" ")}`).join("\n")
+    );
   }
 
   console.log(chalk.blue("Searching YouTube..."));
   const results: SearchResult[] = [];
   for (const query of queries) {
     const queryResults = await yt.search({
-      query,
-      randomlyAppendTerms: ["podcast", "discussion"],
+      query: query.join(" "),
+      // randomlyAppendTerms: ["podcast", "discussion"],
     });
     console.log(
       chalk.blue(
@@ -67,7 +71,7 @@ import chalk from "chalk";
   console.log(chalk.blue("Filtering search results..."));
   const filteredResults = await recommender.search.filter({
     results,
-    queries,
+    queries: queries.map((query) => query.join(" ")),
   });
   if (!filteredResults.length) {
     console.log("No search results passed the search filter");
@@ -91,7 +95,7 @@ import chalk from "chalk";
 
   console.log(chalk.blue(`Fetching ${results.length} transcripts...`));
   const resultsWithTranscripts: SearchResultWithTranscript[] = [];
-  for (const result of results) {
+  for (const result of filteredResults) {
     const { id, title } = result;
     const fetchResult = await yt.transcript.fetch({ id, title });
     if (!fetchResult || !fetchResult.cues.length) {
@@ -173,4 +177,4 @@ import chalk from "chalk";
     JSON.stringify(chunkedTranscripts, null, 2),
     "utf-8"
   );
-})();
+})().catch(console.log);

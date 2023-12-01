@@ -14,27 +14,88 @@ import OpenAI from "openai";
 // Getting this prompt right is critical to the success of the recommender.
 // Run the test suite to compare different versions of the prompt.
 
-const sysMessages = [
-  // podcasts
-  "Analyze the provided list of tweets from a user's Twitter feed to identify specific interests, subtopics, and technical terms, with a focus on topics that would lend themselves well to podcast formats. Then, generate YouTube search queries to find podcasts that align with these interests, combining them in a way that would likely yield engaging and in-depth podcast content. Make sure to include keywords in the queries that are specific to podcasts, such as 'podcast', 'interview', or 'discussion', alongside the identified interests and technical terms. Aim to create a variety of specific queries that target both video and podcast content related to the user's interests.",
-  // videos
-  "Examine the provided list of tweets from a user's Twitter feed and identify specific interests, subtopics, and especially any technical terms or industry jargon mentioned. Focus on these technical terms when creatively combining different interests to generate YouTube search queries. These queries should be crafted to find videos that are deeply aligned with the user's professional or hobbyist interests, using the technical terms to pinpoint content that is both directly related and uniquely insightful. Generate ten specific search queries, aiming for precision in content relevance.",
-  // podcasts, interviews, and videos
-  "Analyze the provided list of tweets from a user's Twitter feed to identify specific topics, events and niches that interest the user. " +
-    "Then, generate YouTube search queries to find videos, interviews and podcasts that align with are deeply aligned with the user's professional or hobbyist interests. " +
-    "Aim to create 10 specific queries. " +
-    "The queries should be written as a collection of keywords as opposed to full sentences.",
-];
+const prompt1 = {
+  prompt: `
+# Instructions
+- Analyze the provided list of tweets from a user's Twitter feed to identify topics, events and niches that interest the user.
+- Then, generate YouTube search queries to find videos, interviews and podcasts that are deeply aligned with the user's professional or hobbyist interests.
+- Each query should be formulated as a short array of 2-3 words, prioritizing specific technical terms the user has mentioned.
+- Create 10 specific queries.
+`.trim(),
+  exampleTweets: tweetsToString(
+    loadExampleTweetHistory("experilearning") || [],
+    "experilearning"
+  ),
+  exampleQueries: [
+    ["AI", "journalling", "assistant"],
+    ["GPT-4V", "Vimium", "web browsing"],
+    ["Three Body Problem", "e/acc", "science fiction"],
+    ["Government", "AI", "integration"],
+    ["LLM", "citation", "verification"],
+    ["YouTube", "recommender", "system"],
+    ["music", "creation", "AI"],
+    ["Dominic Cummings", "interview", "government reform"],
+    ["AI", "Text-to-speech", "integration"],
+    ["e/acc", "meetup", "organization"],
+  ],
+};
+
+const prompt2 = {
+  prompt: prompt1.prompt,
+  exampleTweets:
+    "there's going to be a resurgence in RSS reader style internet consumption once LLM costs drop to the point where you can pre-filter blogs, twitter, subreddits etc using your personalised content recommendation agent",
+  exampleQueries: [["RSS Reader", "LLM"]],
+};
+
+const prompt3 = {
+  prompt: prompt1.prompt,
+  exampleTweets: tweetsToString(
+    loadExampleTweetHistory("corbtt") || [],
+    "corbtt"
+  ),
+  exampleQueries: [
+    ["OpenHermes", "ChatBot", "Arena"],
+    ["GPT-4", "Turbo", "benchmarking"],
+    ["AGI", "economic", "value"],
+    ["Emmett Shear", "OpenAI", "CEO"],
+    ["SAM Altman", "OpenAI", "departure"],
+    ["Microsoft", "Orca 2", "Evals"],
+    ["Language model", "evaluations"],
+    ["OpenAI", "history", "Sam Altman"],
+    ["AI", "decentralization"],
+  ],
+};
+
+const prompts = [prompt1, prompt2, prompt3];
 
 export const createYouTubeSearchQueriesPrompts: ChatCompletionMessageParam[][] =
-  sysMessages.map((sysMessage) => [
+  prompts.map((prompt) => [
     {
       role: "system",
-      content: sysMessage,
+      content: prompt.prompt,
     },
     {
       role: "user",
-      content: "{{ tweets }}",
+      content: `
+My history of Tweets:
+${prompt.exampleTweets}
+`.trim(),
+    },
+    {
+      role: "assistant",
+      content: null,
+      function_call: {
+        name: "createYouTubeSearchQueries",
+        arguments: JSON.stringify({
+          queries: prompt.exampleQueries,
+        } satisfies z.infer<typeof outputSchema>),
+      },
+    },
+    {
+      role: "user",
+      content: `
+My history of Tweets:
+{{ tweets }}`,
     },
   ]);
 
@@ -45,7 +106,7 @@ const inputSchema = z.object({
 export type CreateQueriesInputVars = z.infer<typeof inputSchema>;
 
 const outputSchema = z.object({
-  queries: z.array(z.string()),
+  queries: z.array(z.array(z.string())),
 });
 
 const functionCall: OpenAI.ChatCompletionCreateParams.Function = {
@@ -57,7 +118,7 @@ const functionCall: OpenAI.ChatCompletionCreateParams.Function = {
 
 export const createYouTubeSearchQueries = new Prompt({
   prompt: createYouTubeSearchQueriesPrompts[2],
-  model: "gpt-4-1106-preview",
+  model: "gpt-4",
   inputSchema,
   function: {
     schema: outputSchema,
@@ -66,27 +127,23 @@ export const createYouTubeSearchQueries = new Prompt({
 });
 
 if (require.main === module) {
-  dotenv.config();
-  const user = process.argv[2] || "experilearning";
-  const tweets =
-    loadExampleTweetHistory(user) ||
-    (await (async () => {
-      const { api, bridge } = initTwitterAPI();
-      const tweets = await getUserTweetHistory(api, user);
-      bridge.close();
-      return tweets;
-    })());
-  const tweetsStr = tweetsToString(tweets, user);
-  createYouTubeSearchQueries
-    .run({
+  (async () => {
+    dotenv.config();
+    const user = process.argv[2] || "experilearning";
+    const tweets =
+      loadExampleTweetHistory(user) ||
+      (await (async () => {
+        const { api, bridge } = initTwitterAPI();
+        const tweets = await getUserTweetHistory(api, user);
+        bridge.close();
+        return tweets;
+      })());
+    const tweetsStr = tweetsToString(tweets, user);
+    const results = await createYouTubeSearchQueries.run({
       promptVars: {
         tweets: tweetsStr,
       },
-    })
-    .then((results) => {
-      console.log(results);
-    })
-    .catch((err) => {
-      console.log(err);
     });
+    console.log(results);
+  })();
 }

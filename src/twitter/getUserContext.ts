@@ -8,7 +8,7 @@
  * TODO: bios of recent follows?
  */
 
-import { readFileSync, write, writeFileSync } from "fs";
+import { readFileSync, writeFileSync } from "fs";
 import { TweetSchema, Tweet } from "./schemas";
 import path from "path";
 import { TwitterAPI, initTwitterAPI } from "./twitterAPI";
@@ -48,44 +48,52 @@ export const tweetsToString = (tweets: Tweet[], user: string) => {
     .join("\n---\n");
 };
 
-interface TweetBase {
-  id: number;
-  url: string;
-}
+import { z } from "zod";
 
-interface ReplyBase extends TweetBase {
-  replyContent: string;
-  replyDate: string;
-  replyUser: string;
-  contextContent: string;
-  contextDate: string;
-  contextUser: string;
-}
+const TweetBaseSchema = z.object({
+  id: z.number(),
+  url: z.string(),
+});
 
-interface Reply extends ReplyBase {
-  type: "reply";
-}
+const ReplyBaseSchema = TweetBaseSchema.extend({
+  replyContent: z.string(),
+  replyDate: z.string(),
+  replyUser: z.string(),
+  contextContent: z.string(),
+  contextDate: z.string(),
+  contextUser: z.string(),
+});
 
-interface Quote extends ReplyBase {
-  type: "quote";
-}
+const ReplySchema = ReplyBaseSchema.extend({
+  type: z.literal("reply"),
+});
 
-interface NormalTweet extends TweetBase {
-  type: "tweet";
-  content: string;
-  date: string;
-  user: string;
-}
+const QuoteSchema = ReplyBaseSchema.extend({
+  type: z.literal("quote"),
+});
 
-interface Like extends TweetBase {
-  type: "like";
-  content: string;
-  date: string;
-  user: string;
-  likedBy: string;
-}
+const NormalTweetSchema = TweetBaseSchema.extend({
+  type: z.literal("tweet"),
+  content: z.string(),
+  date: z.string(),
+  user: z.string(),
+});
 
-type TweetType = Reply | Quote | NormalTweet | Like;
+const LikeSchema = TweetBaseSchema.extend({
+  type: z.literal("like"),
+  content: z.string(),
+  date: z.string(),
+  user: z.string(),
+  likedBy: z.string(),
+});
+
+export const TweetTypeSchema = z.union([
+  //ReplySchema,
+  QuoteSchema,
+  NormalTweetSchema,
+  LikeSchema,
+]);
+export type TweetType = z.infer<typeof TweetTypeSchema>;
 
 const formatTweetContent = (content: string) => {
   return content
@@ -147,6 +155,12 @@ const formatTweet = (tweet: Tweet, user: string): TweetType | null => {
   }
 };
 
+export const formatTweets = (tweets: Tweet[], user: string) => {
+  return tweets
+    .map((tweet) => formatTweet(tweet, user))
+    .filter(Boolean) as TweetType[];
+};
+
 const isAdvert = (tweet: Tweet) => {
   const sources = [tweet.source, tweet.sourceUrl, tweet.sourceLabel];
   return sources.some((x) => x?.toLowerCase()?.includes("advert"));
@@ -159,9 +173,10 @@ const parseTweets = (tweetsStr: string) => {
 
 export const getUserTweetHistory = async (
   api: TwitterAPI,
-  user_login: string
+  user_login: string,
+  n_tweets?: number
 ) => {
-  const tweetsStr = await api.get_user_info(user_login);
+  const tweetsStr = await api.get_tweets(user_login, n_tweets || 50);
   return parseTweets(tweetsStr);
 };
 
