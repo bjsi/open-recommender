@@ -61,6 +61,6 @@ export const appraiseTranscript = new Prompt({
     function: functionCall,
   },
   prompt: prompt,
-  model: "gpt-4-1106-preview",
+  model: "gpt-4",
   inputSchema: inputSchema,
 });
