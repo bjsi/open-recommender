@@ -3,11 +3,12 @@ import { load } from "sqlite-vss";
 import { z } from "zod";
 import {
   TweetTypeSchema,
-  formatTweets,
+  formatTweet,
   loadExampleTweetHistory,
   tweetToString,
 } from "./twitter/getUserContext";
 import { embedMany } from "./embed/embedText";
+import { dbPath } from "./filesystem";
 
 type Vector = number[];
 
@@ -15,7 +16,6 @@ export function setupSQLiteDatabase(
   database: BetterSqlite3.Database
 ): BetterSqlite3.Database {
   load(database);
-
   [
     `CREATE TABLE IF NOT EXISTS vectors (id TEXT PRIMARY KEY, data TEXT, vector TEXT)`,
     `CREATE VIRTUAL TABLE IF NOT EXISTS vss_vectors USING vss0(vector(1536))`,
@@ -100,11 +100,30 @@ export class SQLiteVectorIndex<DATA extends object | undefined> {
   }
 }
 
+let _db: BetterSqlite3.Database;
+let _vectorIndex: SQLiteVectorIndex<z.infer<typeof TweetTypeSchema>>;
+
+export function getOrCreateVectorIndex() {
+  if (!_vectorIndex) {
+    _vectorIndex = new SQLiteVectorIndex({
+      db: getOrCreateDB(),
+      schema: TweetTypeSchema,
+    });
+  }
+  return _vectorIndex;
+}
+
+export function getOrCreateDB() {
+  if (!_db) {
+    _db = new BetterSqlite3(dbPath);
+    setupSQLiteDatabase(_db);
+  }
+  return _db;
+}
+
 (async () => {
-  const db = new BetterSqlite3("test.db");
-  setupSQLiteDatabase(db);
   const index = new SQLiteVectorIndex({
-    db,
+    db: getOrCreateDB(),
     schema: TweetTypeSchema,
   });
   const tweets = loadExampleTweetHistory("experilearning") || [];
@@ -115,7 +134,7 @@ export class SQLiteVectorIndex<DATA extends object | undefined> {
   );
   const data = tweets.map((tweet, idx) => ({
     id: tweet.id.toString(),
-    data: formatTweets([tweet], "experilearning")[0],
+    data: formatTweet(tweet, "experilearning"),
     vector: vectors[idx],
   }));
   index.upsertMany(data);
