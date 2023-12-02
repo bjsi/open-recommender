@@ -68,7 +68,7 @@ export const inferInterests = new Prompt({
     function: functionCall,
   },
   prompt: prompt,
-  model: "gpt-4-1106-preview",
+  model: "gpt-4",
   inputSchema: inputSchema,
 });
 
@@ -80,7 +80,7 @@ if (require.main === module) {
     if (!tweets) {
       throw new Error("No tweet history found");
     }
-    const tweetsStr = tweetsToString(tweets, user);
+    const tweetsStr = tweetsToString({ tweets, user });
     const parts = await splitTweetHistory(tweetsStr);
     for (const part of parts) {
       const res = await inferInterests.run({

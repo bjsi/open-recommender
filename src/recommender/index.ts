@@ -86,7 +86,7 @@ export const recommender = {
     create: (args: CreateQueriesArgs) => {
       return createYouTubeSearchQueries.run({
         promptVars: {
-          tweets: tweetsToString(args.tweets, args.user),
+          tweets: tweetsToString({ ...args }),
         },
         verbose: args.verbose,
       });

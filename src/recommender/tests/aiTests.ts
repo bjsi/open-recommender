@@ -139,10 +139,10 @@ const promptTests: Record<string, EvaluateTestSuite> = {
       // },
       {
         vars: {
-          tweets: tweetsToString(
-            loadExampleTweetHistory("corbtt") || [],
-            "corbtt"
-          ),
+          tweets: tweetsToString({
+            tweets: loadExampleTweetHistory("corbtt") || [],
+            user: "corbtt",
+          }),
         } satisfies CreateQueriesInputVars,
         assert: [],
       },
