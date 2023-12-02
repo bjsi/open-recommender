@@ -20,8 +20,8 @@ type Place = z.infer<typeof PlaceSchema>;
 
 const TextLinkSchema = z.object({
   url: z.string(),
-  text: z.string().nullable(),
-  tcourl: z.string().nullable(),
+  text: z.string().nullish(),
+  tcourl: z.string().nullish(),
 });
 
 type TextLink = z.infer<typeof TextLinkSchema>;
@@ -35,7 +35,7 @@ const UserRefSchema = z.object({
 
 type UserRef = z.infer<typeof UserRefSchema>;
 
-const UserSchema = z.object({
+export const UserSchema = z.object({
   id: z.number(),
   id_str: z.string(),
   url: z.string(),
@@ -51,11 +51,11 @@ const UserSchema = z.object({
   mediaCount: z.number(),
   location: z.string(),
   profileImageUrl: z.string(),
-  profileBannerUrl: z.string().nullable(),
-  protected: z.boolean().nullable(),
-  verified: z.boolean().nullable(),
-  blue: z.boolean().nullable(),
-  blueType: z.string().nullable(),
+  profileBannerUrl: z.string().nullish(),
+  protected: z.boolean().nullish(),
+  verified: z.boolean().nullish(),
+  blue: z.boolean().nullish(),
+  blueType: z.string().nullish(),
   descriptionLinks: z.array(TextLinkSchema),
   _type: z.literal("snscrape.modules.twitter.User"),
 });
@@ -84,7 +84,7 @@ const MediaVideoSchema = z.object({
   thumbnailUrl: z.string(),
   variants: z.array(MediaVideoVariantSchema),
   duration: z.number(),
-  views: z.number().nullable(),
+  views: z.number().nullish(),
 });
 
 type MediaVideo = z.infer<typeof MediaVideoSchema>;
@@ -117,6 +117,7 @@ export interface Tweet {
   viewCount?: number | null;
   retweetedTweet?: Tweet | null;
   quotedTweet?: Tweet | null;
+  replyToTweet?: Tweet | null;
   place?: Place | null;
   coordinates?: Coordinates | null;
   inReplyToTweetId?: number | null;
@@ -146,17 +147,18 @@ export const TweetSchema: z.ZodType<Tweet> = z.lazy(() =>
     cashtags: z.array(z.string()),
     mentionedUsers: z.array(UserRefSchema),
     links: z.array(TextLinkSchema),
-    viewCount: z.number().nullable(),
-    retweetedTweet: TweetSchema.nullable(),
-    quotedTweet: TweetSchema.nullable(),
-    place: PlaceSchema.nullable(),
-    coordinates: CoordinatesSchema.nullable(),
-    inReplyToTweetId: z.number().nullable(),
-    inReplyToUser: UserRefSchema.nullable(),
-    source: z.string().nullable(),
-    sourceUrl: z.string().nullable(),
-    sourceLabel: z.string().nullable(),
-    media: MediaSchema.nullable(),
+    viewCount: z.number().nullish(),
+    retweetedTweet: TweetSchema.nullish(),
+    quotedTweet: TweetSchema.nullish(),
+    replyToTweet: TweetSchema.nullish(),
+    place: PlaceSchema.nullish(),
+    coordinates: CoordinatesSchema.nullish(),
+    inReplyToTweetId: z.number().nullish(),
+    inReplyToUser: UserRefSchema.nullish(),
+    source: z.string().nullish(),
+    sourceUrl: z.string().nullish(),
+    sourceLabel: z.string().nullish(),
+    media: MediaSchema.nullish(),
     _type: z.literal("snscrape.modules.twitter.Tweet"),
   })
 );

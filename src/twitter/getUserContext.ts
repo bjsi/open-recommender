@@ -1,33 +1,29 @@
 /**
  * Scrape Twitter to infer user context.
  *
- * user bio
- * tweets + retweets
- * replies
- * TODO: likes
  * TODO: bios of recent follows?
  */
 
 import { readFileSync, writeFileSync } from "fs";
-import { TweetSchema, Tweet } from "./schemas";
+import { TweetSchema, Tweet, UserSchema } from "./schemas";
 import path from "path";
 import { TwitterAPI, initTwitterAPI } from "./twitterAPI";
 
-const UserContextSchema = TweetSchema.array();
-
-// TODO: get replies using tweet.inReplyToTweetId?
 // TODO: what if I quote a tweet and reply to it?
 // TODO: dedupe retweet + like
-export const tweetToString = (data: Tweet, user: string) => {
+export const tweetToString = (args: {
+  data: Tweet;
+  user: string;
+  id?: number;
+}) => {
+  const { data, user, id } = args;
   const tweet = formatTweet(data, user);
-  if (!tweet) {
-    return null;
-  }
   const type = tweet.type;
-  const hasContext = type === "reply" || type === "quote";
+  const hasContext = type === "quote" || type === "reply";
   const date = hasContext ? tweet.replyDate : tweet.date;
   const content = hasContext ? tweet.replyContent : tweet.content;
   const formattedTweet = [
+    id && `ID: ${id}`,
     tweet.type === "like" && `Liked by @${user}`,
     hasContext && `tweet: @${tweet.contextUser} (${tweet.contextDate})`,
     hasContext && tweet.contextContent,
@@ -41,9 +37,19 @@ export const tweetToString = (data: Tweet, user: string) => {
   return formattedTweet;
 };
 
-export const tweetsToString = (tweets: Tweet[], user: string) => {
-  return tweets
-    .map((tweet) => tweetToString(tweet, user))
+export const tweetsToString = (args: {
+  tweets: Tweet[];
+  user: string;
+  includeIds?: boolean;
+}) => {
+  return args.tweets
+    .map((tweet, idx) =>
+      tweetToString({
+        data: tweet,
+        user: args.user,
+        id: args.includeIds ? idx : undefined,
+      })
+    )
     .filter(Boolean)
     .join("\n---\n");
 };
@@ -88,7 +94,7 @@ const LikeSchema = TweetBaseSchema.extend({
 });
 
 export const TweetTypeSchema = z.union([
-  //ReplySchema,
+  ReplySchema,
   QuoteSchema,
   NormalTweetSchema,
   LikeSchema,
@@ -103,8 +109,9 @@ const formatTweetContent = (content: string) => {
     .join("\n");
 };
 
-const formatTweet = (tweet: Tweet, user: string): TweetType | null => {
-  const contextTweet = tweet.retweetedTweet || tweet.quotedTweet;
+export const formatTweet = (tweet: Tweet, user: string): TweetType => {
+  const contextTweet =
+    tweet.retweetedTweet || tweet.quotedTweet || tweet.replyToTweet;
   const tweetContent = formatTweetContent(tweet.rawContent);
   const contextContent = formatTweetContent(contextTweet?.rawContent || "");
   if (tweet.user.username !== user) {
@@ -129,20 +136,18 @@ const formatTweet = (tweet: Tweet, user: string): TweetType | null => {
       contextDate: contextTweet!.date.slice(0, 10),
       contextUser: contextTweet!.user.username,
     };
-  } else if (tweet.inReplyToTweetId) {
-    return null;
-    // @ts-ignore
-    // return {
-    // id: tweet.id,
-    // url: tweet.url,
-    // type: "reply",
-    // replyContent: tweetContent,
-    // replyDate: tweet.date.slice(0, 10),
-    // replyUser: tweet.user.username,
-    // contextContent: contextContent,
-    // contextDate: contextTweet!.date.slice(0, 10),
-    // contextUser: contextTweet!.user.username,
-    // };
+  } else if (tweet.inReplyToTweetId && tweet.replyToTweet) {
+    return {
+      id: tweet.id,
+      url: tweet.url,
+      type: "reply",
+      replyContent: tweetContent,
+      replyDate: tweet.date.slice(0, 10),
+      replyUser: tweet.user.username,
+      contextContent: contextContent,
+      contextDate: contextTweet!.date.slice(0, 10),
+      contextUser: contextTweet!.user.username,
+    };
   } else {
     return {
       id: tweet.id,
@@ -166,9 +171,23 @@ const isAdvert = (tweet: Tweet) => {
   return sources.some((x) => x?.toLowerCase()?.includes("advert"));
 };
 
+const parseTweet = (tweetStr: string | null) => {
+  if (!tweetStr) {
+    return null;
+  }
+  const tweet = TweetSchema.parse(JSON.parse(tweetStr));
+  return isAdvert(tweet) ? null : tweet;
+};
+
 const parseTweets = (tweetsStr: string) => {
-  const tweets = UserContextSchema.parse(JSON.parse(tweetsStr));
+  const tweets = TweetSchema.array().parse(JSON.parse(tweetsStr));
   return tweets.filter((tweet) => !isAdvert(tweet));
+};
+
+export const getUserProfile = async (api: TwitterAPI, user_login: string) => {
+  const userStr = await api.get_user(user_login);
+  const user = UserSchema.parse(JSON.parse(userStr));
+  return user;
 };
 
 export const getUserTweetHistory = async (
@@ -177,7 +196,17 @@ export const getUserTweetHistory = async (
   n_tweets?: number
 ) => {
   const tweetsStr = await api.get_tweets(user_login, n_tweets || 50);
-  return parseTweets(tweetsStr);
+  const tweets = parseTweets(tweetsStr);
+  for (const tweet of tweets) {
+    if (tweet.inReplyToTweetId != null) {
+      console.log("Getting reply to tweet: ", tweet.inReplyToTweetId);
+      const str = await api.get_tweet(tweet.inReplyToTweetId);
+      console.log("Got reply to tweet: ", str);
+
+      tweet.replyToTweet = parseTweet(str);
+    }
+  }
+  return tweets;
 };
 
 export const loadExampleTweetHistory = (user: string) => {
@@ -188,7 +217,7 @@ export const loadExampleTweetHistory = (user: string) => {
     );
     return parseTweets(tweetsStr);
   } catch {
-    return null;
+    return [];
   }
 };
 
@@ -199,19 +228,26 @@ if (require.main === module) {
       loadExampleTweetHistory(user) ||
       (await (async () => {
         const { api, bridge } = initTwitterAPI();
-        const tweets = await getUserTweetHistory(api, user);
+        const tweets = (await getUserTweetHistory(api, user, 20)).filter(
+          Boolean
+        ) as Tweet[];
+        const profile = await getUserProfile(api, user);
         bridge.close();
-        return tweets;
+        return {
+          tweets,
+          profile,
+        };
       })());
     if (!tweets || tweets.length === 0) {
       console.log("No tweets found");
       return;
     }
-    writeFileSync(
-      path.join(__dirname, `${user}ExampleTweets.json`),
-      JSON.stringify(tweets, null, 2)
-    );
-    const str = tweetsToString(tweets, user);
+    // writeFileSync(
+    //   path.join(__dirname, `${user}ExampleTweets.json`),
+    //   JSON.stringify(tweets, null, 2)
+    // );
+    const str = tweetsToString({ tweets, user });
     console.log(str);
+    // console.log("Profile: ", profile);
   })();
 }
