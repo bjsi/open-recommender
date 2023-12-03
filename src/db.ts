@@ -129,7 +129,7 @@ export function getOrCreateDB() {
   const tweets = loadExampleTweetHistory("experilearning") || [];
   const vectors = await embedMany(
     tweets
-      .map((tweet) => tweetToString(tweet, "experilearning"))
+      .map((tweet) => tweetToString({ data: tweet, user: "experilearning" }))
       .filter(Boolean) as string[]
   );
   const data = tweets.map((tweet, idx) => ({

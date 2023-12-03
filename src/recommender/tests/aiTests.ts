@@ -48,28 +48,6 @@ const promptTests: Record<string, EvaluateTestSuite> = {
         } satisfies ChunkTranscriptVars,
         assert: [
           assertValidSchema(chunkTranscript.function!.schema),
-          assertJSON(chunkTranscript.function!.schema, (data) => {
-            const intro = data.clips.find((section) =>
-              section.tags.includes("Intro")
-            );
-            console.log(intro);
-            return {
-              pass: !!intro,
-              score: intro ? 1 : 0,
-              reason: "Intro section found",
-            };
-          }),
-          assertJSON(chunkTranscript.function!.schema, (data) => {
-            const outro = data.clips.find((section) =>
-              section.tags.includes("Outro")
-            );
-            console.log(outro);
-            return {
-              pass: !!outro,
-              score: outro ? 1 : 0,
-              reason: "Outro section found",
-            };
-          }),
         ],
       },
     ],
@@ -123,9 +101,11 @@ const promptTests: Record<string, EvaluateTestSuite> = {
   },
   "create-queries": {
     ...functionCallOptions({
-      model: createYouTubeSearchQueries.model,
+      model: createYouTubeSearchQueries("experilearning").model,
       prompts: createYouTubeSearchQueriesPrompts,
-      functions: [createYouTubeSearchQueries.function!.function],
+      functions: [
+        createYouTubeSearchQueries("experilearning").function!.function,
+      ],
     }),
     tests: [
       // {

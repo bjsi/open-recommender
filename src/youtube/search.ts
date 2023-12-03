@@ -46,7 +46,10 @@ export const formatSearchResult = (result: SearchResult) => {
 Title: ${result.title}
 Channel: ${result.channel}
 Views: ${result.view_count}
-Duration: ${dayjs().startOf("day").second(result.duration).format("H:mm:ss")}
+Duration: ${dayjs()
+    .startOf("day")
+    .second(result.duration || 0)
+    .format("H:mm:ss")}
 Chapters:
 ${result.chapters?.map((c, idx) => idx + 1 + ". " + c.title).join("\n")}
 `.trim();
