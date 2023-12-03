@@ -56,7 +56,7 @@ export const recommender = {
       const parts = await splitTranscript(text);
       const chunks: TranscriptChunk[] = [];
       for (const part of parts) {
-        const { sections } = await chunkTranscript.run({
+        const { clips: sections } = await chunkTranscript.run({
           promptVars: {
             transcript: part,
             title: args.title,

@@ -49,7 +49,7 @@ const promptTests: Record<string, EvaluateTestSuite> = {
         assert: [
           assertValidSchema(chunkTranscript.function!.schema),
           assertJSON(chunkTranscript.function!.schema, (data) => {
-            const intro = data.sections.find((section) =>
+            const intro = data.clips.find((section) =>
               section.tags.includes("Intro")
             );
             console.log(intro);
@@ -60,7 +60,7 @@ const promptTests: Record<string, EvaluateTestSuite> = {
             };
           }),
           assertJSON(chunkTranscript.function!.schema, (data) => {
-            const outro = data.sections.find((section) =>
+            const outro = data.clips.find((section) =>
               section.tags.includes("Outro")
             );
             console.log(outro);

@@ -1,6 +1,6 @@
 import chalk from "chalk";
 import { execSync } from "child_process";
-import { existsSync, readFileSync } from "fs";
+import { existsSync, readFileSync, writeFileSync } from "fs";
 import path from "path";
 import { dataFolder } from "../filesystem";
 import { parseSync, stringifySync } from "subtitle";
@@ -170,6 +170,8 @@ if (require.main === module) {
     process.exit(1);
   }
   fetchTranscript(videoId, "Test video").then((result) => {
+    console.log("TEXT");
+    console.log(transcriptToString(result?.cues || []));
     console.log("CUES");
     console.log(result?.cues);
     // console.log("WEBVTT");
