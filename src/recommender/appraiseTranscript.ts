@@ -14,6 +14,7 @@ const prompt: ChatCompletionMessageParam[] = [
   {
     role: "system",
     content: `
+# Instructions
 Given a transcript of a video, evaluate whether the video is likely to be low-quality SEO spam. Consider the following characteristics when making your assessment:
 - **Use of Buzzwords and Jargon**: Look for an overuse of sensationalist or trendy terms like "revolutionize," "game-changing," "transformative," etc., without substantial context or explanation.
 - **Vagueness and Lack of Specific Details**: Identify if the transcript lacks specific, concrete information about the topics discussed, and instead uses broad, sweeping statements.
@@ -23,14 +24,15 @@ Given a transcript of a video, evaluate whether the video is likely to be low-qu
 - **Overpromising and Excessive Speculation**: Assess whether the transcript makes unrealistic promises about the future or engages in speculation without acknowledging the uncertainty.
 - **Lack of Originality or Unique Insights**: Evaluate if the content offers any new perspectives, insights, or unique information, or if it simply rehashes commonly known information.
 
-Based on these criteria, provide an assessment of whether the video should be recommended to the user. Include one sentence explaining your reasoning.
+Based on these criteria, provide a one sentence assessment of whether the video should be recommended to the user.
 `.trim(),
   },
   {
     role: "user",
     content: `
-Title: {{ title }}
-
+# Title
+{{ title }}
+# Transcript
 {{ transcript }}
 `.trim(),
   },

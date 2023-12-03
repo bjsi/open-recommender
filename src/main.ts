@@ -6,6 +6,8 @@ import { yt } from "./youtube";
 import { SearchResult } from "./youtube/search";
 import { TranscriptCue } from "./youtube/transcript";
 import chalk from "chalk";
+import { tweetsToString } from "./twitter/getUserContext";
+import { Tweet } from "./twitter/schemas";
 
 (async () => {
   const user = process.argv[2] || "experilearning";
@@ -16,7 +18,7 @@ import chalk from "chalk";
   console.log(chalk.blue("Fetching tweets..."));
   const tweets = await twitter.tweets.fetch({
     user,
-    n_tweets: 20,
+    n_tweets: 30,
   });
   if (!tweets.length) {
     console.log(chalk.red("No tweets found"));
@@ -31,48 +33,84 @@ import chalk from "chalk";
   const { queries } = await recommender.queries.create({
     tweets,
     user,
-    verbose: true,
   });
   if (!queries.length) {
     console.log(chalk.red("No search queries generated"));
     return;
-  } else {
-    console.log(chalk.green("Search queries:"));
-    console.log(
-      queries.map((query, idx) => `${idx + 1}. ${query.join(" ")}`).join("\n")
-    );
   }
 
+  const queriesWithTweets = queries.map(({ query, tweetIDs }) => ({
+    query,
+    tweets: tweetIDs.map((id) => tweets[id]),
+  }));
+  console.log(chalk.green("Created " + queries.length + " search queries"));
+  for (let i = 0; i < queriesWithTweets.length; i++) {
+    const { query, tweets } = queriesWithTweets[i];
+    console.log("-----------------");
+    console.log(chalk.blue(i + ". " + query.join(" ")));
+    console.log(tweetsToString({ tweets, user }));
+  }
+
+  type SearchResultsWithTweets = {
+    searchResults: { result: SearchResult; relevance: number }[];
+    query: string;
+    tweets: Tweet[];
+  };
+
   console.log(chalk.blue("Searching YouTube..."));
-  const results: SearchResult[] = [];
-  for (const query of queries) {
-    const queryResults = await yt.search({
+  const filteredResults: SearchResultsWithTweets[] = [];
+  for (const { query, tweets } of queriesWithTweets) {
+    console.log(chalk.blue("Searching for " + query.join(" ")));
+    const rawYouTubeSearchResults = await yt.search({
       query: query.join(" "),
-      // randomlyAppendTerms: ["podcast", "discussion"],
     });
     console.log(
       chalk.blue(
-        queryResults
+        rawYouTubeSearchResults
           .map((result, idx) => `${idx + 1}. ${result.title}`)
           .join("\n")
       )
     );
-    results.push(...queryResults);
-  }
-  if (!results.length) {
-    console.log(chalk.red("No results found"));
-    return;
-  } else {
-    console.log(chalk.green(results.length + " total search results"));
-  }
+    // pre-filter search results
+    console.log(
+      chalk.blue("Found " + rawYouTubeSearchResults.length + " search results")
+    );
+    console.log(chalk.blue("Filtering search results..."));
+    const filteredResultsForQuery = await recommender.search.filter({
+      user,
+      query: query.join(" "),
+      results: rawYouTubeSearchResults,
+      tweets,
+    });
 
-  // pre-filter search results
+    console.log("Filtered search results:");
 
-  console.log(chalk.blue("Filtering search results..."));
-  const filteredResults = await recommender.search.filter({
-    results,
-    queries: queries.map((query) => query.join(" ")),
-  });
+    console.log(
+      filteredResultsForQuery
+        .map(
+          ({ result, relevance }, idx) =>
+            `${idx + 1}. ${result.title} (${relevance})`
+        )
+        .join("\n")
+    );
+
+    const relevantResults = filteredResultsForQuery.filter(
+      (result) => result.relevance > 0.65
+    );
+
+    console.log(
+      chalk.green(
+        relevantResults.length +
+          " search results passed the relevance filter (> 0.65 relevance)"
+      )
+    );
+
+    filteredResults.push({
+      query: query.join(" "),
+      tweets: tweets,
+      searchResults: relevantResults,
+    });
+  }
   if (!filteredResults.length) {
     console.log("No search results passed the search filter");
     return;
@@ -82,30 +120,45 @@ import chalk from "chalk";
   );
   console.log(
     filteredResults
-      .map((result, idx) => `${idx + 1}. ${result.title}`)
+      .flatMap((r) => r.searchResults)
+      .map(({ result }, idx) => `${idx + 1}. ${result.title}`)
       .join("\n")
   );
 
   type SearchResultWithTranscript = {
     searchResult: SearchResult;
+    tweets: Tweet[];
     cues: TranscriptCue[];
+    query: string;
+    relevance: number;
   };
 
   // fetch transcripts
 
-  console.log(chalk.blue(`Fetching ${results.length} transcripts...`));
+  console.log(
+    chalk.blue(
+      `Fetching ${
+        filteredResults.flatMap((r) => r.searchResults).length
+      } transcripts...`
+    )
+  );
   const resultsWithTranscripts: SearchResultWithTranscript[] = [];
-  for (const result of filteredResults) {
-    const { id, title } = result;
-    const fetchResult = await yt.transcript.fetch({ id, title });
-    if (!fetchResult || !fetchResult.cues.length) {
-      console.log("Skipping video without transcript");
-      continue;
+  for (const results of filteredResults) {
+    for (const result of results.searchResults) {
+      const { id, title } = result.result;
+      const fetchResult = await yt.transcript.fetch({ id, title });
+      if (!fetchResult || !fetchResult.cues.length) {
+        console.log("Skipping video without transcript");
+        continue;
+      }
+      resultsWithTranscripts.push({
+        searchResult: result.result,
+        cues: fetchResult.cues,
+        tweets: results.tweets,
+        query: results.query,
+        relevance: result.relevance,
+      });
     }
-    resultsWithTranscripts.push({
-      searchResult: result,
-      cues: fetchResult.cues,
-    });
   }
   console.log(
     chalk.green(
@@ -150,6 +203,8 @@ import chalk from "chalk";
       chalk.blue(`Generating chapters for "${result.searchResult.title}"...`)
     );
     const chunks = await recommender.transcript.chunk({
+      tweets: result.tweets,
+      user,
       transcript: result.cues,
       title: result.searchResult.title,
     });

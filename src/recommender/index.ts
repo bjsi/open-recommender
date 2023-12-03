@@ -1,4 +1,5 @@
 import { tweetsToString } from "../twitter/getUserContext";
+import * as _ from "remeda";
 import { Tweet } from "../twitter/schemas";
 import { SearchResult } from "../youtube/search";
 import { TranscriptCue, transcriptCuesToVtt } from "../youtube/transcript";
@@ -6,7 +7,6 @@ import { appraiseTranscript } from "./appraiseTranscript";
 import {
   TranscriptChunk,
   chunkTranscript,
-  rejectedChunkTags,
   splitTranscript,
 } from "./chunkTranscript";
 import { createYouTubeSearchQueries } from "./createQueries";
@@ -16,14 +16,16 @@ import {
 } from "./filterSearchResults";
 
 interface FilterArgs {
+  user: string;
+  tweets: Tweet[];
   results: SearchResult[];
-  queries: string[];
+  query: string;
   verbose?: boolean;
 }
 
 interface CreateQueriesArgs {
-  tweets: Tweet[];
   user: string;
+  tweets: Tweet[];
   verbose?: boolean;
 }
 
@@ -34,6 +36,8 @@ interface AppraiseTranscriptArgs {
 }
 
 interface ChunkTranscriptArgs {
+  user: string;
+  tweets: Tweet[];
   transcript: TranscriptCue[];
   title: string;
   verbose?: boolean;
@@ -56,18 +60,17 @@ export const recommender = {
       const parts = await splitTranscript(text);
       const chunks: TranscriptChunk[] = [];
       for (const part of parts) {
-        const { clips: sections } = await chunkTranscript.run({
+        const { clips } = await chunkTranscript.run({
           promptVars: {
+            tweets: tweetsToString({ tweets: args.tweets, user: args.user }),
             transcript: part,
             title: args.title,
           },
           verbose: args.verbose,
         });
-        chunks.push(...sections);
+        chunks.push(...clips);
       }
-      return chunks.filter(
-        (chunk) => !chunk.tags.some((tag) => rejectedChunkTags.includes(tag))
-      );
+      return chunks;
     },
   },
   search: {
@@ -75,16 +78,22 @@ export const recommender = {
       const { recommendedVideos } = await filterSearchResults.run({
         promptVars: {
           results: searchResultsToString(args.results),
-          queries: args.queries,
+          query: args.query,
+          tweets: tweetsToString({ tweets: args.tweets, user: args.user }),
         },
         verbose: args.verbose,
       });
-      return recommendedVideos.map((id) => args.results[id]);
+      return _.sortBy(recommendedVideos, [(x) => x.relevance, "desc"]).map(
+        ({ id, relevance }) => ({
+          result: args.results[id],
+          relevance,
+        })
+      );
     },
   },
   queries: {
     create: (args: CreateQueriesArgs) => {
-      return createYouTubeSearchQueries.run({
+      return createYouTubeSearchQueries(args.user).run({
         promptVars: {
           tweets: tweetsToString({ ...args }),
         },

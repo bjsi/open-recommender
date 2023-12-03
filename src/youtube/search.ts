@@ -13,7 +13,7 @@ const searchResultSchema = z.object({
   description: z.string(),
   channel_id: z.string(),
   channel_url: z.string(),
-  duration: z.number(),
+  duration: z.number().nullish(),
   view_count: z.number(),
   average_rating: z.any(),
   categories: z.array(z.string()).nullish(),
@@ -61,7 +61,7 @@ interface YouTubeSearchArgs {
 const pickRandom = <T>(arr: T[]) => arr[Math.floor(Math.random() * arr.length)];
 
 export async function search(args: YouTubeSearchArgs): Promise<SearchResult[]> {
-  const searchCommand = `yt-dlp "ytsearch${args.n_results || 3}:${
+  const searchCommand = `yt-dlp "ytsearch${args.n_results || 5}:${
     args.query +
     (args.randomlyAppendTerms ? " " + pickRandom(args.randomlyAppendTerms) : "")
   }" --dump-json`;

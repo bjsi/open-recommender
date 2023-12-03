@@ -295,15 +295,19 @@ const functionCall: OpenAI.ChatCompletionCreateParams.Function = {
   parameters: zodToJsonSchema(outputSchema),
 };
 
-export const createYouTubeSearchQueries = new Prompt({
-  prompt: createYouTubeSearchQueriesPrompts[1],
-  model: "gpt-4",
-  inputSchema,
-  function: {
-    schema: outputSchema,
-    function: functionCall,
-  },
-});
+export const createYouTubeSearchQueries = (user: string) =>
+  new Prompt({
+    prompt:
+      user !== "experilearning"
+        ? createYouTubeSearchQueriesPrompts[0]
+        : createYouTubeSearchQueriesPrompts[1],
+    model: "gpt-4",
+    inputSchema,
+    function: {
+      schema: outputSchema,
+      function: functionCall,
+    },
+  });
 
 if (require.main === module) {
   (async () => {
@@ -324,7 +328,7 @@ if (require.main === module) {
         id: idx,
       })
     );
-    const results = await createYouTubeSearchQueries.run({
+    const results = await createYouTubeSearchQueries(user).run({
       promptVars: {
         tweets: tweetsAsStr.join("\n---\n"),
       },

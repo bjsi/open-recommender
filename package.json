@@ -12,6 +12,7 @@
     "openpipe": "^0.6.3",
     "promptfoo": "^0.28.1",
     "pybridge": "^1.1.0",
+    "remeda": "^1.29.0",
     "rxjs": "^7.8.1",
     "sqlite-vss": "^0.1.2",
     "subtitle": "^4.2.1",

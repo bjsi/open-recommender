@@ -37,17 +37,13 @@ export const tweetToString = (args: {
   return formattedTweet;
 };
 
-export const tweetsToString = (args: {
-  tweets: Tweet[];
-  user: string;
-  includeIds?: boolean;
-}) => {
+export const tweetsToString = (args: { tweets: Tweet[]; user: string }) => {
   return args.tweets
     .map((tweet, idx) =>
       tweetToString({
         data: tweet,
         user: args.user,
-        id: args.includeIds ? idx : undefined,
+        id: idx,
       })
     )
     .filter(Boolean)
@@ -197,15 +193,15 @@ export const getUserTweetHistory = async (
 ) => {
   const tweetsStr = await api.get_tweets(user_login, n_tweets || 50);
   const tweets = parseTweets(tweetsStr);
-  for (const tweet of tweets) {
-    if (tweet.inReplyToTweetId != null) {
-      console.log("Getting reply to tweet: ", tweet.inReplyToTweetId);
-      const str = await api.get_tweet(tweet.inReplyToTweetId);
-      console.log("Got reply to tweet: ", str);
+  // for (const tweet of tweets) {
+  //   if (tweet.inReplyToTweetId != null) {
+  //     console.log("Getting reply to tweet: ", tweet.inReplyToTweetId);
+  //     const str = await api.get_tweet(tweet.inReplyToTweetId);
+  //     console.log("Got reply to tweet: ", str);
 
-      tweet.replyToTweet = parseTweet(str);
-    }
-  }
+  //     tweet.replyToTweet = parseTweet(str);
+  //   }
+  // }
   return tweets;
 };
 
