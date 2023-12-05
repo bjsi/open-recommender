@@ -29,7 +29,6 @@
     "yt:filter": "npx ts-node ./src/recommender/filterSearchResults.ts",
     "yt:chunk": "npx ts-node ./src/recommender/chunkTranscript.ts",
     "twitter:context": "npx ts-node ./src/twitter/getUserContext.ts",
-    "rec:interests": "npx ts-node ./src/recommender/inferInterests.ts",
     "main": "npx ts-node -T ./src/pipeline/main.ts"
   },
   "devDependencies": {
