@@ -61,6 +61,7 @@ export class Pipeline<T extends PipelineArgs> {
   }
 
   async execute(): Promise<Either<T>> {
+    console.time("full pipeline execution");
     if (!this.stages.length) {
       return failure("No stages added to pipeline");
     }
@@ -118,6 +119,7 @@ export class Pipeline<T extends PipelineArgs> {
         break;
       }
     }
+    console.timeEnd("full pipeline execution");
     return args;
   }
 }
