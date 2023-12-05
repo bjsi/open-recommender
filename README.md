@@ -4,6 +4,8 @@
     Open Recommender - An open source, LLM-powered YouTube video recommendation system
 </h1>
 
+<i>A recommendation system for the terminally online.</i>
+
 <h3 align="center">⚠️ Work in Progress... ⚠️</h3>
 
 - [x] Build an MVP of the data pipeline
