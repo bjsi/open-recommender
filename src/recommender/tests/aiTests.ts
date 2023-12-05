@@ -6,7 +6,7 @@ import {
   AppraiseTranscriptInputVars,
   appraiseTranscript,
 } from "../appraiseTranscript";
-import { assertJSON, assertValidSchema } from "./helpers";
+import { assertValidSchema } from "./helpers";
 import { transcriptToString } from "../../youtube/transcript";
 import {
   remnoteFlashcardsSearchResults,
@@ -46,9 +46,7 @@ const promptTests: Record<string, EvaluateTestSuite> = {
           transcript: transcriptToString(learningVideoTranscript.cues),
           title: learningVideoTranscript.videoTitle,
         } satisfies ChunkTranscriptVars,
-        assert: [
-          assertValidSchema(chunkTranscript.function!.schema),
-        ],
+        assert: [assertValidSchema(chunkTranscript.function!.schema)],
       },
     ],
   },

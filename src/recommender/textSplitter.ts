@@ -1,4 +1,7 @@
 import tiktoken from "js-tiktoken";
+import { learningVideoTranscript } from "./tests/exampleData";
+import { transcriptCuesToVtt } from "../youtube/transcript";
+import { tokenize } from "../tokenize";
 
 // copied from langchain.js
 
@@ -406,7 +409,10 @@ export class RecursiveCharacterTextSplitter
   }
 
   async splitText(text: string): Promise<string[]> {
-    return this._splitText(text, this.separators);
+    console.time("splitText");
+    const result = await this._splitText(text, this.separators);
+    console.timeEnd("splitText");
+    return result;
   }
 
   static fromLanguage(
@@ -857,4 +863,19 @@ export class LatexTextSplitter
         RecursiveCharacterTextSplitter.getSeparatorsForLanguage("latex"),
     });
   }
+}
+
+if (require.main === module) {
+  const text = transcriptCuesToVtt(learningVideoTranscript.cues);
+  new RecursiveCharacterTextSplitter({
+    chunkSize: 2000 * 4,
+    chunkOverlap: 200,
+  })
+    .splitText(text)
+    .then((splits) => {
+      console.log(splits.length);
+    })
+    .catch((e) => {
+      console.error(e);
+    });
 }

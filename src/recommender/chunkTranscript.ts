@@ -272,9 +272,8 @@ export const chunkTranscript = new Prompt({
 
 export const splitTranscript = async (text: string) => {
   const parts = await new RecursiveCharacterTextSplitter({
-    chunkSize: 2000,
+    chunkSize: 2000 * 4,
     chunkOverlap: 200, // not sure if this is necessary
-    lengthFunction: async (x) => (await tokenize(x)).length,
   }).splitText(text);
   return parts;
 };
