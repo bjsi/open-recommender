@@ -1,6 +1,6 @@
 import chalk from "chalk";
 import { execSync } from "child_process";
-import { existsSync, readFileSync, writeFileSync } from "fs";
+import { existsSync, readFileSync } from "fs";
 import path from "path";
 import { dataFolder } from "../filesystem";
 import { parseSync, stringifySync } from "subtitle";
@@ -10,6 +10,7 @@ export interface Transcript {
   cues: TranscriptCue[];
   text: string;
   videoTitle: string;
+  videoId: string;
 }
 
 export async function fetchTranscript(
@@ -41,6 +42,7 @@ export async function fetchTranscript(
       videoTitle,
     });
     return {
+      videoId,
       videoTitle,
       cues,
       text: transcriptText,

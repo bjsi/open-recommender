@@ -8,6 +8,7 @@ import dotenv from "dotenv";
 import { RecursiveCharacterTextSplitter } from "./textSplitter";
 import { tokenize } from "../tokenize";
 import { transcriptCuesToVtt } from "../youtube/transcript";
+import dayjs from "dayjs";
 
 /**
  * We chunk the transcript into logical sections and add metadata using an LLM.
@@ -250,6 +251,42 @@ const clipSchema = z.object({
 
 export type TranscriptChunk = z.infer<typeof clipSchema>;
 
+export interface TranscriptClip {
+  title: string;
+  summary: string;
+  start: number; // seconds
+  end: number; // seconds
+  videoTitle: string;
+  videoUrl: string; // with timestamp
+  videoId: string;
+}
+
+export const hhmmssToSeconds = (hhmmss: string) => {
+  const [hours, minutes, seconds] = hhmmss.split(":");
+  return (
+    parseInt(hours) * 3600 + parseInt(minutes) * 60 + parseInt(seconds) * 1
+  );
+};
+
+export const chunkToClip = (args: {
+  chunk: TranscriptChunk;
+  videoTitle: string;
+  videoId: string;
+}): TranscriptClip => {
+  const { chunk, videoId, videoTitle } = args;
+  return {
+    title: chunk.title,
+    summary: chunk.summary,
+    start: hhmmssToSeconds(chunk.start),
+    end: hhmmssToSeconds(chunk.end),
+    videoTitle: videoTitle,
+    videoId: videoId,
+    videoUrl: `https://www.youtube.com/watch?v=${videoId}&t=${hhmmssToSeconds(
+      chunk.start
+    )}s`,
+  };
+};
+
 const outputSchema = z.object({
   clips: z.array(clipSchema),
 });
@@ -283,7 +320,7 @@ if (require.main === module) {
     dotenv.config();
     const webvttText = transcriptCuesToVtt(learningVideoTranscript.cues);
     const parts = await splitTranscript(webvttText);
-    const clips: TranscriptChunk[] = [];
+    const clips: TranscriptClip[] = [];
     for (const part of parts) {
       const chunks = await chunkTranscript.run({
         promptVars: {
@@ -293,7 +330,16 @@ if (require.main === module) {
             "I'm interested in critiques of the traditional education system.",
         },
       });
-      clips.push(...chunks.clips);
+      clips.push(
+        ...chunks.clips.map((clip) => ({
+          ...clip,
+          start: hhmmssToSeconds(clip.start),
+          end: hhmmssToSeconds(clip.end),
+          videoId: learningVideoTranscript.videoId,
+          videoTitle: learningVideoTranscript.videoTitle,
+          videoUrl: `https://www.youtube.com/watch?v=${learningVideoTranscript.videoId}&t=${clip.start}s`,
+        }))
+      );
     }
     console.log(JSON.stringify(clips, null, 2));
   })();

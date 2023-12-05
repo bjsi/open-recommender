@@ -40,6 +40,7 @@ interface ChunkTranscriptArgs {
   tweets: Tweet[];
   transcript: TranscriptCue[];
   title: string;
+  url: string;
   verbose?: boolean;
 }
 

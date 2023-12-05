@@ -362,6 +362,7 @@ export const chunkTranscripts = {
         user,
         transcript: result.cues,
         title: result.searchResult.title,
+        url: "https://www.youtube.com/watch?v=" + result.searchResult.id,
       });
       if (!chunks.length) {
         console.log(
