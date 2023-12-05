@@ -1,4 +1,5 @@
 import { Pipeline, pipelineArgsSchema } from "./pipeline";
+import { getRunById } from "./run";
 import {
   appraiseTranscripts,
   chunkTranscripts,
@@ -22,12 +23,13 @@ import { Command } from "commander";
     )
     .option(
       "-cr, --cloneRunId <cloneRunId>",
-      "The ID of a run to clone from. Use this if you want to re-run an old run. If not provided, a new run will be created."
+      "The ID of a run to clone from. Use this if you want to reference an old run. If not provided, a new run will be created."
     )
     .option(
       "-st, --stage <stage>",
-      "The stage to begin running from. If not provided, all stages will be run."
+      "The stage to begin from. Defaults to the first stage."
     )
+    .option("-p, --print <key>", "Print the results to stdout.")
     .parse(process.argv);
 
   const opts = pipelineArgsSchema.parse({
@@ -43,6 +45,27 @@ import { Command } from "commander";
     .addStage(downloadTranscripts)
     .addStage(appraiseTranscripts)
     .addStage(chunkTranscripts);
-  const maybeRecommendations = await pipeline.execute();
-  console.log(JSON.stringify(maybeRecommendations, null, 2));
+  const print = opts.print;
+  if (print) {
+    const clonedRun = getRunById(opts.cloneRunId || "");
+    if (!clonedRun) {
+      return console.log("No run found");
+    }
+    const startIndex = opts.stage
+      ? clonedRun.stages.findIndex((s) => s.name === opts.stage)
+      : 0;
+    if (startIndex === -1) {
+      return console.log(`Stage ${opts.stage} not found`);
+    }
+    console.log(
+      JSON.stringify(
+        clonedRun.stages[startIndex]?.result?.result[print],
+        null,
+        2
+      )
+    );
+  } else {
+    const maybeRecommendations = await pipeline.execute();
+    console.log(JSON.stringify(maybeRecommendations, null, 2));
+  }
 })();
