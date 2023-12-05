@@ -5,7 +5,12 @@
 </h1>
 
 <h3 align="center">⚠️ Work in Progress... ⚠️</h3>
-The current focus is on building out the data pipeline for searching and downloading YouTube videos and transcripts. The next step will be to build out the recommendation system itself.
+
+- [x] Build an MVP of the data pipeline
+- [ ] Create a website so people can sign up
+- [ ] Collect fine tune data
+- [ ] Fine tune using [OpenPipe](https://openpipe.ai/)
+- [ ] Scale to millions of users :D
 
 <br/>
 
@@ -18,7 +23,7 @@ Welcome to Open Recommender, an open source recommendation system for YouTube.
 - Understand your current interests by analyzing your Twitter engagement (likes, retweets, etc.)
 - Create a large database of potentially interesting videos
 - Recommend interesting sections from videos
-- Recommend "timeless" content
+- Recommend "timeless" content rather than "trending" content
 - Surface "niche bangers" - difficult to find but really high quality content
 - Biased towards learning as opposed to entertainment
 
@@ -34,25 +39,34 @@ Welcome to Open Recommender, an open source recommendation system for YouTube.
 - `pip install -r requirements.txt`
 - Install [yt-dlp](https://github.com/yt-dlp/yt-dlp)
 - `cp .env.example .env` and fill in the values
+- You need to create a fake Twitter account and create an `accounts.txt` file in the `src/twitter` folder with the account's credentials in the format `username:password:email:email_password`.
+- `npm run main -u <twitter-username>` to run the full data pipeline
 
 ### Commands
 
+- `npm run main -u <twitter-username>` to run the full data pipeline.
+  - There are some other flags for re-running pipelines from a certain step, see `src/pipeline/main.ts`
+  - Pipeline runs are saved in `src/pipeline/runs`.
+  - This is really useful for debugging crashes or errors.
 - `npm run test-prompts <optional prompt name>` to test the AI prompts (see `aiTests.ts`)
+- `npm run yt:queries <twitter username>` to create a list of YouTube queries based on a user's twitter feed
+- `npm run yt:filter` to test the YouTube search result filter.
 - `npm run yt:search <query>` to test YouTube search
 - `npm run yt:transcript <optional videoId>` to test downloading and parsing YouTube transcripts
-- `npm run yt:queries <optional user context>` to create a list of YouTube queries based on a user's context
-- `npm run main <optional user context>` to run the full data pipeline
+- `npm run yt:chunk` to test chunking YouTube transcripts into clips
+- `npm run twitter:context` to test getting a user's bio and tweets
 
 ## 📚 How it Works
 
 A summary of the data pipeline:
 
-- Create a list of search queries to find interesting YouTube videos based on a user's Twitter engagement
-- Search YouTube
-- Filter videos based on how relevant they are to the user's context
-- Download transcripts and chunk them into smaller sections with metadata
+- Download a user's Twitter data (tweets, likes, retweets, etc.)
+- Create a list of search queries to find interesting YouTube videos based on the user's Twitter data
+- Search YouTube for videos based using the queries
+- Filter videos based on how relevant they are to the user
+- Download transcripts and chunk them into clips
 - Create a database of video chunks
-- Give recommendations to the user based on a mixture of their current and past interests
+- Recommend videos to the user
 
 See more detailed working notes [here](https://www.remnote.com/a/YouTube-Recommender/655daa97d42611e86f8536ec)
 
