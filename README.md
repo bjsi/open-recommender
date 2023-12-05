@@ -1,5 +1,5 @@
 <h1 align="center">
-    <img src="/img/logo.webp" alt="Open Recommender Logo" height="200">
+    <img src="https://raw.githubusercontent.com/bjsi/open-recommender/main/img/logo.webp" alt="Open Recommender Logo" height="200">
     <br/>
     Open Recommender - An open source, LLM-powered YouTube video recommendation system
 </h1>
