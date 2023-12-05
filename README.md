@@ -7,8 +7,10 @@
 <h3 align="center">⚠️ Work in Progress... ⚠️</h3>
 
 - [x] Build an MVP of the data pipeline
+- [ ] Iterate on the prompts until 8/10 recommendations are good
+- [ ] Curate fine tune dataset
 - [ ] Create a website so people can sign up
-- [ ] Collect fine tune data
+- [ ] Collect more fine tune data
 - [ ] Fine tune using [OpenPipe](https://openpipe.ai/)
 - [ ] Scale to millions of users :D
 
