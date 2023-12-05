@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import dayjs from "dayjs";
 import { z } from "zod";
 import { writeFileSync } from "fs";
+import { tryParseJSON } from "../utils";
 
 dotenv.config();
 
@@ -74,10 +75,11 @@ export async function search(args: YouTubeSearchArgs): Promise<SearchResult[]> {
     .toString()
     .trim()
     .split("\n");
-  const results = rawOutput.map((line) =>
-    searchResultSchema.parse(JSON.parse(line))
-  );
-  return results || [];
+  const results = rawOutput
+    .map((line) => searchResultSchema.safeParse(tryParseJSON(line)))
+    .map((r) => (r.success ? r.data : undefined))
+    .filter(Boolean) as SearchResult[];
+  return results;
 }
 
 if (require.main === module) {

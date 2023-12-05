@@ -9,6 +9,7 @@ import {
 } from "./twitter/getUserContext";
 import { embedMany } from "./embed/embedText";
 import { dbPath } from "./filesystem";
+import { tryParseJSON } from "./utils";
 
 type Vector = number[];
 
@@ -85,7 +86,7 @@ export class SQLiteVectorIndex<DATA extends object | undefined> {
     }[];
 
     return result.map((row) => {
-      const data = JSON.parse(row.data);
+      const data = tryParseJSON(row.data);
       const validatedData = this.schema.parse(data);
       return {
         id: row.id,

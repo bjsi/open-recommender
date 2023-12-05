@@ -47,10 +47,10 @@ export const recommender = {
   transcript: {
     appraise: async (args: AppraiseTranscriptArgs) => {
       const text = transcriptCuesToVtt(args.transcript);
-      const parts = await splitTranscript(text);
+      const part = text.slice(0, 7000);
       return appraiseTranscript.run({
         promptVars: {
-          transcript: parts[0],
+          transcript: part,
           title: args.title,
         },
       });

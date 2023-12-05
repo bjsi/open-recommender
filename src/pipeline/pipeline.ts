@@ -1,5 +1,6 @@
 import { z } from "zod";
 import {
+  Either,
   Failure,
   Success,
   createRun,
@@ -7,6 +8,7 @@ import {
   getRunById,
   saveRun,
 } from "./run";
+import { STAGES } from "./stages";
 
 export type PipelineFunction<T, U> = (
   input: T
@@ -19,8 +21,10 @@ export type PipelineStage<T, U> = {
 
 export const pipelineArgsSchema = z.object({
   runId: z.string(),
+  cloneRunId: z.string().optional(),
   user: z.string(),
   searchFilterRelevancyCutOff: z.number().min(0).max(1).default(0.65),
+  stage: z.enum(STAGES).optional(),
 });
 
 export type PipelineArgs = z.infer<typeof pipelineArgsSchema>;
@@ -56,17 +60,57 @@ export class Pipeline<T extends PipelineArgs> {
     return this as any;
   }
 
-  async execute(): Promise<Success<T> | Failure> {
+  async execute(): Promise<Either<T>> {
     if (!this.stages.length) {
       return failure("No stages added to pipeline");
     }
-    const stage1 = this.stages[0];
-    let args = await this.executeStage(stage1, this.initialValue);
+    const clonedRun = this.initialValue.cloneRunId
+      ? getRunById(this.initialValue.cloneRunId)
+      : undefined;
+    if (this.initialValue.cloneRunId && !clonedRun) {
+      return failure(
+        `Failed to clone Run. Run with ID "${this.initialValue.cloneRunId}" not found`
+      );
+    }
+    const startIndex = this.initialValue.stage
+      ? this.stages.findIndex((s) => s.name === this.initialValue.stage)
+      : 0;
+    if (startIndex === -1) {
+      return failure(`Stage ${this.initialValue.stage} not found`);
+    }
+
+    const prevStage = clonedRun?.stages?.[startIndex - 1];
+    const stage1 = this.stages[startIndex];
+
+    console.log("Running pipeline with ID", this.initialValue.runId);
+    if (clonedRun) {
+      saveRun({
+        ...clonedRun,
+        id: this.initialValue.runId,
+        stages: clonedRun.stages.slice(0, startIndex - 1),
+      });
+      console.log("Loading cloned run with ID", clonedRun.id);
+    }
+    if (startIndex > 0) {
+      console.log(
+        "Starting from stage",
+        stage1.name,
+        "with previous stage",
+        prevStage?.name
+      );
+    }
+
+    let args = (
+      !clonedRun || !prevStage
+        ? await this.executeStage(stage1, this.initialValue)
+        : prevStage.result
+    ) as Either<T>;
+
     this.saveStage(stage1, args);
     if (!args.success) {
       return args;
     }
-    for (let i = 1; i < this.stages.length; i++) {
+    for (let i = startIndex; i < this.stages.length; i++) {
       const currentStage = this.stages[i];
       args = await this.executeStage(currentStage, args.result);
       this.saveStage(currentStage, args);

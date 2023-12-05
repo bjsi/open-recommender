@@ -2,39 +2,41 @@ import { readFileSync, writeFileSync } from "fs";
 import path from "path";
 import { z } from "zod";
 import { pipelineRunsFolder } from "../filesystem";
+import { tryParseJSON } from "../utils";
 
 const successSchema = z.object({
   success: z.literal(true),
   result: z.any(),
 });
 
-export interface Success<T> {
+export type Success<T> = {
   success: true;
   result: T;
-}
+};
 
 const failureSchema = z.object({
   success: z.literal(false),
-  error: z.string(),
+  result: z.any(),
 });
 
-export interface Failure {
+export type Failure = {
   success: false;
-  error: string;
-}
+  result: any;
+};
+
+export type Either<T> = Success<T> | Failure;
 
 const runResultSchema = z.union([successSchema, failureSchema]);
 
-export const success = <T>(result: T) =>
-  ({
-    success: true,
-    result,
-  } as const);
+export const success = <T>(result: T): Success<T> => ({
+  success: true,
+  result,
+});
 
-export const failure = (error: string) =>
+export const failure = (result: any): Failure =>
   ({
     success: false,
-    error,
+    result,
   } as const);
 
 export const runSchema = z.object({
@@ -50,12 +52,16 @@ export const runSchema = z.object({
 export type Run = z.infer<typeof runSchema>;
 
 export const getRunById = (id: string) => {
-  const maybeRun = runSchema.safeParse(
-    JSON.parse(
-      readFileSync(path.join(pipelineRunsFolder, `${id}.json`), "utf8")
-    )
-  );
-  return maybeRun.success ? maybeRun.data : undefined;
+  try {
+    const runText = readFileSync(
+      path.join(pipelineRunsFolder, `${id}.json`),
+      "utf8"
+    );
+    const maybeRun = runSchema.safeParse(tryParseJSON(runText));
+    return maybeRun.success ? maybeRun.data : undefined;
+  } catch (e) {
+    return undefined;
+  }
 };
 
 export const saveRun = (run: z.infer<typeof runSchema>) => {

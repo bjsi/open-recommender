@@ -164,7 +164,9 @@ export const formatTweets = (tweets: Tweet[], user: string) => {
 
 const isAdvert = (tweet: Tweet) => {
   const sources = [tweet.source, tweet.sourceUrl, tweet.sourceLabel];
-  return sources.some((x) => x?.toLowerCase()?.includes("advert"));
+  return sources.some((source) =>
+    ["ads", "advert"].some((x) => source?.toLowerCase()?.includes(x))
+  );
 };
 
 const parseTweet = (tweetStr: string | null) => {

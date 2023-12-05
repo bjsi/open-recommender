@@ -10,6 +10,17 @@ import { TranscriptCue } from "../youtube/transcript";
 import { TranscriptChunk } from "../recommender/chunkTranscript";
 import { PipelineArgs, pipelineArgsSchema } from "./pipeline";
 
+export const STAGES = [
+  "validate-args",
+  "get-tweets",
+  "create-queries",
+  "search-for-videos",
+  "filter-search-results",
+  "download-transcripts",
+  "appraise-transcripts",
+  "chunk-transcripts",
+] as const;
+
 export const validateArgs = {
   name: "validate-args",
   description: "Validate arguments",
@@ -18,7 +29,7 @@ export const validateArgs = {
   ): Promise<Success<PipelineArgs> | Failure> {
     const maybeArgs = pipelineArgsSchema.safeParse(args);
     if (!maybeArgs.success) {
-      return failure(maybeArgs.error.message);
+      return failure(maybeArgs.error);
     }
     return success(args);
   },
@@ -184,13 +195,6 @@ export const filterSearchResults = {
         (result) => result.relevance > args.searchFilterRelevancyCutOff
       );
 
-      console.log(
-        chalk.green(
-          relevantResults.length +
-            ` search results passed the relevance filter (> ${args.searchFilterRelevancyCutOff} relevance)`
-        )
-      );
-
       filteredResults.push({
         query: query,
         tweets: tweets,
@@ -339,9 +343,7 @@ type SearchResultWithTranscriptAndChunks = {
 export const chunkTranscripts = {
   name: "chunk-transcripts",
   description: "Chunk transcripts",
-  run: async function (
-    args: ChunkTranscriptsStageArgs
-  ): Promise<
+  run: async function (args: ChunkTranscriptsStageArgs): Promise<
     | Success<
         ChunkTranscriptsStageArgs & {
           chunkedTranscripts: SearchResultWithTranscriptAndChunks[];
