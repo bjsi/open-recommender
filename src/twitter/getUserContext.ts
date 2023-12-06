@@ -223,19 +223,16 @@ if (require.main === module) {
   (async () => {
     const user = (process.argv[2] || "experilearning").replace("@", "");
     const tweets =
-      loadExampleTweetHistory(user) ||
-      (await (async () => {
+      //loadExampleTweetHistory(user) ||
+      await (async () => {
         const { api, bridge } = initTwitterAPI();
         const tweets = (await getUserTweetHistory(api, user, 20)).filter(
           Boolean
         ) as Tweet[];
-        const profile = await getUserProfile(api, user);
+        // const profile = await getUserProfile(api, user);
         bridge.close();
-        return {
-          tweets,
-          profile,
-        };
-      })());
+        return tweets; // profile,
+      })();
     if (!tweets || tweets.length === 0) {
       console.log("No tweets found");
       return;
