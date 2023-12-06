@@ -1,5 +1,5 @@
 <h1 align="center">
-    <img src="/img/logo.webp" alt="Open Recommender Logo" height="200">
+    <img src="https://raw.githubusercontent.com/bjsi/open-recommender/main/img/logo.webp" alt="Open Recommender Logo" height="200">
     <br/>
     Open Recommender - An open source, LLM-powered YouTube video recommendation system
 </h1>
@@ -7,8 +7,10 @@
 <h3 align="center">⚠️ Work in Progress... ⚠️</h3>
 
 - [x] Build an MVP of the data pipeline
+- [ ] Iterate on the prompts until 8/10 recommendations are good
+- [ ] Curate fine tune dataset
 - [ ] Create a website so people can sign up
-- [ ] Collect fine tune data
+- [ ] Collect more fine tune data
 - [ ] Fine tune using [OpenPipe](https://openpipe.ai/)
 - [ ] Scale to millions of users :D
 
@@ -70,8 +72,8 @@ A summary of the data pipeline:
 
 See more detailed working notes [here](https://www.remnote.com/a/YouTube-Recommender/655daa97d42611e86f8536ec)
 
-## Related Papers and Blog Posts
-
+## Papers and Blog Posts
+- [Building an LLM-Powered Open Source Recommendation System for YouTube](https://dev.to/experilearning/building-an-llm-powered-open-source-recommendation-system-40fg)
 - [BookGPT: A General Framework for Book Recommendation Based on a Large Language Model](https://arxiv.org/pdf/2305.15673.pdf)
 - [A Survey on Large Language Models for Recommendation](https://arxiv.org/abs/2305.19860)
 - [Recommender Systems in the Era of Large Language Models (LLMs)](https://arxiv.org/abs/2307.02046)
