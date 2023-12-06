@@ -7,6 +7,8 @@ import {
   ChatCompletionMessageParam,
 } from "openai/resources";
 
+const MAX_RETRIES = 3;
+
 export class Prompt<
   InputSchema extends ZodType,
   OutputSchema extends ZodType | undefined = undefined
@@ -37,7 +39,14 @@ export class Prompt<
   run = async (args: {
     promptVars: z.infer<InputSchema>;
     verbose?: boolean;
+    retries?: number;
   }): Promise<OutputSchema extends ZodType<infer U> ? U : string | null> => {
+    if (args.retries) {
+      console.log(`Retrying prompt: ${args.retries} of ${MAX_RETRIES}`);
+      if (args.retries >= MAX_RETRIES) {
+        throw new Error("Max retries exceeded");
+      }
+    }
     const promptVars = this.inputSchema.parse(args.promptVars);
     const messages = compilePrompt(this.prompt, promptVars);
     if (args.verbose) console.log(messages);
@@ -52,7 +61,10 @@ export class Prompt<
       const args = JSON.parse(
         response.choices[0].message.function_call?.arguments || "{}"
       );
-      return this.function.schema.parse(args);
+      const parsed = this.function.schema.safeParse(args);
+      return parsed.success
+        ? parsed.data
+        : this.run({ ...args, retries: (args.retries || 0) + 1 });
     } else {
       return response.choices[0].message.content as any;
     }
