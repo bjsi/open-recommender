@@ -28,6 +28,7 @@ Welcome to Open Recommender, an open source recommendation system for YouTube.
 - Recommend "timeless" content rather than "trending" content
 - Surface "niche bangers" - difficult to find but really high quality content
 - Biased towards learning as opposed to entertainment
+- Read my blog post for more: [Building an LLM-Powered Open Source Recommendation System for YouTube](https://dev.to/experilearning/building-an-llm-powered-open-source-recommendation-system-40fg)
 
 ## How to Run
 
