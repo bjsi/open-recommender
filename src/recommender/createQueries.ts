@@ -302,7 +302,7 @@ export const createYouTubeSearchQueries = (user: string) =>
         ? createYouTubeSearchQueriesPrompts[0]
         : createYouTubeSearchQueriesPrompts[1],
     model: "gpt-4",
-    inputSchema,
+    input: inputSchema,
     function: {
       schema: outputSchema,
       function: functionCall,

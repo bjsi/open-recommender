@@ -304,7 +304,7 @@ export const chunkTranscript = new Prompt({
   },
   prompt: prompt,
   model: "gpt-4",
-  inputSchema,
+  input: inputSchema,
 });
 
 export const splitTranscript = async (text: string) => {

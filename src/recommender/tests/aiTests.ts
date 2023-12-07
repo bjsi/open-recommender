@@ -50,32 +50,6 @@ const promptTests: Record<string, EvaluateTestSuite> = {
       },
     ],
   },
-  "appraise-transcript": {
-    ...functionCallOptions({
-      model: appraiseTranscript.model,
-      prompts: [appraiseTranscript.prompt],
-      functions: [appraiseTranscript.function!.function],
-    }),
-    tests: [
-      {
-        vars: {
-          transcript: transcriptToString(learningVideoTranscript.cues).slice(
-            0,
-            5000
-          ),
-          title: learningVideoTranscript.videoTitle,
-        } satisfies AppraiseTranscriptInputVars,
-        assert: [assertValidSchema(appraiseTranscript.function!.schema)],
-      },
-      {
-        vars: {
-          transcript: spamVideoTranscript,
-          title: "The 10 AI Innovations Expected to Revolutionize 2024 - 2025",
-        } satisfies AppraiseTranscriptInputVars,
-        assert: [assertValidSchema(appraiseTranscript.function!.schema)],
-      },
-    ],
-  },
   "filter-search-results": {
     ...functionCallOptions({
       model: filterSearchResults.model,

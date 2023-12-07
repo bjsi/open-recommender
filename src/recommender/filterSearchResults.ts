@@ -138,7 +138,7 @@ export const filterSearchResults = new Prompt({
   },
   prompt: prompt,
   model: "gpt-4",
-  inputSchema,
+  input: inputSchema,
 });
 
 if (require.main === module) {
