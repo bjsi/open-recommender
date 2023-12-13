@@ -1,24 +1,26 @@
-import { ChatCompletionMessageParam } from "openai/resources";
+import { CandidatePrompt } from "prompt-iteration-assistant";
+import { filterSearchResultsInputSchema } from "../schemas/filterSearchResultsInputSchema";
 import { z } from "zod";
-import zodToJsonSchema from "zod-to-json-schema";
-import { SearchResult } from "../youtube/search";
-import { Prompt } from "./prompt";
-import OpenAI from "openai";
-import dotenv from "dotenv";
+import { filterSearchResultsOutputSchema } from "../schemas/filterSearchResultsOutputSchema";
 
-const prompt: ChatCompletionMessageParam[] = [
-  {
-    role: "system",
-    content: `
+export const mainPrompt = new CandidatePrompt<
+  z.infer<typeof filterSearchResultsInputSchema>
+>({
+  name: "withExample",
+  compile() {
+    return [
+      {
+        role: "system",
+        content: `
 # Instructions
 - You are a YouTube video recommender system choosing which videos to recommend to a user based on their tweet history and search query.
 - You should assess the relevance of each video by looking at the search query and the user's tweet history.
 - Output an array of video IDs with relevancy scores between 0 and 1.
 `.trim(),
-  },
-  {
-    role: "user",
-    content: `
+      },
+      {
+        role: "user",
+        content: `
 # Twitter
 ID: 48
 tweet: @experilearning (2023-11-07)
@@ -65,24 +67,24 @@ Duration: 0:00:38
 Chapters:
 undefined
 `.trim(),
-  },
-  {
-    role: "assistant",
-    content: null,
-    function_call: {
-      name: "recommendVideos",
-      arguments: JSON.stringify({
-        recommendedVideos: [
-          { id: 0, relevance: 0.5 },
-          { id: 1, relevance: 1 },
-          { id: 2, relevance: 0.2 },
-        ],
-      } satisfies z.infer<typeof outputSchema>),
-    },
-  },
-  {
-    role: "user",
-    content: `
+      },
+      {
+        role: "assistant",
+        content: null,
+        function_call: {
+          name: "recommendVideos",
+          arguments: JSON.stringify({
+            recommendedVideos: [
+              { id: 0, relevance: 0.5 },
+              { id: 1, relevance: 1 },
+              { id: 2, relevance: 0.2 },
+            ],
+          } satisfies z.infer<typeof filterSearchResultsOutputSchema>),
+        },
+      },
+      {
+        role: "user",
+        content: `
 # Twitter
 {{ tweets }}
 # Search Query
@@ -90,72 +92,7 @@ undefined
 # Search Results
 {{ results }}
 `.trim(),
-  },
-];
-
-const inputSchema = z.object({
-  tweets: z.string(),
-  results: z.string(),
-  query: z.string(),
-});
-
-export type FilterSearchResultsInputVars = z.infer<typeof inputSchema>;
-
-export const searchResultsToString = (results: SearchResult[]) => {
-  return results
-    .map((r, idx) =>
-      `
-ID: ${idx}
-Title: ${r.title}
-Channel: ${r.channel}
-Views: ${r.view_count}
-Chapters:
-${r.chapters?.map((c, idx) => idx + 1 + ". " + c.title).join("\n")}
-`.trim()
-    )
-    .join("\n---\n");
-};
-
-const outputSchema = z.object({
-  recommendedVideos: z.array(
-    z.object({
-      id: z.number(),
-      relevance: z.number().describe("Relevance is a float between 0 and 1."),
-    })
-  ),
-});
-
-const functionCall: OpenAI.ChatCompletionCreateParams.Function = {
-  name: "recommendVideos",
-  description: "Recommend relevant videos to the user",
-  parameters: zodToJsonSchema(outputSchema),
-};
-
-export const filterSearchResults = new Prompt({
-  function: {
-    schema: outputSchema,
-    function: functionCall,
-  },
-  prompt: prompt,
-  model: "gpt-4",
-  input: inputSchema,
-});
-
-if (require.main === module) {
-  (async () => {
-    dotenv.config();
-    const searchResults = ``.trim();
-    const tweets = "".trim();
-    const { recommendedVideos } = await filterSearchResults.run({
-      promptVars: {
-        query: "AI journalling assistant",
-        results: searchResults,
-        tweets,
       },
-      verbose: true,
-    });
-    console.log(
-      recommendedVideos.map((video) => searchResults.split("---")[video.id])
-    );
-  })();
-}
+    ];
+  },
+});

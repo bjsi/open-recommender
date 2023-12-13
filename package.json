@@ -14,6 +14,7 @@
     "js-tiktoken": "^1.0.8",
     "openai": "^4.20.1",
     "openpipe": "^0.6.3",
+    "prompt-iteration-assistant": "^0.0.1",
     "promptfoo": "^0.28.1",
     "pybridge": "^1.1.0",
     "remeda": "^1.29.0",
@@ -25,14 +26,14 @@
     "zod-to-json-schema": "^3.22.1"
   },
   "scripts": {
-    "test-prompts": "npx ts-node ./src/recommender/tests/aiTests.ts",
-    "yt:search": "npx ts-node ./src/youtube/search.ts",
-    "yt:transcript": "npx ts-node ./src/youtube/transcript.ts",
-    "yt:queries": "npx ts-node ./src/recommender/createQueries.ts",
-    "yt:filter": "npx ts-node ./src/recommender/filterSearchResults.ts",
-    "yt:chunk": "npx ts-node ./src/recommender/chunkTranscript.ts",
-    "twitter:context": "npx ts-node ./src/twitter/getUserContext.ts",
-    "main": "npx ts-node -T ./src/pipeline/main.ts"
+    "prompts": "npx tsx ./src/recommender/prompts/main.ts",
+    "yt:search": "npx tsx ./src/youtube/search.ts",
+    "yt:transcript": "npx tsx ./src/youtube/transcript.ts",
+    "yt:queries": "npx tsx ./src/recommender/createQueries.ts",
+    "yt:filter": "npx tsx ./src/recommender/filterSearchResults.ts",
+    "yt:chunk": "npx tsx ./src/recommender/chunkTranscript.ts",
+    "twitter:context": "npx tsx ./src/twitter/getUserContext.ts",
+    "main": "npx tsx ./src/pipeline/main.ts"
   },
   "devDependencies": {
     "@deepkit/type-compiler": "^1.0.1-alpha.108",

@@ -7,8 +7,8 @@ import { SearchResult } from "../youtube/search";
 import { yt } from "../youtube";
 import { Failure, Success, failure, success } from "./run";
 import { TranscriptCue } from "../youtube/transcript";
-import { TranscriptChunk } from "../recommender/chunkTranscript";
 import { PipelineArgs, pipelineArgsSchema } from "./pipeline";
+import { TranscriptChunk } from "../recommender/prompts/createClips/helpers/transcriptClip";
 
 export const STAGES = [
   "validate-args",

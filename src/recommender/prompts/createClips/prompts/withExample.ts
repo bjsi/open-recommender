@@ -1,35 +1,26 @@
-import { ChatCompletionMessageParam } from "openai/resources";
+import { CandidatePrompt, ChatMessage } from "prompt-iteration-assistant";
+import { createClipsInputSchema } from "../schemas/createClipsInputSchema";
 import { z } from "zod";
-import zodToJsonSchema from "zod-to-json-schema";
-import { Prompt } from "./prompt";
-import OpenAI from "openai";
-import { learningVideoTranscript } from "./tests/exampleData";
-import dotenv from "dotenv";
-import { RecursiveCharacterTextSplitter } from "./textSplitter";
-import { tokenize } from "../tokenize";
-import { transcriptCuesToVtt } from "../youtube/transcript";
-import dayjs from "dayjs";
+import { createClipsOutputSchema } from "../schemas/createClipsOutputSchema";
 
-/**
- * We chunk the transcript into logical sections and add metadata using an LLM.
- * We could use YouTube's chapters, but they are not always available, accurate or granular enough.
- */
-
-const prompt: ChatCompletionMessageParam[] = [
-  {
-    role: "system",
-    content: `
+export const withExamplePrompt = new CandidatePrompt<
+  z.infer<typeof createClipsInputSchema>
+>({
+  name: "withExample",
+  compile: function () {
+    return [
+      ChatMessage.system(
+        `
 # Instructions
 - You are a YouTube video editor creating 45-90 second clips from a video transcript that will be interesting to a user based on their Twitter feed.
 - Analyze the user's tweets, identifying key themes, topics and people they are interested in and extract relevant sections from the video transcript.
 - Only extract clips that are **directly** related to the user's interests.
 - If there are no directly relevant clips, you should output an empty array.
 - Include a title and one sentence summary of each section focusing on why it will be interesting to the user.
-`.trim(),
-  },
-  {
-    role: "user",
-    content: `
+`.trim()
+      ),
+      ChatMessage.user(
+        `
 # Tweets   
 @experilearning (2023-11-07)
 Experimenting with creating a AI journalling assistant rn. Getting the RAG/chat memory right is the most important part. Here's the approach that got the best results so far:
@@ -200,147 +191,34 @@ my vector store in here.
 00:02:29.143 --> 00:02:31.363
 like I said, I'm using
 the OpenAI embeddings.
-`.trim(),
-  },
-  {
-    role: "assistant",
-    content: null,
-    function_call: {
-      name: "createClips",
-      arguments: JSON.stringify({
-        clips: [
-          {
-            title: "Enhancing AI Retrieval with Self-Querying Techniques",
-            summary:
-              "This clip offers insightful strategies on using self-querying retrieval to improve the efficiency and accuracy of AI systems in parsing and summarizing complex data, directly applicable to your AI journaling project.",
-            start: "00:00:47",
-            end: "00:01:55",
-          },
-        ],
-      } satisfies z.infer<typeof outputSchema>),
-    },
-  },
-  {
-    role: "user",
-    content: `
+`.trim()
+      ),
+      ChatMessage.assistant(null, {
+        name: "createClips",
+        arguments: {
+          clips: [
+            {
+              title: "Enhancing AI Retrieval with Self-Querying Techniques",
+              summary:
+                "This clip offers insightful strategies on using self-querying retrieval to improve the efficiency and accuracy of AI systems in parsing and summarizing complex data, directly applicable to your AI journaling project.",
+              start: "00:00:47",
+              end: "00:01:55",
+            },
+          ],
+        } satisfies z.infer<typeof createClipsOutputSchema>,
+      }),
+      {
+        role: "user",
+        content: `
 # Tweets
-{{ tweets }}
+${this.getVariable("tweets")}
 # Video
 ## Title
-{{ title }}
+${this.getVariable("title")}
 ## Transcript
-{{ transcript }}
+${this.getVariable("transcript")}
   `.trim(),
+      },
+    ];
   },
-];
-
-const inputSchema = z.object({
-  transcript: z.string(),
-  title: z.string(),
-  tweets: z.string(),
 });
-
-export type ChunkTranscriptVars = z.infer<typeof inputSchema>;
-
-const clipSchema = z.object({
-  title: z.string(),
-  summary: z.string().describe("A one sentence summary of the section."),
-  start: z.string(), // TODO: format?
-  end: z.string(), // TODO: format?
-});
-
-export type TranscriptChunk = z.infer<typeof clipSchema>;
-
-export interface TranscriptClip {
-  title: string;
-  summary: string;
-  start: number; // seconds
-  end: number; // seconds
-  videoTitle: string;
-  videoUrl: string; // with timestamp
-  videoId: string;
-}
-
-export const hhmmssToSeconds = (hhmmss: string) => {
-  const [hours, minutes, seconds] = hhmmss.split(":");
-  return (
-    parseInt(hours) * 3600 + parseInt(minutes) * 60 + parseInt(seconds) * 1
-  );
-};
-
-export const chunkToClip = (args: {
-  chunk: TranscriptChunk;
-  videoTitle: string;
-  videoId: string;
-}): TranscriptClip => {
-  const { chunk, videoId, videoTitle } = args;
-  return {
-    title: chunk.title,
-    summary: chunk.summary,
-    start: hhmmssToSeconds(chunk.start),
-    end: hhmmssToSeconds(chunk.end),
-    videoTitle: videoTitle,
-    videoId: videoId,
-    videoUrl: `https://www.youtube.com/watch?v=${videoId}&t=${hhmmssToSeconds(
-      chunk.start
-    )}s`,
-  };
-};
-
-const outputSchema = z.object({
-  clips: z.array(clipSchema),
-});
-
-const functionCall: OpenAI.ChatCompletionCreateParams.Function = {
-  name: "createClips",
-  description: "Extract clips from a video based on the user's interests.",
-  parameters: zodToJsonSchema(outputSchema),
-};
-
-export const chunkTranscript = new Prompt({
-  function: {
-    schema: outputSchema,
-    function: functionCall,
-  },
-  prompt: prompt,
-  model: "gpt-4",
-  input: inputSchema,
-});
-
-export const splitTranscript = async (text: string) => {
-  const parts = await new RecursiveCharacterTextSplitter({
-    chunkSize: 2000 * 4,
-    chunkOverlap: 200, // not sure if this is necessary
-  }).splitText(text);
-  return parts;
-};
-
-if (require.main === module) {
-  (async () => {
-    dotenv.config();
-    const webvttText = transcriptCuesToVtt(learningVideoTranscript.cues);
-    const parts = await splitTranscript(webvttText);
-    const clips: TranscriptClip[] = [];
-    for (const part of parts) {
-      const chunks = await chunkTranscript.run({
-        promptVars: {
-          transcript: part,
-          title: learningVideoTranscript.videoTitle,
-          tweets:
-            "I'm interested in critiques of the traditional education system.",
-        },
-      });
-      clips.push(
-        ...chunks.clips.map((clip) => ({
-          ...clip,
-          start: hhmmssToSeconds(clip.start),
-          end: hhmmssToSeconds(clip.end),
-          videoId: learningVideoTranscript.videoId,
-          videoTitle: learningVideoTranscript.videoTitle,
-          videoUrl: `https://www.youtube.com/watch?v=${learningVideoTranscript.videoId}&t=${clip.start}s`,
-        }))
-      );
-    }
-    console.log(JSON.stringify(clips, null, 2));
-  })();
-}

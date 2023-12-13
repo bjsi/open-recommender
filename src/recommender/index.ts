@@ -3,17 +3,13 @@ import * as _ from "remeda";
 import { Tweet } from "../twitter/schemas";
 import { SearchResult } from "../youtube/search";
 import { TranscriptCue, transcriptCuesToVtt } from "../youtube/transcript";
-import { appraiseTranscript } from "./appraiseTranscript";
-import {
-  TranscriptChunk,
-  chunkTranscript,
-  splitTranscript,
-} from "./chunkTranscript";
-import { createYouTubeSearchQueries } from "./createQueries";
-import {
-  filterSearchResults,
-  searchResultsToString,
-} from "./filterSearchResults";
+import { appraiseTranscript } from "./prompts/appraiseTranscript/appraiseTranscript";
+import { splitTranscript } from "./prompts/createClips/helpers/splitTranscript";
+import { TranscriptChunk } from "./prompts/createClips/helpers/transcriptClip";
+import { createClipsFromTranscript } from "./prompts/createClips/createClips";
+import { filterSearchResults } from "./prompts/filterSearchResults/filterSearchResults";
+import { searchResultsToString } from "../youtube/formatting";
+import { createYouTubeSearchQueries } from "./prompts/createQueries/createQueries";
 
 interface FilterArgs {
   user: string;
@@ -49,11 +45,12 @@ export const recommender = {
     appraise: async (args: AppraiseTranscriptArgs) => {
       const text = transcriptCuesToVtt(args.transcript);
       const part = text.slice(0, 7000);
-      return appraiseTranscript.run({
-        promptVars: {
+      return appraiseTranscript().run({
+        promptVariables: {
           transcript: part,
-          title: args.title,
+          videoTitle: args.title,
         },
+        stream: false,
       });
     },
     chunk: async (args: ChunkTranscriptArgs) => {
@@ -61,12 +58,13 @@ export const recommender = {
       const parts = await splitTranscript(text);
       const chunks: TranscriptChunk[] = [];
       for (const part of parts) {
-        const { clips } = await chunkTranscript.run({
-          promptVars: {
+        const { clips } = await createClipsFromTranscript().run({
+          promptVariables: {
             tweets: tweetsToString({ tweets: args.tweets, user: args.user }),
             transcript: part,
             title: args.title,
           },
+          stream: false,
           verbose: args.verbose,
         });
         chunks.push(...clips);
@@ -76,13 +74,14 @@ export const recommender = {
   },
   search: {
     filter: async (args: FilterArgs) => {
-      const { recommendedVideos } = await filterSearchResults.run({
-        promptVars: {
+      const { recommendedVideos } = await filterSearchResults().run({
+        promptVariables: {
           results: searchResultsToString(args.results),
           query: args.query,
           tweets: tweetsToString({ tweets: args.tweets, user: args.user }),
         },
         verbose: args.verbose,
+        stream: false,
       });
       return _.sortBy(recommendedVideos, [(x) => x.relevance, "desc"]).map(
         ({ id, relevance }) => ({
@@ -95,10 +94,11 @@ export const recommender = {
   queries: {
     create: (args: CreateQueriesArgs) => {
       return createYouTubeSearchQueries(args.user).run({
-        promptVars: {
+        promptVariables: {
           tweets: tweetsToString({ ...args }),
         },
         verbose: args.verbose,
+        stream: false,
       });
     },
   },

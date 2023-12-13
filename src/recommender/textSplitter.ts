@@ -1,7 +1,6 @@
 import tiktoken from "js-tiktoken";
-import { learningVideoTranscript } from "./tests/exampleData";
+import { learningVideoTranscript } from "./prompts/shared/exampleData";
 import { transcriptCuesToVtt } from "../youtube/transcript";
-import { tokenize } from "../tokenize";
 
 // copied from langchain.js
 
