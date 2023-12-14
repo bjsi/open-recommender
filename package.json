@@ -26,7 +26,7 @@
     "yt:queries": "npx tsx ./src/recommender/createQueries.ts",
     "yt:filter": "npx tsx ./src/recommender/filterSearchResults.ts",
     "yt:chunk": "npx tsx ./src/recommender/chunkTranscript.ts",
-    "twitter:context": "npx tsx ./src/twitter/getUserContext.ts",
+    "twitter:context": "npx ts-node -T ./src/twitter/getUserContext.ts",
     "main": "npx ts-node -T ./src/pipeline/main.ts"
   },
   "devDependencies": {
