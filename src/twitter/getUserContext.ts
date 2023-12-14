@@ -165,7 +165,9 @@ export const formatTweets = (tweets: Tweet[], user: string) => {
 const isAdvert = (tweet: Tweet) => {
   const sources = [tweet.source, tweet.sourceUrl, tweet.sourceLabel];
   return sources.some((source) =>
-    ["ads", "advert"].some((x) => source?.toLowerCase()?.includes(x))
+    ["ads", "advert", "brand networks"].some((x) =>
+      source?.toLowerCase()?.includes(x)
+    )
   );
 };
 
@@ -241,6 +243,8 @@ if (require.main === module) {
     //   path.join(__dirname, `${user}ExampleTweets.json`),
     //   JSON.stringify(tweets, null, 2)
     // );
+
+    console.log(tweets);
     const str = tweetsToString({ tweets, user });
     console.log(str);
     // console.log("Profile: ", profile);
