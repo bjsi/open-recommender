@@ -29,9 +29,9 @@ export const appraiseTranscript = () =>
     exampleData: [spamVideoDataset, learningVideoDataSet],
   })
     .withTest(
-      "recommend-quality",
+      "quality-250-tokens",
       {
-        transcript: learningVideoDataSet.transcript.value,
+        transcript: firstNTokens(learningVideoDataSet.transcript.value, 250),
       },
       (output) => {
         return {
@@ -42,7 +42,34 @@ export const appraiseTranscript = () =>
       }
     )
     .withTest(
-      "reject-spam-350-tokens",
+      "quality-500-tokens",
+      {
+        transcript: firstNTokens(learningVideoDataSet.transcript.value, 500),
+      },
+      (output) => {
+        return {
+          pass: output.recommend,
+          score: output.recommend ? 1 : 0,
+          reason: "",
+        };
+      }
+    )
+    .withTest(
+      "quality-1000-tokens",
+      {
+        transcript: firstNTokens(learningVideoDataSet.transcript.value, 1000),
+      },
+      (output) => {
+        return {
+          pass: output.recommend,
+          score: output.recommend ? 1 : 0,
+          reason: "",
+        };
+      }
+    )
+    // regularly fails - see https://x.com/experilearning/status/1735213419601461376?s=20
+    .withTest(
+      "spam-350-tokens",
       {
         transcript: firstNTokens(spamVideoDataset.transcript.value, 350),
       },
@@ -55,7 +82,7 @@ export const appraiseTranscript = () =>
       }
     )
     .withTest(
-      "reject-spam-500-tokens",
+      "spam-500-tokens",
       {
         transcript: firstNTokens(spamVideoDataset.transcript.value, 500),
       },
@@ -68,7 +95,7 @@ export const appraiseTranscript = () =>
       }
     )
     .withTest(
-      "reject-spam-1000-tokens",
+      "spam-1000-tokens",
       {
         transcript: firstNTokens(spamVideoDataset.transcript.value, 1000),
       },

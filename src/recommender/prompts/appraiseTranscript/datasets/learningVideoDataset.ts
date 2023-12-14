@@ -4,7 +4,7 @@ import { learningVideoTranscript } from "../../shared/exampleData";
 export const learningVideoDataSet = {
   transcript: {
     name: "Learning Video",
-    value: transcriptToString(learningVideoTranscript.cues).slice(0, 5000),
+    value: transcriptToString(learningVideoTranscript.cues),
   },
   videoTitle: {
     name: "Learning Video Title",
