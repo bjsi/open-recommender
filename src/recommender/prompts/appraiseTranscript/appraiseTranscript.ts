@@ -4,6 +4,7 @@ import { appraiseTrancriptOuputSchema } from "./schemas/appraiseTranscriptOutput
 import { noTitlePrompt } from "./prompts/noTitlePrompt";
 import { spamVideoDataset } from "./datasets/spamVideoDataset";
 import { learningVideoDataSet } from "./datasets/learningVideoDataset";
+import { firstNTokens } from "../createClips/helpers/splitTranscript";
 
 export const APPRAISE_TRANSCRIPT = "Appraise Transcript";
 
@@ -41,9 +42,35 @@ export const appraiseTranscript = () =>
       }
     )
     .withTest(
-      "reject-spam",
+      "reject-spam-350-tokens",
       {
-        transcript: spamVideoDataset.transcript.value,
+        transcript: firstNTokens(spamVideoDataset.transcript.value, 350),
+      },
+      (output) => {
+        return {
+          pass: !output.recommend,
+          score: output.recommend ? 0 : 1,
+          reason: "",
+        };
+      }
+    )
+    .withTest(
+      "reject-spam-500-tokens",
+      {
+        transcript: firstNTokens(spamVideoDataset.transcript.value, 500),
+      },
+      (output) => {
+        return {
+          pass: !output.recommend,
+          score: output.recommend ? 0 : 1,
+          reason: "",
+        };
+      }
+    )
+    .withTest(
+      "reject-spam-1000-tokens",
+      {
+        transcript: firstNTokens(spamVideoDataset.transcript.value, 1000),
       },
       (output) => {
         return {

@@ -5,14 +5,14 @@ import { appraiseTranscriptInputSchema } from "../schemas/appraiseTranscriptInpu
 export const noTitlePrompt = new CandidatePrompt<
   z.infer<typeof appraiseTranscriptInputSchema>
 >({
-  name: "No Title",
+  name: "transcript but no title",
   compile: function () {
     return [
       {
         role: "system",
         content: `
 # Instructions
-Given a transcript of a video, evaluate whether the video is likely to be low-quality SEO spam. Consider the following characteristics when making your assessment:
+Given a transcript of a video, evaluate whether the video is likely to be a low-quality video. Consider the following characteristics when making your assessment:
 - **Use of Buzzwords and Jargon**: Look for an overuse of sensationalist or trendy terms like "revolutionize," "game-changing," "transformative," etc., without substantial context or explanation.
 - **Vagueness and Lack of Specific Details**: Identify if the transcript lacks specific, concrete information about the topics discussed, and instead uses broad, sweeping statements.
 - **Clickbait-style Elements**: Determine if the content of the transcript seems designed to attract viewers through sensationalism or exaggerated claims rather than substantive content.

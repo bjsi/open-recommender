@@ -171,12 +171,11 @@ if (require.main === module) {
     console.error("Please provide a video ID");
     process.exit(1);
   }
-  fetchTranscript(videoId, "Test video").then((result) => {
+  fetchTranscript(
+    videoId,
+    "The 10 AI Innovations Expected to Revolutionize 2024 - 2025"
+  ).then((result) => {
     console.log("TEXT");
     console.log(transcriptToString(result?.cues || []));
-    console.log("CUES");
-    console.log(result?.cues);
-    // console.log("WEBVTT");
-    // console.log(transcriptCuesToVtt(result?.cues || []));
   });
 }
