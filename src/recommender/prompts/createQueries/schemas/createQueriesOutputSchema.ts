@@ -8,3 +8,5 @@ export const createQueriesOutputSchema = z.object({
     })
   ),
 });
+
+export type CreateQueriesOutput = z.infer<typeof createQueriesOutputSchema>;

@@ -1,11 +1,8 @@
 import { CandidatePrompt } from "prompt-iteration-assistant";
-import { filterSearchResultsInputSchema } from "../schemas/filterSearchResultsInputSchema";
-import { z } from "zod";
-import { filterSearchResultsOutputSchema } from "../schemas/filterSearchResultsOutputSchema";
+import { FilterSearchResultsInput } from "../schemas/filterSearchResultsInputSchema";
+import { FilterSearchResultsOutput } from "../schemas/filterSearchResultsOutputSchema";
 
-export const mainPrompt = new CandidatePrompt<
-  z.infer<typeof filterSearchResultsInputSchema>
->({
+export const mainPrompt = new CandidatePrompt<FilterSearchResultsInput>({
   name: "withExample",
   compile() {
     return [
@@ -79,7 +76,7 @@ undefined
               { id: 1, relevance: 1 },
               { id: 2, relevance: 0.2 },
             ],
-          } satisfies z.infer<typeof filterSearchResultsOutputSchema>),
+          } satisfies FilterSearchResultsOutput),
         },
       },
       {

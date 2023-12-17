@@ -8,7 +8,7 @@ import { yt } from "../youtube";
 import { Failure, Success, failure, success } from "./run";
 import { TranscriptCue } from "../youtube/transcript";
 import { PipelineArgs, pipelineArgsSchema } from "./pipeline";
-import { TranscriptChunk } from "../recommender/prompts/createClips/helpers/transcriptClip";
+import { TranscriptChunk } from "../recommender/prompts/recommendClips/helpers/transcriptClip";
 
 export const STAGES = [
   "validate-args",

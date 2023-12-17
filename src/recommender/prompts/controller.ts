@@ -4,9 +4,9 @@ import {
   appraiseTranscript,
 } from "./appraiseTranscript/appraiseTranscript";
 import {
-  CREATE_CLIPS,
-  createClipsFromTranscript,
-} from "./createClips/createClips";
+  RECOMMEND_CLIPS,
+  recommendClips,
+} from "./recommendClips/recommendClips";
 import {
   CREATE_YOUTUBE_SEARCH_QUERIES,
   createYouTubeSearchQueries,
@@ -21,7 +21,7 @@ import {
  */
 export const promptController = new PromptController({
   [APPRAISE_TRANSCRIPT]: appraiseTranscript,
-  [CREATE_CLIPS]: createClipsFromTranscript,
+  [RECOMMEND_CLIPS]: recommendClips,
   [CREATE_YOUTUBE_SEARCH_QUERIES]: createYouTubeSearchQueries,
   [RECOMMEND_VIDEOS]: filterSearchResults,
 });

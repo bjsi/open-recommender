@@ -8,3 +8,7 @@ export const filterSearchResultsOutputSchema = z.object({
     })
   ),
 });
+
+export type FilterSearchResultsOutput = z.infer<
+  typeof filterSearchResultsOutputSchema
+>;

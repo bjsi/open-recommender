@@ -1,10 +1,7 @@
 import { CandidatePrompt } from "prompt-iteration-assistant";
-import { z } from "zod";
-import { appraiseTranscriptInputSchema } from "../schemas/appraiseTranscriptInputSchema";
+import { AppraiseTranscriptInput } from "../schemas/appraiseTranscriptInputSchema";
 
-export const noTitlePrompt = new CandidatePrompt<
-  z.infer<typeof appraiseTranscriptInputSchema>
->({
+export const noTitlePrompt = new CandidatePrompt<AppraiseTranscriptInput>({
   name: "transcript but no title",
   compile: function () {
     return [

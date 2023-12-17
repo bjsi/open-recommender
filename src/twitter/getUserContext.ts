@@ -4,7 +4,7 @@
  * TODO: bios of recent follows?
  */
 
-import { readFileSync, writeFileSync } from "fs";
+import { readFileSync } from "fs";
 import { TweetSchema, Tweet, UserSchema } from "./schemas";
 import path from "path";
 import { TwitterAPI, initTwitterAPI } from "./twitterAPI";
@@ -224,11 +224,13 @@ export const loadExampleTweetHistory = (user: string) => {
 if (require.main === module) {
   (async () => {
     const user = (process.argv[2] || "experilearning").replace("@", "");
+    const n_tweets = parseInt(process.argv[3] || "20");
+    console.log(`Getting ${n_tweets} tweets for user @${user}`);
     const tweets =
       //loadExampleTweetHistory(user) ||
       await (async () => {
         const { api, bridge } = initTwitterAPI();
-        const tweets = (await getUserTweetHistory(api, user, 20)).filter(
+        const tweets = (await getUserTweetHistory(api, user, n_tweets)).filter(
           Boolean
         ) as Tweet[];
         // const profile = await getUserProfile(api, user);

@@ -6,10 +6,12 @@
     "commander": "^11.1.0",
     "dayjs": "^1.11.10",
     "dotenv": "^16.3.1",
+    "inquirer": "^8.0.0",
+    "inquirer-search-list": "^1.2.6",
     "js-tiktoken": "^1.0.8",
     "openai": "^4.20.1",
     "openpipe": "^0.6.3",
-    "prompt-iteration-assistant": "^0.0.7",
+    "prompt-iteration-assistant": "^0.0.13",
     "promptfoo": "^0.28.1",
     "pybridge": "^1.1.0",
     "remeda": "^1.29.0",
@@ -22,18 +24,19 @@
   "scripts": {
     "prompts": "npx tsx ./src/recommender/prompts/main.ts",
     "yt:search": "npx tsx ./src/youtube/search.ts",
-    "yt:transcript": "npx tsx ./src/youtube/transcript.ts",
+    "yt:transcript": "npx ts-node -T ./src/youtube/transcript.ts",
     "yt:queries": "npx tsx ./src/recommender/createQueries.ts",
     "yt:filter": "npx tsx ./src/recommender/filterSearchResults.ts",
-    "yt:chunk": "npx tsx ./src/recommender/chunkTranscript.ts",
+    "yt:clips": "npx tsx ./src/recommender/chunkTranscript.ts",
     "twitter:context": "npx ts-node -T ./src/twitter/getUserContext.ts",
     "main": "npx ts-node -T ./src/pipeline/main.ts"
   },
   "devDependencies": {
-    "ts-node": "^10.9.1",
     "@deepkit/type-compiler": "^1.0.1-alpha.108",
     "@types/better-sqlite3": "^7.6.8",
     "@types/cli-progress": "^3.11.5",
-    "@types/node": "^20.9.4"
+    "@types/inquirer": "^9.0.7",
+    "@types/node": "^20.9.4",
+    "ts-node": "^10.9.1"
   }
 }

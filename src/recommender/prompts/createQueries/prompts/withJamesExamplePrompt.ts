@@ -3,8 +3,11 @@ import { sharedCreateQueriesInstructions } from "./shared";
 import { toCamelCase } from "../../shared/toCamelCase";
 import { CREATE_YOUTUBE_SEARCH_QUERIES } from "../createQueries";
 import { z } from "zod";
-import { createQueriesOutputSchema } from "../schemas/createQueriesOutputSchema";
-import { createQueriesInputSchema } from "../schemas/createQueriesInputSchema";
+import { CreateQueriesOutput } from "../schemas/createQueriesOutputSchema";
+import {
+  CreateQueriesInput,
+  createQueriesInputSchema,
+} from "../schemas/createQueriesInputSchema";
 
 const promptData = {
   instructions: sharedCreateQueriesInstructions,
@@ -119,9 +122,7 @@ https://t.co/gO6RPaJsjf
   ],
 };
 
-export const withJamesExamplePrompt = new CandidatePrompt<
-  z.infer<typeof createQueriesInputSchema>
->({
+export const withJamesExamplePrompt = new CandidatePrompt<CreateQueriesInput>({
   name: "withJamesExamplePrompt",
   compile() {
     return [
@@ -137,7 +138,7 @@ ${promptData.exampleTweets}
         name: toCamelCase(CREATE_YOUTUBE_SEARCH_QUERIES),
         arguments: {
           queries: promptData.exampleQueries,
-        } satisfies z.infer<typeof createQueriesOutputSchema>,
+        } satisfies CreateQueriesOutput,
       }),
       {
         role: "user",

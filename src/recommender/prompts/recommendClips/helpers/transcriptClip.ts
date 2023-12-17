@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { hhmmssToSeconds } from "./timeUtils";
-import { createClipsOutputSchema } from "../schemas/createClipsOutputSchema";
+import { recommendClipsOutputSchema } from "../schemas/recommendClipsOutputSchema";
 
 export interface TranscriptClip {
   title: string;
@@ -12,8 +12,8 @@ export interface TranscriptClip {
   videoId: string;
 }
 
-export type TranscriptChunk = z.infer<
-  typeof createClipsOutputSchema
+export type TranscriptChunk = Required<
+  z.infer<typeof recommendClipsOutputSchema>
 >["clips"][number];
 
 export const chunkToClip = (args: {
@@ -24,7 +24,7 @@ export const chunkToClip = (args: {
   const { chunk, videoId, videoTitle } = args;
   return {
     title: chunk.title,
-    summary: chunk.summary,
+    summary: chunk.reason,
     start: hhmmssToSeconds(chunk.start),
     end: hhmmssToSeconds(chunk.end),
     videoTitle: videoTitle,

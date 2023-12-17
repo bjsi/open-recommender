@@ -1,10 +1,9 @@
 import { CandidatePrompt, ChatMessage } from "prompt-iteration-assistant";
 import { sharedCreateQueriesInstructions } from "./shared";
-import { z } from "zod";
-import { createQueriesInputSchema } from "../schemas/createQueriesInputSchema";
+import { CreateQueriesInput } from "../schemas/createQueriesInputSchema";
 import { toCamelCase } from "../../shared/toCamelCase";
 import { CREATE_YOUTUBE_SEARCH_QUERIES } from "../createQueries";
-import { createQueriesOutputSchema } from "../schemas/createQueriesOutputSchema";
+import { CreateQueriesOutput } from "../schemas/createQueriesOutputSchema";
 
 const promptData = {
   prompt: sharedCreateQueriesInstructions,
@@ -112,10 +111,8 @@ ID: 9
   ],
 };
 
-export const withKyleExamplePrompt = new CandidatePrompt<
-  z.infer<typeof createQueriesInputSchema>
->({
-  name: "withJamesExamplePrompt",
+export const withKyleExamplePrompt = new CandidatePrompt<CreateQueriesInput>({
+  name: "withKyleExamplePrompt",
   compile() {
     return [
       ChatMessage.system(sharedCreateQueriesInstructions),
@@ -130,7 +127,7 @@ ${promptData.exampleTweets}
         name: toCamelCase(CREATE_YOUTUBE_SEARCH_QUERIES),
         arguments: {
           queries: promptData.exampleQueries,
-        } satisfies z.infer<typeof createQueriesOutputSchema>,
+        } satisfies CreateQueriesOutput,
       }),
       {
         role: "user",

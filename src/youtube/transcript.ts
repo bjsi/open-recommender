@@ -1,6 +1,6 @@
 import chalk from "chalk";
 import { execSync } from "child_process";
-import { existsSync, readFileSync } from "fs";
+import { existsSync, readFileSync, writeFileSync } from "fs";
 import path from "path";
 import { dataFolder } from "../filesystem";
 import { parseSync, stringifySync } from "subtitle";
@@ -31,6 +31,7 @@ export async function fetchTranscript(
     `https://www.youtube.com/watch?v=${videoId}`,
   ];
   const transcriptFile = path.join(dataFolder, `${videoId}.en.vtt`);
+  console.log(transcriptFile);
   try {
     if (!existsSync(transcriptFile)) {
       execSync(command.join(" "));
@@ -54,6 +55,17 @@ export async function fetchTranscript(
       )
     );
   }
+}
+
+export function transcriptToMarkdownCues(cues: TranscriptCue[]) {
+  return cues
+    .map(
+      (cue, id) => `
+ID: ${id}
+${cue.text}
+`
+    )
+    .join(`\n---\n`);
 }
 
 export function transcriptToString(cues: TranscriptCue[]) {
@@ -171,11 +183,18 @@ if (require.main === module) {
     console.error("Please provide a video ID");
     process.exit(1);
   }
+  console.log("Fetching", videoId);
   fetchTranscript(
     videoId,
     "The 10 AI Innovations Expected to Revolutionize 2024 - 2025"
   ).then((result) => {
-    console.log("TEXT");
-    console.log(transcriptToString(result?.cues || []));
+    const formatted = result?.cues
+      ?.map((x, i) => ({
+        id: i,
+        text: x.text,
+      }))
+      .map((x) => `ID: ${x.id}\n${x.text}`)
+      .join("\n---\n");
+    console.log(formatted);
   });
 }

@@ -5,3 +5,7 @@ export const filterSearchResultsInputSchema = z.object({
   results: z.string(),
   query: z.string(),
 });
+
+export type FilterSearchResultsInput = z.infer<
+  typeof filterSearchResultsInputSchema
+>;
