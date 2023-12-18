@@ -5,7 +5,7 @@ import { z } from "zod";
 const client = new OpenAI();
 
 export const openpipe = {
-  function: async function <
+  functionCall: async function <
     Input extends Record<string, any>,
     Output extends Record<string, any>
   >(args: {
@@ -30,5 +30,4 @@ export const openpipe = {
     const json = JSON.parse(valueText);
     return args.output?.parse?.(json);
   },
-  instruct: async function () {},
 };

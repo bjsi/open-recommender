@@ -44,7 +44,7 @@ class CreateYouTubeSearchQueries extends Prompt<
         stream: false,
       });
     } else {
-      return await openpipe.function({
+      return await openpipe.functionCall({
         input: this.input!,
         output: this.output!,
         vars: promptVariables,

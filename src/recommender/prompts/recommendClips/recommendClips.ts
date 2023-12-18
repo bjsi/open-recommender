@@ -61,14 +61,14 @@ class RecommendClipsPrompt extends Prompt<
         title: args.title,
       };
       if (!args.enableOpenPipeLogging) {
-        const { clips } = await recommendClips().run({
+        const { clips } = await this.run({
           promptVariables,
           stream: false,
           verbose: args.verbose,
         });
         chunks.push(...(clips || []));
       } else {
-        const { clips } = await openpipe.function({
+        const { clips } = await openpipe.functionCall({
           input: this.input!,
           output: this.output!,
           vars: promptVariables,

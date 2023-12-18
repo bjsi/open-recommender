@@ -55,7 +55,7 @@ class RecommendVideos extends Prompt<
       });
       videos = recommendedVideos;
     } else {
-      const { recommendedVideos } = await openpipe.function({
+      const { recommendedVideos } = await openpipe.functionCall({
         prompt: this.prompts[0],
         input: this.input!,
         output: this.output!,

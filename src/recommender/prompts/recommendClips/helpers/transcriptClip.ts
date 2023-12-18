@@ -10,6 +10,7 @@ export interface TranscriptClip {
   videoTitle: string;
   videoUrl: string; // with timestamp
   videoId: string;
+  text: string;
 }
 
 export type TranscriptChunk = Required<
@@ -20,9 +21,11 @@ export const chunkToClip = (args: {
   chunk: TranscriptChunk;
   videoTitle: string;
   videoId: string;
+  text: string;
 }): TranscriptClip => {
   const { chunk, videoId, videoTitle } = args;
   return {
+    text: args.text,
     title: chunk.title,
     summary: chunk.reason,
     start: hhmmssToSeconds(chunk.start),
