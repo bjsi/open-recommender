@@ -25,6 +25,10 @@ import { TranscriptChunk } from "./helpers/transcriptClip";
 
 export const RECOMMEND_CLIPS = "Recommend Clips";
 
+/**
+ * We extract clips from the transcript based on the user's tweets.
+ * We could use YouTube's chapters, but they are not always available, accurate or granular enough.
+ */
 class RecommendClipsPrompt extends Prompt<
   typeof recommendClipsInputSchema,
   typeof recommendClipsOutputSchema
@@ -60,36 +64,24 @@ class RecommendClipsPrompt extends Prompt<
         transcript: part,
         title: args.title,
       };
-      if (!args.enableOpenPipeLogging) {
-        const { clips } = await this.run({
-          promptVariables,
-          stream: false,
-          verbose: args.verbose,
-        });
-        chunks.push(...(clips || []));
-      } else {
-        const { clips } = await openpipe.functionCall({
-          input: this.input!,
-          output: this.output!,
-          vars: promptVariables,
-          prompt: this.prompts[0],
-          body: {
-            max_tokens: this.max_tokens,
-            temperature: this.temperature,
-            model: this.model,
-          },
-        });
-        chunks.push(...(clips || []));
-      }
+      const { clips } = await openpipe.functionCall({
+        input: this.input!,
+        output: this.output!,
+        vars: promptVariables,
+        prompt: this.prompts[0],
+        body: {
+          max_tokens: this.max_tokens,
+          temperature: this.temperature,
+          model: this.model,
+        },
+        enableOpenPipeLogging: args.enableOpenPipeLogging,
+      });
+      chunks.push(...(clips || []));
     }
     return chunks;
   }
 }
 
-/**
- * We extract clips from the transcript based on the user's tweets.
- * We could use YouTube's chapters, but they are not always available, accurate or granular enough.
- */
 export const recommendClips = () =>
   new RecommendClipsPrompt()
     .withTest("medium related", {

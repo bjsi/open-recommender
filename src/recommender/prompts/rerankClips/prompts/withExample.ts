@@ -1,8 +1,8 @@
 import { CandidatePrompt, ChatMessage } from "prompt-iteration-assistant";
 import { RerankClipsInput } from "../schemas/rerankClipsInputSchema";
 
-export const withExamplePrompt = new CandidatePrompt<RerankClipsInput>({
-  name: "with example",
+export const zeroShotPrompt = new CandidatePrompt<RerankClipsInput>({
+  name: "zero-shot",
   compile() {
     return [
       ChatMessage.system(

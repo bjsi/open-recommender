@@ -37,26 +37,19 @@ class CreateYouTubeSearchQueries extends Prompt<
     const promptVariables: CreateQueriesInput = {
       tweets: tweetsToString({ tweets: args.tweets, user: args.user }),
     };
-
-    if (!args.enableOpenPipeLogging) {
-      return await this.run({
-        promptVariables: promptVariables,
+    return await openpipe.functionCall({
+      input: this.input!,
+      output: this.output!,
+      vars: promptVariables,
+      prompt: this.prompts[0],
+      body: {
+        max_tokens: this.max_tokens,
+        temperature: this.temperature,
+        model: this.model,
         stream: false,
-      });
-    } else {
-      return await openpipe.functionCall({
-        input: this.input!,
-        output: this.output!,
-        vars: promptVariables,
-        prompt: this.prompts[0],
-        body: {
-          max_tokens: this.max_tokens,
-          temperature: this.temperature,
-          model: this.model,
-          stream: false,
-        },
-      });
-    }
+      },
+      enableOpenPipeLogging: args.enableOpenPipeLogging,
+    });
   }
 }
 

@@ -16,6 +16,10 @@ import { openpipe } from "../../../openpipe/openpipe";
 
 export const APPRAISE_TRANSCRIPT = "Appraise Transcript";
 
+/**
+ * We run some quality and "taste" checks on the transcript to
+ * check that the video meets our standards before further processing.
+ */
 class AppraiseTranscriptPrompt extends Prompt<
   typeof appraiseTranscriptInputSchema,
   typeof appraiseTrancriptOuputSchema
@@ -43,31 +47,21 @@ class AppraiseTranscriptPrompt extends Prompt<
       transcript,
       videoTitle: args.title,
     };
-    if (!args.enableOpenPipeLogging) {
-      return await appraiseTranscript().run({
-        promptVariables: promptVariables,
-        stream: false,
-      });
-    } else {
-      return await openpipe.functionCall({
-        input: this.input!,
-        output: this.output!,
-        vars: promptVariables,
-        prompt: this.prompts[0],
-        body: {
-          max_tokens: this.max_tokens,
-          temperature: this.temperature,
-          model: this.model,
-        },
-      });
-    }
+    return await openpipe.functionCall({
+      input: this.input!,
+      output: this.output!,
+      vars: promptVariables,
+      prompt: this.prompts[0],
+      body: {
+        max_tokens: this.max_tokens,
+        temperature: this.temperature,
+        model: this.model,
+      },
+      enableOpenPipeLogging: args.enableOpenPipeLogging,
+    });
   }
 }
 
-/**
- * We run some quality and "taste" checks on the transcript to
- * check that the video meets our standards before further processing.
- */
 export const appraiseTranscript = () =>
   new AppraiseTranscriptPrompt()
     .withTest(

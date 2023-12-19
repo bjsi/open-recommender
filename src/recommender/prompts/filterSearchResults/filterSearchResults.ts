@@ -46,29 +46,19 @@ class RecommendVideos extends Prompt<
       query: args.query,
       tweets: tweetsToString({ tweets: args.tweets, user: args.user }),
     };
-
-    let videos: FilterSearchResultsOutput["recommendedVideos"] = [];
-    if (!args.enableOpenPipeLogging) {
-      const { recommendedVideos } = await filterSearchResults().run({
-        promptVariables,
-        stream: false,
-      });
-      videos = recommendedVideos;
-    } else {
-      const { recommendedVideos } = await openpipe.functionCall({
-        prompt: this.prompts[0],
-        input: this.input!,
-        output: this.output!,
-        vars: promptVariables,
-        body: {
-          max_tokens: this.max_tokens,
-          temperature: this.temperature,
-          model: this.model,
-        },
-      });
-      videos = recommendedVideos;
-    }
-    return _.sortBy(videos, [(x) => x.relevance, "desc"]).map(
+    const { recommendedVideos } = await openpipe.functionCall({
+      prompt: this.prompts[0],
+      input: this.input!,
+      output: this.output!,
+      vars: promptVariables,
+      body: {
+        max_tokens: this.max_tokens,
+        temperature: this.temperature,
+        model: this.model,
+      },
+      enableOpenPipeLogging: args.enableOpenPipeLogging,
+    });
+    return _.sortBy(recommendedVideos, [(x) => x.relevance, "desc"]).map(
       ({ id, relevance }) => ({
         result: args.results[id],
         relevance,

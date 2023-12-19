@@ -4,7 +4,7 @@ import {
   rerankClipsInputSchema,
 } from "./schemas/rerankClipsInputSchema";
 import { rerankClipsOutputSchema } from "./schemas/rerankClipsOutputSchema";
-import { withExamplePrompt } from "./prompts/withExample";
+import { zeroShotPrompt } from "./prompts/withExample";
 import { TranscriptClip } from "../recommendClips/helpers/transcriptClip";
 import { Tweet } from "../../../twitter/schemas";
 import { tweetsToString } from "../../../twitter/getUserContext";
@@ -13,6 +13,11 @@ import _ from "remeda";
 
 export const RERANK_CLIPS = "Rerank Clips";
 
+/**
+ * To find the best video clips to show to the user, we use a re-ranking prompt loosely based on https://github.com/sunnweiwei/RankGPT.
+ * To get around context length limitations in cases where there are many clips, we use a sliding window approach.
+ * In each call we compare and order four clips. The lowest ranked clip is discarded
+ */
 class RerankClips extends Prompt<
   typeof rerankClipsInputSchema,
   typeof rerankClipsOutputSchema
@@ -22,7 +27,7 @@ class RerankClips extends Prompt<
       name: RERANK_CLIPS,
       description:
         "Order YouTube video clips based on their relevance to the user's interests.",
-      prompts: [withExamplePrompt],
+      prompts: [zeroShotPrompt],
       model: "gpt-4",
       input: rerankClipsInputSchema,
       output: rerankClipsOutputSchema,
@@ -36,41 +41,32 @@ class RerankClips extends Prompt<
     clips: TranscriptClip[];
     enableOpenPipeLogging?: boolean;
   }) {
-    const callApi = async (clips: TranscriptClip[]) => {
+    const callApi = async (windowClips: TranscriptClip[]) => {
       const promptVariables: RerankClipsInput = {
         tweets: tweetsToString({ tweets: args.tweets, user: args.user }),
-        clips: clips
-          .map(
-            (clip, i) => `
+        clips: windowClips
+          .map((clip, i) =>
+            `
 ID: ${i}
 ${clip.title}
 ${clip.text}
-`
+`.trim()
           )
           .join("\n---\n"),
       };
-      let orderedWindowClipIds: number[] = [];
-      if (!args.enableOpenPipeLogging) {
-        const { orderedClipIds } = await this.run({
-          promptVariables,
-          stream: false,
-        });
-        orderedWindowClipIds = orderedClipIds;
-      } else {
-        const { orderedClipIds } = await openpipe.functionCall({
-          input: this.input!,
-          output: this.output!,
-          vars: promptVariables,
-          prompt: this.prompts[0],
-          body: {
-            max_tokens: this.max_tokens,
-            temperature: this.temperature,
-            model: this.model,
-          },
-        });
-        orderedWindowClipIds = orderedClipIds;
-      }
-      return orderedWindowClipIds.map((id) => clips[id]);
+      const { orderedClipIds } = await openpipe.functionCall({
+        input: this.input!,
+        output: this.output!,
+        vars: promptVariables,
+        prompt: this.prompts[0],
+        body: {
+          max_tokens: this.max_tokens,
+          temperature: this.temperature,
+          model: this.model,
+        },
+        enableOpenPipeLogging: args.enableOpenPipeLogging,
+      });
+      return orderedClipIds.map((id) => windowClips[id]);
     };
 
     if (args.clips.length === 0) {
