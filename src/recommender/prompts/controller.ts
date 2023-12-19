@@ -13,7 +13,7 @@ import {
 } from "./createQueries/createQueries";
 import {
   RECOMMEND_VIDEOS,
-  filterSearchResults,
+  recommendVideos,
 } from "./filterSearchResults/filterSearchResults";
 
 /**
@@ -23,5 +23,5 @@ export const promptController = new PromptController({
   [APPRAISE_TRANSCRIPT]: appraiseTranscript,
   [RECOMMEND_CLIPS]: recommendClips,
   [CREATE_YOUTUBE_SEARCH_QUERIES]: createYouTubeSearchQueries,
-  [RECOMMEND_VIDEOS]: filterSearchResults,
+  [RECOMMEND_VIDEOS]: recommendVideos,
 });

@@ -1,6 +1,5 @@
 import chalk from "chalk";
 import { twitter } from "../twitter";
-import { recommender } from "../recommender";
 import { Tweet } from "../twitter/schemas";
 import { tweetsToString } from "../twitter/getUserContext";
 import { SearchResult } from "../youtube/search";
@@ -9,6 +8,12 @@ import { Failure, Success, failure, success } from "./run";
 import { TranscriptCue } from "../youtube/transcript";
 import { PipelineArgs, pipelineArgsSchema } from "./pipeline";
 import { TranscriptChunk } from "../recommender/prompts/recommendClips/helpers/transcriptClip";
+import _ from "remeda";
+import { createYouTubeSearchQueries } from "../recommender/prompts/createQueries/createQueries";
+import { recommendVideos } from "../recommender/prompts/filterSearchResults/filterSearchResults";
+import { appraiseTranscript } from "../recommender/prompts/appraiseTranscript/appraiseTranscript";
+import { recommendClips } from "../recommender/prompts/recommendClips/recommendClips";
+import { rerankClips } from "../recommender/prompts/rerankClips/rerankClips";
 
 export const STAGES = [
   "validate-args",
@@ -19,6 +24,7 @@ export const STAGES = [
   "download-transcripts",
   "appraise-transcripts",
   "chunk-transcripts",
+  "order-clips",
 ] as const;
 
 export const validateArgs = {
@@ -76,7 +82,7 @@ export const createQueries = {
   ): Promise<Success<SearchForVideosStageArgs> | Failure> {
     const { tweets, user } = args;
     console.log(chalk.blue("Creating search queries..."));
-    const { queries } = await recommender.queries.create({
+    const { queries } = await createYouTubeSearchQueries(user).execute({
       tweets,
       user,
     });
@@ -173,7 +179,7 @@ export const filterSearchResults = {
         searchResults: rawYouTubeSearchResults,
       } = rawSearchResult;
       console.log(chalk.blue("Filtering search results..."));
-      const filteredResultsForQuery = await recommender.search.filter({
+      const filteredResultsForQuery = await recommendVideos().execute({
         user,
         query: query,
         results: rawYouTubeSearchResults,
@@ -294,10 +300,9 @@ export const appraiseTranscripts = {
     console.log(chalk.blue("Appraising transcripts..."));
     const appraisedResults: SearchResultWithTranscript[] = [];
     for (const result of resultsWithTranscripts) {
-      const { recommend, reasoning } = await recommender.transcript.appraise({
+      const { recommend, reasoning } = await appraiseTranscript().execute({
         transcript: result.cues,
         title: result.searchResult.title,
-        verbose: true,
       });
       if (!recommend) {
         console.log(
@@ -357,7 +362,7 @@ export const chunkTranscripts = {
       console.log(
         chalk.blue(`Generating chapters for "${result.searchResult.title}"...`)
       );
-      const chunks = await recommender.transcript.chunk({
+      const chunks = await recommendClips().execute({
         tweets: result.tweets,
         user,
         transcript: result.cues,
@@ -395,5 +400,36 @@ export const chunkTranscripts = {
       );
       return success({ ...args, chunkedTranscripts });
     }
+  },
+};
+
+interface RankClipsStageArgs extends ChunkTranscriptsStageArgs {
+  chunkedTranscripts: SearchResultWithTranscriptAndChunks[];
+}
+
+export const rankClips = {
+  name: "order-clips",
+  description: "Order Clips",
+  run: async function (args: RankClipsStageArgs): Promise<
+    | Success<
+        RankClipsStageArgs & {
+          orderedClips: SearchResultWithTranscriptAndChunks[];
+        }
+      >
+    | Failure
+  > {
+    // order globally over all transcripts and all clips
+    const allClips = _.shuffle(
+      args.chunkedTranscripts.flatMap((result) =>
+        result.chunks.map((chunk) => ({ chunk, result }))
+      )
+    );
+    const output = await rerankClips().execute({
+      user: args.user,
+      tweets: args.tweets,
+      clips: allClips,
+    });
+
+    return success({ ...args, orderedClips });
   },
 };

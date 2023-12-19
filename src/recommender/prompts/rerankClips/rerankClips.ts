@@ -5,7 +5,6 @@ import {
 } from "./schemas/rerankClipsInputSchema";
 import { rerankClipsOutputSchema } from "./schemas/rerankClipsOutputSchema";
 import { zeroShotPrompt } from "./prompts/withExample";
-import { TranscriptClip } from "../recommendClips/helpers/transcriptClip";
 import { Tweet } from "../../../twitter/schemas";
 import { tweetsToString } from "../../../twitter/getUserContext";
 import { openpipe } from "../../../openpipe/openpipe";
@@ -13,16 +12,23 @@ import _ from "remeda";
 
 export const RERANK_CLIPS = "Rerank Clips";
 
+type Clip = {
+  id: number;
+  title: string;
+  summary: string;
+  text: string;
+};
+
 /**
  * To find the best video clips to show to the user, we use a re-ranking prompt loosely based on https://github.com/sunnweiwei/RankGPT.
  * To get around context length limitations in cases where there are many clips, we use a sliding window approach.
- * In each call we compare and order four clips. The lowest ranked clip is discarded
+ * In each call we compare and order `windowSize` clips. The lowest ranked clip is discarded leaving us with `windowSize-1` clips
  */
-class RerankClips extends Prompt<
+export class RerankClips extends Prompt<
   typeof rerankClipsInputSchema,
   typeof rerankClipsOutputSchema
 > {
-  constructor() {
+  constructor(public windowSize = 4) {
     super({
       name: RERANK_CLIPS,
       description:
@@ -38,17 +44,18 @@ class RerankClips extends Prompt<
   async execute(args: {
     user: string;
     tweets: Tweet[];
-    clips: TranscriptClip[];
+    clips: Clip[];
     enableOpenPipeLogging?: boolean;
   }) {
-    const callApi = async (windowClips: TranscriptClip[]) => {
+    const callApi = async (windowClips: Clip[]) => {
       const promptVariables: RerankClipsInput = {
         tweets: tweetsToString({ tweets: args.tweets, user: args.user }),
         clips: windowClips
           .map((clip, i) =>
             `
-ID: ${i}
+ID: ${clip.id}
 ${clip.title}
+${clip.summary}
 ${clip.text}
 `.trim()
           )
@@ -74,22 +81,21 @@ ${clip.text}
     } else if (args.clips.length === 1) {
       return args.clips;
     } else {
-      const windowSize = 4;
-      let topClips: TranscriptClip[] = [];
-      const initialWindow = args.clips.slice(0, windowSize);
+      let topClips: Clip[] = [];
+      const initialWindow = args.clips.slice(0, this.windowSize);
       // initial rank
       const orderedClips = await callApi(initialWindow);
-      topClips = orderedClips.slice(0, windowSize - 1);
-      // rerank all
-      for (let i = windowSize; i < args.clips.length; i++) {
+      topClips = orderedClips.slice(0, this.windowSize - 1);
+      // rank all
+      for (let i = this.windowSize; i < args.clips.length; i++) {
         const window = topClips.concat(args.clips[i]);
         const orderedWindow = await callApi(window);
         // discard the bottom ranked clip
-        topClips = orderedWindow.slice(0, windowSize - 1);
+        topClips = orderedWindow.slice(0, this.windowSize - 1);
       }
       return _.uniq(topClips);
     }
   }
 }
 
-export const rerankClips = () => new RerankClips();
+export const rerankClips = (windowSize?: number) => new RerankClips(windowSize);

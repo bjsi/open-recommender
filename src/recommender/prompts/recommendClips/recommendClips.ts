@@ -29,7 +29,7 @@ export const RECOMMEND_CLIPS = "Recommend Clips";
  * We extract clips from the transcript based on the user's tweets.
  * We could use YouTube's chapters, but they are not always available, accurate or granular enough.
  */
-class RecommendClipsPrompt extends Prompt<
+export class RecommendClipsPrompt extends Prompt<
   typeof recommendClipsInputSchema,
   typeof recommendClipsOutputSchema
 > {

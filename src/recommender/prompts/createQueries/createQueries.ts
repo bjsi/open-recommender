@@ -12,26 +12,38 @@ import { openpipe } from "../../../openpipe/openpipe";
 
 export const CREATE_YOUTUBE_SEARCH_QUERIES = "Create YouTube Search Queries";
 
-class CreateYouTubeSearchQueries extends Prompt<
+/**
+ * We use GPT to create YouTube search queries based on the user's tweets.
+ * Getting this prompt right is critical to the success of the recommender.
+ * Run the test suite to compare different versions of the prompt.
+ */
+export class CreateYouTubeSearchQueries extends Prompt<
   typeof createQueriesInputSchema,
   typeof createQueriesOutputSchema
 > {
-  constructor() {
+  constructor(user: string) {
     super({
       name: CREATE_YOUTUBE_SEARCH_QUERIES,
       description:
         "Create YouTube search queries based on the user's recent tweets.",
-      prompts: [withKyleExamplePrompt, withJamesExamplePrompt],
+      prompts: [
+        user === "experilearning"
+          ? withKyleExamplePrompt
+          : withJamesExamplePrompt,
+        user === "experilearning"
+          ? withJamesExamplePrompt
+          : withKyleExamplePrompt,
+      ],
       model: "gpt-4",
       input: createQueriesInputSchema,
       output: createQueriesOutputSchema,
       exampleData: [],
     });
   }
+
   async execute(args: {
     user: string;
     tweets: Tweet[];
-    verbose?: boolean;
     enableOpenPipeLogging?: boolean;
   }) {
     const promptVariables: CreateQueriesInput = {
@@ -53,9 +65,5 @@ class CreateYouTubeSearchQueries extends Prompt<
   }
 }
 
-/**
- * Getting this prompt right is critical to the success of the recommender.
- * Run the test suite to compare different versions of the prompt.
- */
 export const createYouTubeSearchQueries = (user: string) =>
-  new CreateYouTubeSearchQueries();
+  new CreateYouTubeSearchQueries(user);

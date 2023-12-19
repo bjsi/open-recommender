@@ -17,7 +17,7 @@ import { openpipe } from "../../../openpipe/openpipe";
 
 export const RECOMMEND_VIDEOS = "Recommend Videos";
 
-class RecommendVideos extends Prompt<
+export class RecommendVideos extends Prompt<
   typeof filterSearchResultsInputSchema,
   typeof filterSearchResultsOutputSchema
 > {
@@ -67,4 +67,4 @@ class RecommendVideos extends Prompt<
   }
 }
 
-export const filterSearchResults = () => new RecommendVideos();
+export const recommendVideos = () => new RecommendVideos();

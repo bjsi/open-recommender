@@ -5,7 +5,7 @@ import {
   chunkTranscripts,
   createQueries,
   downloadTranscripts,
-  filterSearchResults,
+  recommendVideos,
   getTweets,
   searchForVideos,
   validateArgs,
@@ -41,10 +41,11 @@ import { Command } from "commander";
     .addStage(getTweets)
     .addStage(createQueries)
     .addStage(searchForVideos)
-    .addStage(filterSearchResults)
+    .addStage(recommendVideos)
     .addStage(downloadTranscripts)
     .addStage(appraiseTranscripts)
     .addStage(chunkTranscripts);
+
   const print = opts.print;
   if (print) {
     const clonedRun = getRunById(opts.cloneRunId || "");
