@@ -71,11 +71,8 @@ export async function searchChunkAndRank() {
   const rankedClips = await rerankClips().execute({
     tweets,
     user,
-    clips: shuffledClips.map((clip, i) => ({
-      id: i,
-      title: clip.title,
-      summary: clip.summary,
-      text: clip.text,
-    })),
+    clips: shuffledClips,
   });
+  console.log("ranked");
+  console.log(rankedClips);
 }

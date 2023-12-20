@@ -18,7 +18,7 @@ export const withExamplePrompt = new CandidatePrompt<
 - Transcript clips are considered interesting if they **directly** mention one or more of the user's interests.
 - You can understand the user's interests by looking at their Tweets and seeing the topics, concepts, events, ideas, problems and people they tweet about.
 - Only create clips that are strongly related to the user's tweets. In cases where no strongly related clips are found, reply with an empty array.
-- If a clip is created, include a structured output with a title and a one-sentence explanation highlighting the direct connection to the user's interests. 
+- If a clip is created, include a title and a one-sentence explanation highlighting the direct connection to the user's interests. 
 `.trim()
       ),
       ChatMessage.user(

@@ -8,11 +8,10 @@ export const zeroShotPrompt = new CandidatePrompt<RerankClipsInput>({
       ChatMessage.system(
         `
 # Instructions
-- Order the clips based on their relevance to the user's interests.
-- Clips are considered moderately relevant if they mention one more of the user's interests.
-- Clips are considered more relevant if they mention multiple of the user's interests.
-- Clips are considered less relevant if they mention none of the user's interests.
-- Clips are considered extremely relevant if they solve a problem the user has.
+- Order the YouTube video clips based on their relevance to the user's interests.
+- Clips are considered interesting if they are **directly** related to one or more of the user's interests.
+- You can understand the user's interests by looking at their Tweets and seeing the topics, concepts, events, ideas, problems and people they tweet about.
+- Order the clips in descending order of relevance, starting with the most relevant.
 `.trim()
       ),
       ChatMessage.user(

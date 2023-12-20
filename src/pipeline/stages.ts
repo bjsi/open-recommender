@@ -7,7 +7,10 @@ import { yt } from "../youtube";
 import { Failure, Success, failure, success } from "./run";
 import { TranscriptCue } from "../youtube/transcript";
 import { PipelineArgs, pipelineArgsSchema } from "./pipeline";
-import { TranscriptChunk } from "../recommender/prompts/recommendClips/helpers/transcriptClip";
+import {
+  TranscriptChunk,
+  TranscriptClip,
+} from "../recommender/prompts/recommendClips/helpers/transcriptClip";
 import _ from "remeda";
 import { createYouTubeSearchQueries } from "../recommender/prompts/createQueries/createQueries";
 import { recommendVideos } from "../recommender/prompts/filterSearchResults/filterSearchResults";
@@ -351,13 +354,13 @@ export const chunkTranscripts = {
   run: async function (args: ChunkTranscriptsStageArgs): Promise<
     | Success<
         ChunkTranscriptsStageArgs & {
-          chunkedTranscripts: SearchResultWithTranscriptAndChunks[];
+          chunkedTranscripts: TranscriptClip[];
         }
       >
     | Failure
   > {
     const { appraisedResults, user } = args;
-    const chunkedTranscripts: SearchResultWithTranscriptAndChunks[] = [];
+    const chunkedTranscripts: TranscriptClip[] = [];
     for (const result of appraisedResults) {
       console.log(
         chalk.blue(`Generating chapters for "${result.searchResult.title}"...`)
@@ -368,6 +371,7 @@ export const chunkTranscripts = {
         transcript: result.cues,
         title: result.searchResult.title,
         url: "https://www.youtube.com/watch?v=" + result.searchResult.id,
+        videoId: result.searchResult.id,
       });
       if (!chunks.length) {
         console.log(
@@ -381,10 +385,7 @@ export const chunkTranscripts = {
           )
         );
         console.log(chunks);
-        chunkedTranscripts.push({
-          ...result,
-          chunks,
-        });
+        chunkedTranscripts.push(...chunks);
       }
     }
 

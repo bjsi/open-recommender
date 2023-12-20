@@ -9,15 +9,10 @@ import { Tweet } from "../../../twitter/schemas";
 import { tweetsToString } from "../../../twitter/getUserContext";
 import { openpipe } from "../../../openpipe/openpipe";
 import _ from "remeda";
+import { TranscriptClip } from "../recommendClips/helpers/transcriptClip";
+import { searchChunkAndRank } from "../../dialogs/searchAndChunk";
 
 export const RERANK_CLIPS = "Rerank Clips";
-
-type Clip = {
-  id: number;
-  title: string;
-  summary: string;
-  text: string;
-};
 
 /**
  * To find the best video clips to show to the user, we use a re-ranking prompt loosely based on https://github.com/sunnweiwei/RankGPT.
@@ -44,18 +39,16 @@ export class RerankClips extends Prompt<
   async execute(args: {
     user: string;
     tweets: Tweet[];
-    clips: Clip[];
+    clips: TranscriptClip[];
     enableOpenPipeLogging?: boolean;
   }) {
-    const callApi = async (windowClips: Clip[]) => {
+    const callApi = async (windowClips: TranscriptClip[]) => {
       const promptVariables: RerankClipsInput = {
         tweets: tweetsToString({ tweets: args.tweets, user: args.user }),
         clips: windowClips
           .map((clip, i) =>
             `
-ID: ${clip.id}
-${clip.title}
-${clip.summary}
+ID: ${i}
 ${clip.text}
 `.trim()
           )
@@ -85,7 +78,7 @@ ${clip.text}
     } else if (args.clips.length === 1) {
       return args.clips;
     } else {
-      let topClips: Clip[] = [];
+      let topClips: TranscriptClip[] = [];
       const initialWindow = args.clips.slice(0, this.windowSize);
       // initial rank
       const orderedClips = await callApi(initialWindow);
@@ -102,4 +95,10 @@ ${clip.text}
   }
 }
 
-export const rerankClips = (windowSize?: number) => new RerankClips(windowSize);
+export const rerankClips = (windowSize?: number) =>
+  new RerankClips(windowSize).withCommand({
+    name: "search chunk and rank",
+    async action() {
+      await searchChunkAndRank();
+    },
+  });
