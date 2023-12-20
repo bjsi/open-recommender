@@ -50,8 +50,12 @@ export class CreateYouTubeSearchQueries extends Prompt<
       tweets: tweetsToString({ tweets: args.tweets, user: args.user }),
     };
     return await openpipe.functionCall({
-      input: this.input!,
-      output: this.output!,
+      function: {
+        name: this.name,
+        description: this.description,
+        input: this.input!,
+        output: this.output!,
+      },
       vars: promptVariables,
       prompt: this.prompts[0],
       body: {

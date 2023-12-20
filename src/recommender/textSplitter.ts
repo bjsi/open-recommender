@@ -408,9 +408,7 @@ export class RecursiveCharacterTextSplitter
   }
 
   async splitText(text: string): Promise<string[]> {
-    console.time("splitText");
     const result = await this._splitText(text, this.separators);
-    console.timeEnd("splitText");
     return result;
   }
 

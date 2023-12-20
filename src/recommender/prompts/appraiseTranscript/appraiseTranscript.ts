@@ -48,8 +48,12 @@ class AppraiseTranscriptPrompt extends Prompt<
       videoTitle: args.title,
     };
     return await openpipe.functionCall({
-      input: this.input!,
-      output: this.output!,
+      function: {
+        input: this.input!,
+        output: this.output!,
+        name: this.name,
+        description: this.description,
+      },
       vars: promptVariables,
       prompt: this.prompts[0],
       body: {

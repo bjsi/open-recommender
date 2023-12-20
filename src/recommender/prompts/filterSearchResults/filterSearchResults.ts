@@ -48,8 +48,12 @@ export class RecommendVideos extends Prompt<
     };
     const { recommendedVideos } = await openpipe.functionCall({
       prompt: this.prompts[0],
-      input: this.input!,
-      output: this.output!,
+      function: {
+        name: this.name,
+        description: this.description,
+        input: this.input!,
+        output: this.output!,
+      },
       vars: promptVariables,
       body: {
         max_tokens: this.max_tokens,
