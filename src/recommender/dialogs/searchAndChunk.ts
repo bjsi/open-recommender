@@ -52,6 +52,7 @@ export async function searchAndChunk() {
     url: `https://www.youtube.com/watch?v=${chosenVideo.id}`,
     title: chosenVideo.title,
     transcript: transcript.cues,
+    videoId: chosenVideo.id,
   });
   console.log("Recommended clips:");
   console.log(clips);
@@ -73,7 +74,7 @@ export async function searchChunkAndRank() {
     clips: shuffledClips.map((clip, i) => ({
       id: i,
       title: clip.title,
-      summary: clip.reason,
+      summary: clip.summary,
       text: clip.text,
     })),
   });

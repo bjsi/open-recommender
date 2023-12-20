@@ -1,30 +1,17 @@
-import {
-  Prompt,
-  getInputFromCLI,
-  searchList,
-} from "prompt-iteration-assistant";
+import { Prompt } from "prompt-iteration-assistant";
 import { recommendClipsInputSchema } from "./schemas/recommendClipsInputSchema";
 import { withExamplePrompt } from "./prompts/withExample";
 import { recommendClipsOutputSchema } from "./schemas/recommendClipsOutputSchema";
 import { unrelatedDataset1 } from "./datasets/unrelated1";
 import { unrelatedDataset2 } from "./datasets/unrelated2";
 import { relatedDataset } from "./datasets/related";
-import { search } from "../../../youtube/search";
-import {
-  TranscriptCue,
-  fetchTranscript,
-  transcriptCuesToVtt,
-  transcriptToMarkdownCues,
-} from "../../../youtube/transcript";
+import { TranscriptCue } from "../../../youtube/transcript";
 import { splitTranscript } from "./helpers/splitTranscript";
-import { program } from "commander";
-import {
-  loadExampleTweetHistory,
-  tweetsToString,
-} from "../../../twitter/getUserContext";
+import { tweetsToString } from "../../../twitter/getUserContext";
 import { openpipe } from "../../../openpipe/openpipe";
 import { Tweet } from "../../../twitter/schemas";
-import { TranscriptChunk } from "./helpers/transcriptClip";
+import { TranscriptClip } from "./helpers/transcriptClip";
+import { searchAndChunk } from "../../dialogs/searchAndChunk";
 
 export const RECOMMEND_CLIPS = "Recommend Clips";
 
@@ -56,11 +43,20 @@ export class RecommendClipsPrompt extends Prompt<
     transcript: TranscriptCue[];
     title: string;
     url: string;
+    videoId: string;
     verbose?: boolean;
-  }) {
-    const text = transcriptCuesToVtt(args.transcript);
-    const parts = await splitTranscript({ text });
-    const chunks: TranscriptChunk[] = [];
+  }): Promise<TranscriptClip[]> {
+    const text = args.transcript
+      .map((cue, i) =>
+        `
+ID: ${i}
+${cue.text}
+`.trim()
+      )
+      .join(`\n---\n`);
+
+    const parts = await splitTranscript({ text, separators: ["---"] });
+    const chunks: TranscriptClip[] = [];
     for (const part of parts) {
       const promptVariables = {
         tweets: tweetsToString({ tweets: args.tweets, user: args.user }),
@@ -83,7 +79,19 @@ export class RecommendClipsPrompt extends Prompt<
         },
         enableOpenPipeLogging: args.enableOpenPipeLogging,
       });
-      chunks.push(...(clips || []));
+      for (const clip of clips || []) {
+        const cues = args.transcript.slice(clip.startId, clip.endId + 1);
+        chunks.push({
+          title: clip.title,
+          summary: clip.reason,
+          text: cues.map((cue) => cue.text).join(" "),
+          start: cues[0].start,
+          end: cues[cues.length - 1].end,
+          videoId: args.videoId,
+          videoUrl: cues[0].url,
+          videoTitle: args.title,
+        });
+      }
     }
     return chunks;
   }

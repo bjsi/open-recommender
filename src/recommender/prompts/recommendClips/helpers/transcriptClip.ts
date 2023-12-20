@@ -16,24 +16,3 @@ export interface TranscriptClip {
 export type TranscriptChunk = Required<
   z.infer<typeof recommendClipsOutputSchema>
 >["clips"][number];
-
-export const chunkToClip = (args: {
-  chunk: TranscriptChunk;
-  videoTitle: string;
-  videoId: string;
-  text: string;
-}): TranscriptClip => {
-  const { chunk, videoId, videoTitle } = args;
-  return {
-    text: args.text,
-    title: chunk.title,
-    summary: chunk.reason,
-    start: hhmmssToSeconds(chunk.start),
-    end: hhmmssToSeconds(chunk.end),
-    videoTitle: videoTitle,
-    videoId: videoId,
-    videoUrl: `https://www.youtube.com/watch?v=${videoId}&t=${hhmmssToSeconds(
-      chunk.start
-    )}s`,
-  };
-};
