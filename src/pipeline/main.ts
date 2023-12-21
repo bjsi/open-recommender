@@ -5,8 +5,9 @@ import {
   chunkTranscripts,
   createQueries,
   downloadTranscripts,
-  recommendVideos,
+  filterSearchResults,
   getTweets,
+  rankClips,
   searchForVideos,
   validateArgs,
 } from "./stages";
@@ -41,10 +42,11 @@ import { Command } from "commander";
     .addStage(getTweets)
     .addStage(createQueries)
     .addStage(searchForVideos)
-    .addStage(recommendVideos)
+    .addStage(filterSearchResults)
     .addStage(downloadTranscripts)
     .addStage(appraiseTranscripts)
-    .addStage(chunkTranscripts);
+    .addStage(chunkTranscripts)
+    .addStage(rankClips);
 
   const print = opts.print;
   if (print) {

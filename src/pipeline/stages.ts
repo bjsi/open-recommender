@@ -405,7 +405,7 @@ export const chunkTranscripts = {
 };
 
 interface RankClipsStageArgs extends ChunkTranscriptsStageArgs {
-  chunkedTranscripts: SearchResultWithTranscriptAndChunks[];
+  chunkedTranscripts: TranscriptClip[];
 }
 
 export const rankClips = {
@@ -414,18 +414,14 @@ export const rankClips = {
   run: async function (args: RankClipsStageArgs): Promise<
     | Success<
         RankClipsStageArgs & {
-          orderedClips: SearchResultWithTranscriptAndChunks[];
+          orderedClips: TranscriptClip[];
         }
       >
     | Failure
   > {
     // order globally over all transcripts and all clips
-    const allClips = _.shuffle(
-      args.chunkedTranscripts.flatMap((result) =>
-        result.chunks.map((chunk) => ({ chunk, result }))
-      )
-    );
-    const output = await rerankClips().execute({
+    const allClips = _.shuffle(args.chunkedTranscripts);
+    const orderedClips = await rerankClips(11).execute({
       user: args.user,
       tweets: args.tweets,
       clips: allClips,
