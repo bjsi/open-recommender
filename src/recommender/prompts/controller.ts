@@ -15,6 +15,7 @@ import {
   RECOMMEND_VIDEOS,
   recommendVideos,
 } from "./filterSearchResults/filterSearchResults";
+import { RERANK_CLIPS, rerankClips } from "./rerankClips/rerankClips";
 
 /**
  * Container for all the prompts in the recommender.
@@ -24,4 +25,5 @@ export const promptController = new PromptController({
   [RECOMMEND_CLIPS]: recommendClips,
   [CREATE_YOUTUBE_SEARCH_QUERIES]: createYouTubeSearchQueries,
   [RECOMMEND_VIDEOS]: recommendVideos,
+  [RERANK_CLIPS]: rerankClips,
 });

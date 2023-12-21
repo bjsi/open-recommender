@@ -11,6 +11,7 @@ import { openpipe } from "../../../openpipe/openpipe";
 import _ from "remeda";
 import { TranscriptClip } from "../recommendClips/helpers/transcriptClip";
 import { searchChunkAndRank } from "../../dialogs/searchAndChunk";
+import { advancedRagDataset } from "./datasets/advancedRagDataset";
 
 export const RERANK_CLIPS = "Rerank Clips";
 
@@ -32,7 +33,7 @@ export class RerankClips extends Prompt<
       model: "gpt-4",
       input: rerankClipsInputSchema,
       output: rerankClipsOutputSchema,
-      exampleData: [],
+      exampleData: [advancedRagDataset],
     });
   }
 
@@ -96,9 +97,14 @@ ${clip.text}
 }
 
 export const rerankClips = (windowSize?: number) =>
-  new RerankClips(windowSize).withCommand({
-    name: "search chunk and rank",
-    async action() {
-      await searchChunkAndRank();
-    },
-  });
+  new RerankClips(windowSize)
+    .withCommand({
+      name: "search chunk and rank",
+      async action() {
+        await searchChunkAndRank();
+      },
+    })
+    .withTest("advanced rag", {
+      clips: advancedRagDataset.clips.value,
+      tweets: advancedRagDataset.tweets.value,
+    });
