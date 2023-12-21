@@ -1,7 +1,14 @@
 import { Prompt } from "prompt-iteration-assistant";
 import { recommendClipsInputSchema } from "./schemas/recommendClipsInputSchema";
-import { withExamplePrompt } from "./prompts/withExample";
-import { recommendClipsOutputSchema } from "./schemas/recommendClipsOutputSchema";
+import {
+  MAX_CLIP_LENGTH,
+  MIN_CLIP_LENGTH,
+  withExamplePrompt,
+} from "./prompts/withExample";
+import {
+  RecommendClipsOutput,
+  recommendClipsOutputSchema,
+} from "./schemas/recommendClipsOutputSchema";
 import { unrelatedDataset1 } from "./datasets/unrelated1";
 import { unrelatedDataset2 } from "./datasets/unrelated2";
 import { relatedDataset } from "./datasets/related";
@@ -97,13 +104,39 @@ ${cue.text}
   }
 }
 
+const testClipLength = (output: RecommendClipsOutput) => {
+  const clips = output.clips || [];
+  const wrongLength = clips.find((clip) => {
+    const n_cues = clip.endId - clip.startId;
+    return n_cues < MIN_CLIP_LENGTH || n_cues > MAX_CLIP_LENGTH;
+  });
+  if (wrongLength) {
+    return {
+      score: 0,
+      reason:
+        "At least one clip is too short or too long:\n" +
+        JSON.stringify(wrongLength, null, 2),
+      pass: false,
+    };
+  }
+  return {
+    score: 1,
+    reason: "",
+    pass: true,
+  };
+};
+
 export const recommendClips = () =>
   new RecommendClipsPrompt()
-    .withTest("medium related", {
-      tweets: unrelatedDataset1.tweets.value,
-      title: unrelatedDataset1.title.value,
-      transcript: unrelatedDataset1.transcript.value,
-    })
+    .withTest(
+      "medium related",
+      {
+        tweets: unrelatedDataset1.tweets.value,
+        title: unrelatedDataset1.title.value,
+        transcript: unrelatedDataset1.transcript.value,
+      },
+      testClipLength
+    )
     .withTest(
       "unrelated",
       {
@@ -111,6 +144,7 @@ export const recommendClips = () =>
         title: unrelatedDataset2.title.value,
         transcript: unrelatedDataset2.transcript.value,
       },
+      // expect no clips to be created
       (output) => {
         const clips = output.clips || [];
         return {
@@ -118,13 +152,18 @@ export const recommendClips = () =>
           reason: "",
           pass: clips.length === 0,
         };
-      }
+      },
+      testClipLength
     )
-    .withTest("strongly related", {
-      tweets: relatedDataset.tweets.value,
-      title: relatedDataset.title.value,
-      transcript: relatedDataset.transcript.value,
-    })
+    .withTest(
+      "strongly related",
+      {
+        tweets: relatedDataset.tweets.value,
+        title: relatedDataset.title.value,
+        transcript: relatedDataset.transcript.value,
+      },
+      testClipLength
+    )
     .withCommand({
       name: "search and chunk",
       async action() {

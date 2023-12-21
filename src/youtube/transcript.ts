@@ -192,8 +192,9 @@ if (require.main === module) {
       ?.map((x, i) => ({
         id: i,
         text: x.text,
+        start: x.start,
       }))
-      .map((x) => `ID: ${x.id}\n${x.text}`)
+      .map((x) => `ID: ${x.id}\nstart:${x.start}\n${x.text}`)
       .join("\n---\n");
     console.log(formatted);
   });
