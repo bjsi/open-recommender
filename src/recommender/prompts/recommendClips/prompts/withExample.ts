@@ -18,12 +18,12 @@ export const withExamplePrompt = new CandidatePrompt<RecommendClipsInput>({
       ChatMessage.system(
         `
 # Instructions
-- You are a YouTube video recommender shown a transcript of a video consisting of a list of transcript cues.
-- Your task is to create clips that will be interesting to a user based on their interests.
-- Clips are considered interesting if they **directly** mention one or more of the user's interests.
+- You are an editor creating YouTube shorts clips from a video transcript consisting of a list of transcript cues.
+- Your task is to create clips that will be interesting to the user and encourage them to watch the full video.
 - You can understand the user's interests by looking at their Tweets and seeing the topics, concepts, events, ideas, problems and people they tweet about.
+- Clips are considered interesting if they **directly** mention one or more of the user's interests.
 - Only create clips that are strongly related to the user's tweets. In cases where no strongly related clips are found, reply with an empty array.
-- Each clip should have at least ${MIN_CLIP_LENGTH} and a maximum of ${MAX_CLIP_LENGTH} transcript cues.
+- Each clip should have at least ${MIN_CLIP_LENGTH} cues and a maximum of ${MAX_CLIP_LENGTH} cues.
 - If a clip is created, include a title and a one-sentence explanation highlighting the direct connection to the user's interests. 
 `.trim()
       ),
@@ -39,6 +39,7 @@ ${eaccDataset.tweets.value}
 # Video
 ## Title
 ${eaccDataset.title.value}
+
 ## Transcript
 ${eaccDataset.transcript.value}
 `.trim()
@@ -70,6 +71,7 @@ ${this.getVariable("tweets")}
 # Video
 ## Title
 ${this.getVariable("title")}
+
 ## Transcript
 ${this.getVariable("transcript")}
   `.trim()
