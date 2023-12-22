@@ -14,7 +14,7 @@ import {
 import {
   RECOMMEND_VIDEOS,
   recommendVideos,
-} from "./filterSearchResults/filterSearchResults";
+} from "./recommendVideos/recommendVideos";
 import { RERANK_CLIPS, rerankClips } from "./rerankClips/rerankClips";
 
 /**

@@ -1,8 +1,13 @@
-import { CandidatePrompt } from "prompt-iteration-assistant";
-import { FilterSearchResultsInput } from "../schemas/filterSearchResultsInputSchema";
-import { FilterSearchResultsOutput } from "../schemas/filterSearchResultsOutputSchema";
+import {
+  CandidatePrompt,
+  ChatMessage,
+  toCamelCase,
+} from "prompt-iteration-assistant";
+import { RecommendVideosInput } from "../schemas/recommendVideosInputSchema";
+import { RecommendVideosOutput } from "../schemas/recommendVideosOutputSchema";
+import { RECOMMEND_VIDEOS } from "../recommendVideos";
 
-export const mainPrompt = new CandidatePrompt<FilterSearchResultsInput>({
+export const mainPrompt = new CandidatePrompt<RecommendVideosInput>({
   name: "withExample",
   compile() {
     return [
@@ -33,8 +38,10 @@ Exporting and pre-processing to get RAG working is extremely tedious. My journal
 ID: 51
 @experilearning (2023-11-13)
 Hoping that the OpenAI retrieval API will eventually just be able to pick a RAG strategy and do all of the preprocessing for you based on the problem domain. It's just using naive RAG atm afaik, but I'm sure they are planning something more sophisticated.
+
 # Search Query
-AI journalling assistant
+AI Journaling Assistant
+
 # Search Results
 Title: The Best All-in-One AI Writing Assistant | HIX AI Review
 Channel: AI Andy
@@ -65,29 +72,27 @@ Chapters:
 undefined
 `.trim(),
       },
-      {
-        role: "assistant",
-        content: null,
-        function_call: {
-          name: "recommendVideos",
-          arguments: JSON.stringify({
-            recommendedVideos: [
-              { id: 0, relevance: 0.5 },
-              { id: 1, relevance: 1 },
-              { id: 2, relevance: 0.2 },
-            ],
-          } satisfies FilterSearchResultsOutput),
+      ChatMessage.assistant<RecommendVideosOutput>(null, {
+        name: toCamelCase(RECOMMEND_VIDEOS),
+        arguments: {
+          recommendedVideos: [
+            { id: 0, relevance: 0.5 },
+            { id: 1, relevance: 1 },
+            { id: 2, relevance: 0.2 },
+          ],
         },
-      },
+      }),
       {
         role: "user",
         content: `
 # Twitter
-{{ tweets }}
+${this.getVariable("tweets")}
+
 # Search Query
-{{ query }}
+${this.getVariable("query")}
+
 # Search Results
-{{ results }}
+${this.getVariable("results")}
 `.trim(),
       },
     ];

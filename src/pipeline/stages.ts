@@ -13,7 +13,7 @@ import {
 } from "../recommender/prompts/recommendClips/helpers/transcriptClip";
 import _ from "remeda";
 import { createYouTubeSearchQueries } from "../recommender/prompts/createQueries/createQueries";
-import { recommendVideos } from "../recommender/prompts/filterSearchResults/filterSearchResults";
+import { recommendVideos } from "../recommender/prompts/recommendVideos/recommendVideos";
 import { appraiseTranscript } from "../recommender/prompts/appraiseTranscript/appraiseTranscript";
 import { recommendClips } from "../recommender/prompts/recommendClips/recommendClips";
 import { rerankClips } from "../recommender/prompts/rerankClips/rerankClips";

@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const filterSearchResultsOutputSchema = z.object({
+export const recommendVideosOutputSchema = z.object({
   recommendedVideos: z.array(
     z.object({
       id: z.number(),
@@ -9,6 +9,4 @@ export const filterSearchResultsOutputSchema = z.object({
   ),
 });
 
-export type FilterSearchResultsOutput = z.infer<
-  typeof filterSearchResultsOutputSchema
->;
+export type RecommendVideosOutput = z.infer<typeof recommendVideosOutputSchema>;

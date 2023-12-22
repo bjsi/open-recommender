@@ -1,9 +1,9 @@
 import {
-  FilterSearchResultsInput,
-  filterSearchResultsInputSchema,
-} from "./schemas/filterSearchResultsInputSchema";
+  RecommendVideosInput,
+  recommendVideosInputSchema,
+} from "./schemas/recommendVideosInputSchema";
 import { Prompt } from "prompt-iteration-assistant";
-import { filterSearchResultsOutputSchema } from "./schemas/filterSearchResultsOutputSchema";
+import { recommendVideosOutputSchema } from "./schemas/recommendVideosOutputSchema";
 import { mainPrompt } from "./prompts/withExample";
 import _ from "lodash";
 import { tweetsToString } from "../../../twitter/getUserContext";
@@ -11,12 +11,16 @@ import { Tweet } from "../../../twitter/schemas";
 import { searchResultsToString } from "../../../youtube/formatting";
 import { SearchResult } from "../../../youtube/search";
 import { openpipe } from "../../../openpipe/openpipe";
+import {
+  elonAndRemNote,
+  elonAndRemNoteSearchResults,
+} from "./datasets/elonAndRemNote";
 
 export const RECOMMEND_VIDEOS = "Recommend Videos";
 
 export class RecommendVideos extends Prompt<
-  typeof filterSearchResultsInputSchema,
-  typeof filterSearchResultsOutputSchema
+  typeof recommendVideosInputSchema,
+  typeof recommendVideosOutputSchema
 > {
   constructor() {
     super({
@@ -25,8 +29,8 @@ export class RecommendVideos extends Prompt<
         "Recommend relevant videos to the user based on their interests.",
       prompts: [mainPrompt],
       model: "gpt-4",
-      input: filterSearchResultsInputSchema,
-      output: filterSearchResultsOutputSchema,
+      input: recommendVideosInputSchema,
+      output: recommendVideosOutputSchema,
       exampleData: [],
     });
   }
@@ -38,9 +42,9 @@ export class RecommendVideos extends Prompt<
     query: string;
     enableOpenPipeLogging?: boolean;
   }) {
-    const promptVariables: FilterSearchResultsInput = {
-      results: searchResultsToString(args.results),
+    const promptVariables: RecommendVideosInput = {
       query: args.query,
+      results: searchResultsToString(args.results),
       tweets: tweetsToString({ tweets: args.tweets, user: args.user }),
     };
     const { recommendedVideos } = await openpipe.functionCall({
@@ -68,4 +72,25 @@ export class RecommendVideos extends Prompt<
   }
 }
 
-export const recommendVideos = () => new RecommendVideos();
+export const DEFAULT_RELEVANCE_THRESHOLD = 0.65;
+
+export const recommendVideos = () => {
+  return new RecommendVideos().withTest(
+    "mix of relevant and irrelevant videos",
+    {
+      query: elonAndRemNote.query.value,
+      results: elonAndRemNote.results.value,
+      tweets: elonAndRemNote.tweets.value,
+    },
+    (output) => {
+      const vids = output.recommendedVideos.map(
+        (x) => elonAndRemNoteSearchResults[x.id]
+      );
+      return {
+        pass: true,
+        reason: "",
+        score: 1,
+      };
+    }
+  );
+};
