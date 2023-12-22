@@ -2,7 +2,7 @@ import { CandidatePrompt, ChatMessage } from "prompt-iteration-assistant";
 import { RerankClipsInput } from "../schemas/rerankClipsInputSchema";
 
 export const zeroShotPrompt = new CandidatePrompt<RerankClipsInput>({
-  name: "zero-shot",
+  name: "zero shot with reasoning",
   compile() {
     return [
       ChatMessage.system(
