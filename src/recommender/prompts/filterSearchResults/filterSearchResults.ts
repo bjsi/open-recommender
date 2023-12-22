@@ -3,10 +3,7 @@ import {
   filterSearchResultsInputSchema,
 } from "./schemas/filterSearchResultsInputSchema";
 import { Prompt } from "prompt-iteration-assistant";
-import {
-  FilterSearchResultsOutput,
-  filterSearchResultsOutputSchema,
-} from "./schemas/filterSearchResultsOutputSchema";
+import { filterSearchResultsOutputSchema } from "./schemas/filterSearchResultsOutputSchema";
 import { mainPrompt } from "./prompts/withExample";
 import _ from "lodash";
 import { tweetsToString } from "../../../twitter/getUserContext";

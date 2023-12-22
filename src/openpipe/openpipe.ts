@@ -1,8 +1,11 @@
 import { ChatCompletionCreateParamsNonStreaming } from "openai/resources";
 import OpenAI from "openpipe/openai";
-import { CandidatePrompt } from "prompt-iteration-assistant";
+import {
+  CandidatePrompt,
+  ChatMessage,
+  toCamelCase,
+} from "prompt-iteration-assistant";
 import { z } from "zod";
-import { toCamelCase } from "../recommender/prompts/shared/toCamelCase";
 import zodToJsonSchema from "zod-to-json-schema";
 
 const client = new OpenAI();
@@ -36,7 +39,10 @@ export const openpipe = {
       .withVariables((validArgs || {}) as Input)
       .compile();
     const response = await client.chat.completions.create({
-      messages,
+      messages:
+        typeof messages === "string"
+          ? [ChatMessage.system(messages)]
+          : messages,
       functions: [
         {
           name: toCamelCase(args.function.name),

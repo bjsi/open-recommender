@@ -1,9 +1,12 @@
-import { CandidatePrompt, ChatMessage } from "prompt-iteration-assistant";
+import {
+  CandidatePrompt,
+  ChatMessage,
+  toCamelCase,
+} from "prompt-iteration-assistant";
 import { RecommendClipsInput } from "../schemas/recommendClipsInputSchema";
 import { RecommendClipsOutput } from "../schemas/recommendClipsOutputSchema";
 import { eaccDataset } from "../datasets/eacc";
 import { RECOMMEND_CLIPS } from "../recommendClips";
-import { toCamelCase } from "../../shared/toCamelCase";
 
 export const MIN_CLIP_LENGTH = 10; // ~30 seconds
 export const MAX_CLIP_LENGTH = 50; // ~2.5 mins
@@ -40,7 +43,7 @@ ${eaccDataset.title.value}
 ${eaccDataset.transcript.value}
 `.trim()
       ),
-      ChatMessage.assistant(null, {
+      ChatMessage.assistant<RecommendClipsOutput>(null, {
         name: toCamelCase(RECOMMEND_CLIPS),
         arguments: {
           clips: [
@@ -53,7 +56,7 @@ ${eaccDataset.transcript.value}
               endId: 60,
             },
           ],
-        } satisfies RecommendClipsOutput,
+        },
       }),
       ChatMessage.user(
         `

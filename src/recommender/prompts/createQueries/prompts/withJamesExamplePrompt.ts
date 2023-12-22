@@ -1,13 +1,12 @@
-import { CandidatePrompt, ChatMessage } from "prompt-iteration-assistant";
-import { sharedCreateQueriesInstructions } from "./shared";
-import { toCamelCase } from "../../shared/toCamelCase";
-import { CREATE_YOUTUBE_SEARCH_QUERIES } from "../createQueries";
-import { z } from "zod";
-import { CreateQueriesOutput } from "../schemas/createQueriesOutputSchema";
 import {
-  CreateQueriesInput,
-  createQueriesInputSchema,
-} from "../schemas/createQueriesInputSchema";
+  CandidatePrompt,
+  ChatMessage,
+  toCamelCase,
+} from "prompt-iteration-assistant";
+import { sharedCreateQueriesInstructions } from "./shared";
+import { CREATE_YOUTUBE_SEARCH_QUERIES } from "../createQueries";
+import { CreateQueriesOutput } from "../schemas/createQueriesOutputSchema";
+import { CreateQueriesInput } from "../schemas/createQueriesInputSchema";
 
 const promptData = {
   instructions: sharedCreateQueriesInstructions,
@@ -134,11 +133,11 @@ export const withJamesExamplePrompt = new CandidatePrompt<CreateQueriesInput>({
 ${promptData.exampleTweets}
 `.trim(),
       },
-      ChatMessage.assistant(null, {
+      ChatMessage.assistant<CreateQueriesOutput>(null, {
         name: toCamelCase(CREATE_YOUTUBE_SEARCH_QUERIES),
         arguments: {
           queries: promptData.exampleQueries,
-        } satisfies CreateQueriesOutput,
+        },
       }),
       {
         role: "user",
