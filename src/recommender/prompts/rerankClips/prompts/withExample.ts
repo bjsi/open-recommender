@@ -13,6 +13,7 @@ export const zeroShotPrompt = new CandidatePrompt<RerankClipsInput>({
 - Clips that are more conceptual in nature are considered more interesting than clips that are more practical or tutorial based.
 - You can understand the user's interests by looking at their Tweets and seeing the topics, concepts, events, ideas, problems and people they tweet about.
 - Order the clips in descending order of interestingness, starting with the most interesting.
+- Include one sentence of reasoning.
 `.trim()
       ),
       ChatMessage.user(

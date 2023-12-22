@@ -5,67 +5,6 @@ import { transcriptClipsToString } from "../helpers/transcriptClipsToString";
 
 const clips: TranscriptClip[] = [
   {
-    start: 32,
-    end: 186,
-    videoId: "videoId",
-    videoUrl: "videoUrl",
-    videoTitle: "Advanced RAG 01",
-    title: "Advanced RAG: Self Querying Retrieval and Metadata",
-    summary:
-      "Given your interest in AI journalling and your work with RAG/chat memory, this clip provides valuable insights into advanced RAG systems, self querying retrieval, and the use of metadata, which aligns with your exploration of AI and metadata in your tweets.",
-    text:
-      `So this brings us to the whole concept of self querying retrieval. ` +
-      `If we look at the diagram for this, we can see that the idea here is that. ` +
-      `We have a sort of step between the retrieval and the input. ` +
-      `So the person types in their query. ` +
-      `and then we use a large language model to reformat that query to get ` +
-      `both the semantic elements of that, but also to be able to convert it ` +
-      `so that we can actually do searches on metadata as we go through this. ` +
-      `So this is a fundamental fact that if you're looking for a movie and you ` +
-      `want to basically specify the year, you don't want to look for the year using ` +
-      `a vector store in semantic search. ` +
-      `You want to basically just do a lookup that looks at the year and ` +
-      `filters the results back based on that year that you put in. ` +
-      `Just the same if you were doing something for doing searches on Spotify or doing ` +
-      `such as with music, if the person gives you the name of the artist, ` +
-      `you don't want to use semantic search to look up the name of the artist. ` +
-      `You want to do a query that looks for that artists and then uses the semantic ` +
-      `search for doing the parts where semantic search is actually strong in this. ` +
-      `So let's jump in, have a look at this in LangChain. ` +
-      `So we're going to be using the self querying retriever here. ` +
-      `now I'm using OpenAI embeddings and the OpenAI models. ` +
-      `you can swap out, these for, you know, the other models like ` +
-      `I've done in many videos before. ` +
-      `And maybe at some point I'll do an end-to-end example of building an app with ` +
-      `this using LLaMA-2 and say BGE embeddings. ` +
-      `I've just gone for these cause so that these parts are not ` +
-      `the important part in here. ` +
-      `And the code doesn't take up too much room. ` +
-      `So I'm using chroma as my vector store in here. ` +
-      `like I said, I'm using the OpenAI embeddings. ` +
-      `and then I'm going to pass in data. ` +
-      `So this is where you would put a lot of effort into preparing your data. ` +
-      `In this case, I'm going to be doing search over wines. ` +
-      `And wine's going to have a number of different things in here. ` +
-      `So you can see that we've got a description of the wine that's in here. ` +
-      `We've got the name of the wine. ` +
-      `We've got the year. ` +
-      `We've got the rating that it's got. ` +
-      `We've got the type of, grape, in there. ` +
-      `We've also got the color of the wine. ` +
-      `And finally, we've got the country of where the wine comes from. ` +
-      `So all of these things are metadata that we're putting in, ` +
-      `And he, you can see that I've got these for a number of different wines in here. ` +
-      `Now, Which part where we use the semantic search on? ` +
-      `We would use it on this description that we've got here. ` +
-      `So the description is what's going to be actually used for doing the search. ` +
-      `So you'll see, as we go through it, that if we talk about things ` +
-      `like, fruity notes or that kind of thing, It's able to work out that, ` +
-      `okay, apricot and peaches are fruit. ` +
-      `black fruit, stone fruits. ` +
-      `These are sorts of things that relate to fruit, citrus flavors. `,
-  },
-  {
     start: 200,
     end: 280,
     videoId: "videoId",
@@ -181,6 +120,67 @@ const clips: TranscriptClip[] = [
       `And it's able then to basically bring back the data that we want. ` +
       `So this shows us that we can do a Whole variety of different searches ` +
       `that comprise both filtering the metadata, but also using the semantic.`,
+  },
+  {
+    start: 32,
+    end: 186,
+    videoId: "videoId",
+    videoUrl: "videoUrl",
+    videoTitle: "Advanced RAG 01",
+    title: "Advanced RAG: Self Querying Retrieval and Metadata",
+    summary:
+      "Given your interest in AI journalling and your work with RAG/chat memory, this clip provides valuable insights into advanced RAG systems, self querying retrieval, and the use of metadata, which aligns with your exploration of AI and metadata in your tweets.",
+    text:
+      `So this brings us to the whole concept of self querying retrieval. ` +
+      `If we look at the diagram for this, we can see that the idea here is that. ` +
+      `We have a sort of step between the retrieval and the input. ` +
+      `So the person types in their query. ` +
+      `and then we use a large language model to reformat that query to get ` +
+      `both the semantic elements of that, but also to be able to convert it ` +
+      `so that we can actually do searches on metadata as we go through this. ` +
+      `So this is a fundamental fact that if you're looking for a movie and you ` +
+      `want to basically specify the year, you don't want to look for the year using ` +
+      `a vector store in semantic search. ` +
+      `You want to basically just do a lookup that looks at the year and ` +
+      `filters the results back based on that year that you put in. ` +
+      `Just the same if you were doing something for doing searches on Spotify or doing ` +
+      `such as with music, if the person gives you the name of the artist, ` +
+      `you don't want to use semantic search to look up the name of the artist. ` +
+      `You want to do a query that looks for that artists and then uses the semantic ` +
+      `search for doing the parts where semantic search is actually strong in this. ` +
+      `So let's jump in, have a look at this in LangChain. ` +
+      `So we're going to be using the self querying retriever here. ` +
+      `now I'm using OpenAI embeddings and the OpenAI models. ` +
+      `you can swap out, these for, you know, the other models like ` +
+      `I've done in many videos before. ` +
+      `And maybe at some point I'll do an end-to-end example of building an app with ` +
+      `this using LLaMA-2 and say BGE embeddings. ` +
+      `I've just gone for these cause so that these parts are not ` +
+      `the important part in here. ` +
+      `And the code doesn't take up too much room. ` +
+      `So I'm using chroma as my vector store in here. ` +
+      `like I said, I'm using the OpenAI embeddings. ` +
+      `and then I'm going to pass in data. ` +
+      `So this is where you would put a lot of effort into preparing your data. ` +
+      `In this case, I'm going to be doing search over wines. ` +
+      `And wine's going to have a number of different things in here. ` +
+      `So you can see that we've got a description of the wine that's in here. ` +
+      `We've got the name of the wine. ` +
+      `We've got the year. ` +
+      `We've got the rating that it's got. ` +
+      `We've got the type of, grape, in there. ` +
+      `We've also got the color of the wine. ` +
+      `And finally, we've got the country of where the wine comes from. ` +
+      `So all of these things are metadata that we're putting in, ` +
+      `And he, you can see that I've got these for a number of different wines in here. ` +
+      `Now, Which part where we use the semantic search on? ` +
+      `We would use it on this description that we've got here. ` +
+      `So the description is what's going to be actually used for doing the search. ` +
+      `So you'll see, as we go through it, that if we talk about things ` +
+      `like, fruity notes or that kind of thing, It's able to work out that, ` +
+      `okay, apricot and peaches are fruit. ` +
+      `black fruit, stone fruits. ` +
+      `These are sorts of things that relate to fruit, citrus flavors. `,
   },
 ];
 
