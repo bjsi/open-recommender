@@ -32,7 +32,8 @@ export class CreateYouTubeSearchQueries extends Prompt<
       input: createQueriesInputSchema,
       output: createQueriesOutputSchema,
       exampleData: [],
-      max_tokens: 600,
+      // TODO: fix more comprehensively
+      max_tokens: 400,
     });
   }
   override chooseCandidatePrompt = (vars: Partial<CreateQueriesInput>) => {
@@ -91,3 +92,15 @@ export const createYouTubeSearchQueries = () =>
         tweets: corbttTweetsDataset.tweets.value,
       },
     });
+
+if (require.main === module) {
+  createYouTubeSearchQueries()
+    .run({
+      promptVariables: {
+        user: experilearningTweetsDataset.user.value,
+        tweets: experilearningTweetsDataset.tweets.value,
+      },
+      stream: false,
+    })
+    .then(console.log);
+}
