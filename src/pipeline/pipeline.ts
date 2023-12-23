@@ -50,10 +50,14 @@ export class Pipeline<T extends PipelineArgs> {
   }
 
   private async executeStage<T>(stage: PipelineStage<T, any>, args: T) {
+    console.time(stage.name);
     try {
-      return await stage.run(args);
+      const result = await stage.run(args);
+      return result;
     } catch (e) {
       return failure(`Error thrown while running stage ${stage.name}: ${e}`);
+    } finally {
+      console.timeEnd(stage.name);
     }
   }
 
@@ -63,7 +67,7 @@ export class Pipeline<T extends PipelineArgs> {
   }
 
   async execute(): Promise<Either<T>> {
-    console.time("full pipeline execution");
+    console.time("pipeline.execute()");
     if (!this.stages.length) {
       return failure("No stages added to pipeline");
     }
@@ -121,7 +125,7 @@ export class Pipeline<T extends PipelineArgs> {
         break;
       }
     }
-    console.timeEnd("full pipeline execution");
+    console.timeEnd("pipeline.execute()");
     return args;
   }
 }

@@ -11,10 +11,12 @@
     "js-tiktoken": "^1.0.8",
     "openai": "^4.20.1",
     "openpipe": "^0.6.3",
+    "p-all": "^5.0.0",
     "prompt-iteration-assistant": "^0.0.25",
     "promptfoo": "^0.28.1",
     "pybridge": "^1.1.0",
     "remeda": "^1.29.0",
+    "run-parallel-limit": "^1.1.0",
     "rxjs": "^7.8.1",
     "sqlite-vss": "^0.1.2",
     "subtitle": "^4.2.1",
@@ -37,6 +39,7 @@
     "@types/cli-progress": "^3.11.5",
     "@types/inquirer": "^9.0.7",
     "@types/node": "^20.9.4",
+    "@types/run-parallel-limit": "^1.0.3",
     "ts-node": "^10.9.1"
   }
 }

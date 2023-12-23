@@ -17,6 +17,7 @@ import { recommendVideos } from "../recommender/prompts/recommendVideos/recommen
 import { appraiseTranscript } from "../recommender/prompts/appraiseTranscript/appraiseTranscript";
 import { recommendClips } from "../recommender/prompts/recommendClips/recommendClips";
 import { rerankClips } from "../recommender/prompts/rerankClips/rerankClips";
+import pAll from "p-all";
 
 export const STAGES = [
   "validate-args",
@@ -60,10 +61,12 @@ export const getTweets = {
     // get user context
 
     console.log(chalk.blue("Fetching tweets..."));
-    const tweets = await twitter.tweets.fetch({
-      user,
-      n_tweets: 30,
-    });
+    const tweets = (
+      await twitter.tweets.fetch({
+        user,
+        n_tweets: 30,
+      })
+    ).slice(0, 30);
     if (!tweets.length) {
       console.log(chalk.red("No tweets found"));
     } else {
@@ -133,25 +136,26 @@ export const searchForVideos = {
 
     console.log(chalk.blue("Searching YouTube..."));
 
-    const rawSearchResults: SearchResultsWithTweets[] = [];
-    for (const { query, tweets } of queriesWithTweets) {
-      console.log(chalk.blue("Searching for " + query));
-      const rawSearchResultsForQuery = await yt.search({
-        query,
-      });
-      console.log(
-        chalk.blue(
-          rawSearchResultsForQuery
-            .map((result, idx) => `${idx + 1}. ${result.title}`)
-            .join("\n")
-        )
-      );
-      rawSearchResults.push({
-        query,
-        tweets: tweets,
-        searchResults: rawSearchResultsForQuery,
-      });
-    }
+    const rawSearchResults: SearchResultsWithTweets[] = await pAll(
+      queriesWithTweets.map(({ query, tweets }) => async () => {
+        const rawSearchResultsForQuery = await yt.search({
+          query,
+        });
+        console.log(
+          chalk.blue(
+            rawSearchResultsForQuery
+              .map((result, idx) => `${idx + 1}. ${result.title}`)
+              .join("\n")
+          )
+        );
+        return {
+          query,
+          tweets: tweets,
+          searchResults: rawSearchResultsForQuery,
+        };
+      }),
+      { concurrency: 5 }
+    );
     console.log(
       chalk.blue("Found " + rawSearchResults.length + " search results")
     );
@@ -170,46 +174,32 @@ export const filterSearchResults = {
     args: FilterSearchResultsStageArgs
   ): Promise<Success<DownloadTranscriptsStageArgs> | Failure> {
     const { rawSearchResults, user } = args;
+
+    console.log(chalk.blue("Filtering search results..."));
     const filteredResults: {
       searchResults: { result: SearchResult; relevance: number }[];
       query: string;
       tweets: Tweet[];
-    }[] = [];
-    for (const rawSearchResult of rawSearchResults) {
-      const {
-        query,
-        tweets,
-        searchResults: rawYouTubeSearchResults,
-      } = rawSearchResult;
-      console.log(chalk.blue("Filtering search results..."));
-      const filteredResultsForQuery = await recommendVideos().execute({
-        user,
-        query: query,
-        results: rawYouTubeSearchResults,
-        tweets,
-      });
+    }[] = await pAll(
+      rawSearchResults.map(({ query, tweets, searchResults }) => async () => {
+        const filteredResultsForQuery = await recommendVideos().execute({
+          user,
+          query: query,
+          results: searchResults,
+          tweets,
+        });
+        const relevantResults = filteredResultsForQuery.filter(
+          (result) => result.relevance > args.searchFilterRelevancyCutOff
+        );
 
-      console.log("Filtered search results:");
-
-      console.log(
-        filteredResultsForQuery
-          .map(
-            ({ result, relevance }, idx) =>
-              `${idx + 1}. ${result.title} (${relevance})`
-          )
-          .join("\n")
-      );
-
-      const relevantResults = filteredResultsForQuery.filter(
-        (result) => result.relevance > args.searchFilterRelevancyCutOff
-      );
-
-      filteredResults.push({
-        query: query,
-        tweets: tweets,
-        searchResults: relevantResults,
-      });
-    }
+        return {
+          query: query,
+          tweets: tweets,
+          searchResults: relevantResults,
+        };
+      }),
+      { concurrency: 5 }
+    );
     if (!filteredResults.length) {
       const msg = "No search results passed the search filter";
       console.log(msg);
@@ -260,21 +250,24 @@ export const downloadTranscripts = {
     );
     const resultsWithTranscripts: SearchResultWithTranscript[] = [];
     for (const results of filteredResults) {
-      for (const result of results.searchResults) {
-        const { id, title } = result.result;
-        const fetchResult = await yt.transcript.fetch({ id, title });
-        if (!fetchResult || !fetchResult.cues.length) {
-          console.log("Skipping video without transcript");
-          continue;
-        }
-        resultsWithTranscripts.push({
-          searchResult: result.result,
-          cues: fetchResult.cues,
-          tweets: results.tweets,
-          query: results.query,
-          relevance: result.relevance,
-        });
-      }
+      await pAll(
+        results.searchResults.map((result) => async () => {
+          const { id, title } = result.result;
+          const fetchResult = await yt.transcript.fetch({ id, title });
+          if (!fetchResult || !fetchResult.cues.length) {
+            console.log("Skipping video without transcript");
+            return;
+          }
+          resultsWithTranscripts.push({
+            searchResult: result.result,
+            cues: fetchResult.cues,
+            tweets: results.tweets,
+            query: results.query,
+            relevance: result.relevance,
+          });
+        }),
+        { concurrency: 5 }
+      );
     }
     if (!resultsWithTranscripts.length) {
       const msg = "No transcripts fetched";
@@ -301,28 +294,32 @@ export const appraiseTranscripts = {
   run: async function (args: AppraiseTranscriptsStageArgs) {
     const { resultsWithTranscripts } = args;
     console.log(chalk.blue("Appraising transcripts..."));
-    const appraisedResults: SearchResultWithTranscript[] = [];
-    for (const result of resultsWithTranscripts) {
-      const { recommend, reasoning } = await appraiseTranscript().execute({
-        transcript: result.cues,
-        title: result.searchResult.title,
-      });
-      if (!recommend) {
-        console.log(
-          chalk.blue(
-            `Rejecting video ${result.searchResult.title}. ${reasoning}`
-          )
-        );
-        continue;
-      } else {
-        console.log(
-          chalk.green(
-            `Accepting video ${result.searchResult.title}. ${reasoning}`
-          )
-        );
-        appraisedResults.push({ ...result });
-      }
-    }
+    const appraisedResults: SearchResultWithTranscript[] = _.compact(
+      await pAll(
+        resultsWithTranscripts.map((result) => async () => {
+          const { recommend, reasoning } = await appraiseTranscript().execute({
+            transcript: result.cues,
+            title: result.searchResult.title,
+          });
+          if (!recommend) {
+            console.log(
+              chalk.blue(
+                `Rejecting video ${result.searchResult.title}. ${reasoning}`
+              )
+            );
+            return;
+          } else {
+            console.log(
+              chalk.green(
+                `Accepting video ${result.searchResult.title}. ${reasoning}`
+              )
+            );
+            return result;
+          }
+        }),
+        { concurrency: 5 }
+      )
+    );
     if (!appraisedResults.length) {
       const msg = "No transcripts passed the appraisal filter";
       console.log(chalk.red(msg));
@@ -342,12 +339,6 @@ interface ChunkTranscriptsStageArgs extends AppraiseTranscriptsStageArgs {
   appraisedResults: SearchResultWithTranscript[];
 }
 
-type SearchResultWithTranscriptAndChunks = {
-  searchResult: SearchResult;
-  cues: TranscriptCue[];
-  chunks: TranscriptChunk[];
-};
-
 export const chunkTranscripts = {
   name: "chunk-transcripts",
   description: "Chunk transcripts",
@@ -360,34 +351,37 @@ export const chunkTranscripts = {
     | Failure
   > {
     const { appraisedResults, user } = args;
-    const chunkedTranscripts: TranscriptClip[] = [];
-    for (const result of appraisedResults) {
-      console.log(
-        chalk.blue(`Generating chapters for "${result.searchResult.title}"...`)
-      );
-      const chunks = await recommendClips().execute({
-        tweets: result.tweets,
-        user,
-        transcript: result.cues,
-        title: result.searchResult.title,
-        url: "https://www.youtube.com/watch?v=" + result.searchResult.id,
-        videoId: result.searchResult.id,
-      });
-      if (!chunks.length) {
-        console.log(
-          chalk.red("No chapters generated for " + result.searchResult.title)
-        );
-        continue;
-      } else {
-        console.log(
-          chalk.green(
-            `${chunks.length} chapters generated for "${result.searchResult.title}"`
-          )
-        );
-        console.log(chunks);
-        chunkedTranscripts.push(...chunks);
-      }
-    }
+    const chunkedTranscripts: TranscriptClip[] = _.compact(
+      await pAll(
+        appraisedResults.map((result) => async () => {
+          const chunks = await recommendClips().execute({
+            tweets: result.tweets,
+            user,
+            transcript: result.cues,
+            title: result.searchResult.title,
+            url: "https://www.youtube.com/watch?v=" + result.searchResult.id,
+            videoId: result.searchResult.id,
+          });
+          if (!chunks.length) {
+            console.log(
+              chalk.red(
+                "No chapters generated for " + result.searchResult.title
+              )
+            );
+            return;
+          } else {
+            console.log(
+              chalk.green(
+                `${chunks.length} chapters generated for "${result.searchResult.title}"`
+              )
+            );
+            console.log(chunks);
+            return chunks;
+          }
+        }),
+        { concurrency: 5 }
+      )
+    ).flat();
 
     if (!chunkedTranscripts.length) {
       const msg = "No transcripts chunked";
