@@ -11,7 +11,7 @@ export const experilearningTweetsDataset: ExampleDataSet<
   tweets: {
     name: "experilearning tweets",
     value: tweetsToString({
-      tweets: loadExampleTweetHistory("experilearning") || [],
+      tweets: (loadExampleTweetHistory("experilearning") || []).slice(0, 20),
       user: "experilearning",
     }),
   },

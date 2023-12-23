@@ -12,7 +12,6 @@ const promptData = {
   instructions: sharedCreateQueriesInstructions,
   exampleBio: `@experilearning: fascinated by LLM agents | building the best SRS app in the multiverse @rem_note`,
   exampleTweets: `
----
 ID: 0
 @experilearning (2023-11-07)
 Experimenting with creating a AI journalling assistant rn. Getting the RAG/chat memory right is the most important part. Here's the approach that got the best results so far:
@@ -52,10 +51,7 @@ Full episode out Wednesday
 “In one day on COVID, the day starts off with, are we going to have a lockdown?
 Proceeds to the PM's girlfriend going crazy about the media.
 Then Trump calling up saying, we've got to bomb all these people in Iraq.
-It then goes to the deep state coming in saying, we don't think we should because it's probably going to bomb the wrong people.
-And then other parts of the system come in and say, no, we should bomb them because we've got to stay friends with America.
 If you haven't been in that environment, it's extremely hard to appreciate that you have these handful of people trying to come up with the right answers to extremely hard problems.
-Then on top of that, you have these incredibly old, centralized bureaucracies actually trying to cope with all of this."
 @Dominic2306
 ---
 ID: 5
@@ -75,47 +71,38 @@ The Three Body Problem is an e/acc piece of science fiction because, unlike the 
 reply: @experilearning (2023-11-22)
 Instead of killing scientists, the aliens drove them crazy and spread doomerism to throttle Earth's capacity to create new knowledge. Its not the knowledge you create that kills you, it's the knowledge you didn't create and the danger you didn't foresee
 https://t.co/gO6RPaJsjf
----
 `.trim(),
   exampleQueries: [
     {
-      query: ["AI", "journalling", "assistant"],
+      query: "AI journalling assistant",
       tweetIDs: [0, 2],
     },
     {
-      query: ["LLM", "journalling"],
-      tweetIDs: [0, 2],
-    },
-    {
-      query: ["LLM", "therapist"],
+      query: "AI therapist",
       tweetIDs: [3],
     },
     {
-      query: ["AI", "therapist"],
-      tweetIDs: [3],
-    },
-    {
-      query: ["LLM", "Advanced", "RAG"],
+      query: "Advanced retrieval augmented generation",
       tweetIDs: [0, 2],
     },
     {
-      query: ["e/acc", "meetup"],
+      query: "e/acc meetup",
       tweetIDs: [1],
     },
     {
-      query: ["e/acc", "discussion"],
+      query: "Effective Accelerationism discussion",
       tweetIDs: [1, 7],
     },
     {
-      query: ["Dominic Cummings", "podcast"],
+      query: "Dominic Cummings interview",
       tweetIDs: [4],
     },
     {
-      query: ["OpenAI", "board", "drama"],
+      query: "OpenAI board drama",
       tweetIDs: [5, 6],
     },
     {
-      query: ["Three Body Problem", "analysis"],
+      query: "Three Body Problem analysis",
       tweetIDs: [7],
     },
   ],

@@ -12,7 +12,6 @@ const promptData = {
   prompt: sharedCreateQueriesInstructions,
   exampleBio: `Currently building @OpenPipeAI. Formerly @ycombinator, @google. I am always down to go on a quest.`,
   exampleTweets: `
----
 ID: 0
 tweet: @sama (2023-11-17)
 i loved my time at openai. it was transformative for me personally, and hopefully the world a little bit. most of all i loved working with such talented people.
@@ -68,47 +67,42 @@ Liked by @corbtt
 @Teknium1 (2023-11-29)
 OpenHermes 2.5 is now on @lmsysorg's ChatBot Arena! Go and test out several models and compare them blind to determine who is the best!
 Website: https://t.co/NTChcOXZFL
----
-ID: 9
-@corbtt (2023-11-29)
-@Teknium1 @lmsysorg Awesome, was hoping it would show up there!
----
 `.trim(),
   exampleQueries: [
     {
-      query: ["OpenAI", "Sam Altman", "podcast"],
+      query: "Sam Altman podcast",
       tweetIDs: [0, 1],
     },
     {
-      query: ["OpenAI", "Emmett Shear", "Sam Altman"],
-      tweetIDs: [0, 1],
+      query: "Emmett Shear OpenAI",
+      tweetIDs: [1],
     },
     {
-      query: ["Microsoft Orca 2", "performance"],
+      query: "Open source LLMs podcast",
+      tweetIDs: [2, 3, 5, 6, 8],
+    },
+    {
+      query: "Microsoft Orca 2 performance",
       tweetIDs: [2, 3],
     },
     {
-      query: ["small", "LLM", "reasoning"],
-      tweetIDs: [2, 3],
-    },
-    {
-      query: ["Mistral", "fine-tuning"],
+      query: "Mistral fine-tuning",
       tweetIDs: [4, 6],
     },
     {
-      query: ["GPT-4-Turbo", "evaluation"],
+      query: "GPT-4-Turbo evaluation",
       tweetIDs: [4, 6],
     },
     {
-      query: ["OpenAI", "OSS", "alternatives"],
+      query: "OpenAI open source alternatives",
       tweetIDs: [5, 8],
     },
     {
-      query: ["AGI", "economic", "impact"],
+      query: "AGI economic impact",
       tweetIDs: [7],
     },
     {
-      query: ["OpenHermes", "ChatBot Arena"],
+      query: "OpenHermes ChatBot Arena",
       tweetIDs: [8, 9],
     },
   ],

@@ -12,7 +12,7 @@ import { openpipe } from "../../../openpipe/openpipe";
 import { experilearningTweetsDataset } from "./datasets/experilearningTweetsDataset";
 import { corbttTweetsDataset } from "./datasets/corbttTweetsDataset";
 
-export const CREATE_YOUTUBE_SEARCH_QUERIES = "Create YouTube Search Queries";
+export const CREATE_YOUTUBE_SEARCH_QUERIES = "Create Queries";
 
 /**
  * We use GPT to create YouTube search queries based on the user's tweets.
@@ -25,15 +25,12 @@ export class CreateYouTubeSearchQueries extends Prompt<
   constructor() {
     super({
       name: CREATE_YOUTUBE_SEARCH_QUERIES,
-      description:
-        "Create YouTube search queries based on the user's recent tweets.",
+      description: "Create queries based on the user's recent tweets.",
       prompts: [withJamesExamplePrompt, withKyleExamplePrompt],
       model: "gpt-4",
       input: createQueriesInputSchema,
       output: createQueriesOutputSchema,
       exampleData: [],
-      // TODO: fix more comprehensively
-      max_tokens: 400,
     });
   }
   override chooseCandidatePrompt = (vars: Partial<CreateQueriesInput>) => {
