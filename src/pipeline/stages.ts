@@ -103,7 +103,7 @@ export const createQueries = {
     for (let i = 0; i < queriesWithTweets.length; i++) {
       const { query, tweets } = queriesWithTweets[i];
       console.log("-----------------");
-      console.log(chalk.blue(i + ". " + query.join(" ")));
+      console.log(chalk.blue(i + ". " + query));
       console.log(tweetsToString({ tweets, user }));
     }
     return success({ ...args, queriesWithTweets });
@@ -112,7 +112,7 @@ export const createQueries = {
 
 interface SearchForVideosStageArgs extends CreateQueriesStageArgs {
   queriesWithTweets: {
-    query: string[];
+    query: string;
     tweets: Tweet[];
   }[];
 }
@@ -135,9 +135,9 @@ export const searchForVideos = {
 
     const rawSearchResults: SearchResultsWithTweets[] = [];
     for (const { query, tweets } of queriesWithTweets) {
-      console.log(chalk.blue("Searching for " + query.join(" ")));
+      console.log(chalk.blue("Searching for " + query));
       const rawSearchResultsForQuery = await yt.search({
-        query: query.join(" "),
+        query,
       });
       console.log(
         chalk.blue(
@@ -147,7 +147,7 @@ export const searchForVideos = {
         )
       );
       rawSearchResults.push({
-        query: query.join(" "),
+        query,
         tweets: tweets,
         searchResults: rawSearchResultsForQuery,
       });
