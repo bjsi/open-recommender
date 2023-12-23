@@ -85,7 +85,7 @@ export const createQueries = {
   ): Promise<Success<SearchForVideosStageArgs> | Failure> {
     const { tweets, user } = args;
     console.log(chalk.blue("Creating search queries..."));
-    const { queries } = await createYouTubeSearchQueries(user).execute({
+    const { queries } = await createYouTubeSearchQueries().execute({
       tweets,
       user,
     });

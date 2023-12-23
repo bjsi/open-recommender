@@ -15,4 +15,8 @@ export const experilearningTweetsDataset: ExampleDataSet<
       user: "experilearning",
     }),
   },
+  user: {
+    name: "experilearning",
+    value: "experilearning",
+  },
 };

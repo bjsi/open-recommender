@@ -15,4 +15,8 @@ export const corbttTweetsDataset: ExampleDataSet<
       user: "corbtt",
     }),
   },
+  user: {
+    name: "corbtt",
+    value: "corbtt",
+  },
 };

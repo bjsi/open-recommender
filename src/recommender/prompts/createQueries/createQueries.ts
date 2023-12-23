@@ -32,6 +32,7 @@ export class CreateYouTubeSearchQueries extends Prompt<
       input: createQueriesInputSchema,
       output: createQueriesOutputSchema,
       exampleData: [],
+      max_tokens: 600,
     });
   }
   override chooseCandidatePrompt = (vars: Partial<CreateQueriesInput>) => {
