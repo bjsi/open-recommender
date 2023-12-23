@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 export const createQueriesInputSchema = z.object({
+  user: z.string(),
   tweets: z.string(),
 });
 

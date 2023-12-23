@@ -9,37 +9,38 @@ import {
 import { tweetsToString } from "../../../twitter/getUserContext";
 import { Tweet } from "../../../twitter/schemas";
 import { openpipe } from "../../../openpipe/openpipe";
+import { experilearningTweetsDataset } from "./datasets/experilearningTweetsDataset";
+import { corbttTweetsDataset } from "./datasets/corbttTweetsDataset";
 
 export const CREATE_YOUTUBE_SEARCH_QUERIES = "Create YouTube Search Queries";
 
 /**
  * We use GPT to create YouTube search queries based on the user's tweets.
  * Getting this prompt right is critical to the success of the recommender.
- * Run the test suite to compare different versions of the prompt.
  */
 export class CreateYouTubeSearchQueries extends Prompt<
   typeof createQueriesInputSchema,
   typeof createQueriesOutputSchema
 > {
-  constructor(user: string) {
+  constructor() {
     super({
       name: CREATE_YOUTUBE_SEARCH_QUERIES,
       description:
         "Create YouTube search queries based on the user's recent tweets.",
-      prompts: [
-        user === "experilearning"
-          ? withKyleExamplePrompt
-          : withJamesExamplePrompt,
-        user === "experilearning"
-          ? withJamesExamplePrompt
-          : withKyleExamplePrompt,
-      ],
+      prompts: [withJamesExamplePrompt, withKyleExamplePrompt],
       model: "gpt-4",
       input: createQueriesInputSchema,
       output: createQueriesOutputSchema,
       exampleData: [],
     });
   }
+  override chooseCandidatePrompt = (vars: Partial<CreateQueriesInput>) => {
+    if (vars.user === "experilearning") {
+      return withKyleExamplePrompt;
+    } else {
+      return withJamesExamplePrompt;
+    }
+  };
 
   async execute(args: {
     user: string;
@@ -47,8 +48,10 @@ export class CreateYouTubeSearchQueries extends Prompt<
     enableOpenPipeLogging?: boolean;
   }) {
     const promptVariables: CreateQueriesInput = {
+      user: args.user,
       tweets: tweetsToString({ tweets: args.tweets, user: args.user }),
     };
+    const prompt = this.chooseCandidatePrompt(promptVariables);
     return await openpipe.functionCall({
       function: {
         name: this.name,
@@ -57,7 +60,7 @@ export class CreateYouTubeSearchQueries extends Prompt<
         output: this.output!,
       },
       vars: promptVariables,
-      prompt: this.prompts[0],
+      prompt,
       body: {
         max_tokens: this.max_tokens,
         temperature: this.temperature,
@@ -69,5 +72,13 @@ export class CreateYouTubeSearchQueries extends Prompt<
   }
 }
 
-export const createYouTubeSearchQueries = (user: string) =>
-  new CreateYouTubeSearchQueries(user);
+export const createYouTubeSearchQueries = () =>
+  new CreateYouTubeSearchQueries()
+    .withTest("experilearning", {
+      user: "experilearning",
+      tweets: experilearningTweetsDataset.tweets.value,
+    })
+    .withTest("corbtt", {
+      user: "corbtt",
+      tweets: corbttTweetsDataset.tweets.value,
+    });

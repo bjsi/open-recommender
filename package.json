@@ -11,7 +11,7 @@
     "js-tiktoken": "^1.0.8",
     "openai": "^4.20.1",
     "openpipe": "^0.6.3",
-    "prompt-iteration-assistant": "^0.0.16",
+    "prompt-iteration-assistant": "^0.0.18",
     "promptfoo": "^0.28.1",
     "pybridge": "^1.1.0",
     "remeda": "^1.29.0",
