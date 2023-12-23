@@ -75,11 +75,19 @@ export class CreateYouTubeSearchQueries extends Prompt<
 
 export const createYouTubeSearchQueries = () =>
   new CreateYouTubeSearchQueries()
-    .withTest("experilearning", {
-      user: "experilearning",
-      tweets: experilearningTweetsDataset.tweets.value,
+    .withTest({
+      name: "experilearning",
+      onlyTestMainPrompt: true,
+      vars: {
+        user: "experilearning",
+        tweets: experilearningTweetsDataset.tweets.value,
+      },
     })
-    .withTest("corbtt", {
-      user: "corbtt",
-      tweets: corbttTweetsDataset.tweets.value,
+    .withTest({
+      name: "corbtt",
+      onlyTestMainPrompt: true,
+      vars: {
+        user: "corbtt",
+        tweets: corbttTweetsDataset.tweets.value,
+      },
     });

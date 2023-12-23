@@ -76,11 +76,13 @@ export const DEFAULT_RELEVANCE_THRESHOLD = 0.65;
 
 export const recommendVideos = () => {
   return new RecommendVideos().withTest(
-    "mix of relevant and irrelevant videos",
     {
-      query: elonAndRemNote.query.value,
-      results: elonAndRemNote.results.value,
-      tweets: elonAndRemNote.tweets.value,
+      name: "elon-and-rem-note",
+      vars: {
+        query: elonAndRemNote.query.value,
+        results: elonAndRemNote.results.value,
+        tweets: elonAndRemNote.tweets.value,
+      },
     },
     (output) => {
       const vids = output.recommendedVideos.map(

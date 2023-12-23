@@ -69,9 +69,11 @@ class AppraiseTranscriptPrompt extends Prompt<
 export const appraiseTranscript = () =>
   new AppraiseTranscriptPrompt()
     .withTest(
-      "quality-250-tokens",
       {
-        transcript: firstNTokens(learningVideoDataSet.transcript.value, 250),
+        name: "quality-250-tokens",
+        vars: {
+          transcript: firstNTokens(learningVideoDataSet.transcript.value, 250),
+        },
       },
       (output) => {
         return {
@@ -82,9 +84,11 @@ export const appraiseTranscript = () =>
       }
     )
     .withTest(
-      "quality-500-tokens",
       {
-        transcript: firstNTokens(learningVideoDataSet.transcript.value, 500),
+        name: "quality-500-tokens",
+        vars: {
+          transcript: firstNTokens(learningVideoDataSet.transcript.value, 500),
+        },
       },
       (output) => {
         return {
@@ -95,9 +99,11 @@ export const appraiseTranscript = () =>
       }
     )
     .withTest(
-      "quality-1000-tokens",
       {
-        transcript: firstNTokens(learningVideoDataSet.transcript.value, 1000),
+        name: "quality-1000-tokens",
+        vars: {
+          transcript: firstNTokens(learningVideoDataSet.transcript.value, 1000),
+        },
       },
       (output) => {
         return {
@@ -109,9 +115,11 @@ export const appraiseTranscript = () =>
     )
     // regularly fails - see here for analysis: https://x.com/experilearning/status/1735213419601461376?s=20
     .withTest(
-      "spam-350-tokens",
       {
-        transcript: firstNTokens(spamVideoDataset.transcript.value, 350),
+        name: "spam-350-tokens",
+        vars: {
+          transcript: firstNTokens(spamVideoDataset.transcript.value, 350),
+        },
       },
       (output) => {
         return {
@@ -122,9 +130,11 @@ export const appraiseTranscript = () =>
       }
     )
     .withTest(
-      "spam-500-tokens",
       {
-        transcript: firstNTokens(spamVideoDataset.transcript.value, 500),
+        name: "spam-500-tokens",
+        vars: {
+          transcript: firstNTokens(spamVideoDataset.transcript.value, 500),
+        },
       },
       (output) => {
         return {
@@ -135,9 +145,11 @@ export const appraiseTranscript = () =>
       }
     )
     .withTest(
-      "spam-1000-tokens",
       {
-        transcript: firstNTokens(spamVideoDataset.transcript.value, 1000),
+        name: "spam-1000-tokens",
+        vars: {
+          transcript: firstNTokens(spamVideoDataset.transcript.value, 1000),
+        },
       },
       (output) => {
         return {

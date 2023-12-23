@@ -105,10 +105,12 @@ export const rerankClips = (windowSize?: number) =>
       },
     })
     .withTest(
-      "advanced rag",
       {
-        clips: advancedRagDataset.clips.value,
-        tweets: advancedRagDataset.tweets.value,
+        name: "advanced rag",
+        vars: {
+          clips: advancedRagDataset.clips.value,
+          tweets: advancedRagDataset.tweets.value,
+        },
       },
       (output) => {
         return {

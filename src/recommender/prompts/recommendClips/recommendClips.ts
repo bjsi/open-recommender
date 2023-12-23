@@ -129,20 +129,24 @@ const testClipLength = (output: RecommendClipsOutput) => {
 export const recommendClips = () =>
   new RecommendClipsPrompt()
     .withTest(
-      "medium related",
       {
-        tweets: unrelatedDataset1.tweets.value,
-        title: unrelatedDataset1.title.value,
-        transcript: unrelatedDataset1.transcript.value,
+        name: "medium related",
+        vars: {
+          tweets: unrelatedDataset1.tweets.value,
+          title: unrelatedDataset1.title.value,
+          transcript: unrelatedDataset1.transcript.value,
+        },
       },
       testClipLength
     )
     .withTest(
-      "unrelated",
       {
-        tweets: unrelatedDataset2.tweets.value,
-        title: unrelatedDataset2.title.value,
-        transcript: unrelatedDataset2.transcript.value,
+        name: "unrelated",
+        vars: {
+          tweets: unrelatedDataset2.tweets.value,
+          title: unrelatedDataset2.title.value,
+          transcript: unrelatedDataset2.transcript.value,
+        },
       },
       // expect no clips to be created
       (output) => {
@@ -156,11 +160,13 @@ export const recommendClips = () =>
       testClipLength
     )
     .withTest(
-      "strongly related",
       {
-        tweets: relatedDataset.tweets.value,
-        title: relatedDataset.title.value,
-        transcript: relatedDataset.transcript.value,
+        name: "strongly related",
+        vars: {
+          tweets: relatedDataset.tweets.value,
+          title: relatedDataset.title.value,
+          transcript: relatedDataset.transcript.value,
+        },
       },
       testClipLength
     )
