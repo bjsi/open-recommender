@@ -7,10 +7,7 @@ import { yt } from "../youtube";
 import { Failure, Success, failure, success } from "./run";
 import { TranscriptCue } from "../youtube/transcript";
 import { PipelineArgs, pipelineArgsSchema } from "./pipeline";
-import {
-  TranscriptChunk,
-  TranscriptClip,
-} from "../recommender/prompts/recommendClips/helpers/transcriptClip";
+import { TranscriptClip } from "../recommender/prompts/recommendClips/helpers/transcriptClip";
 import _ from "remeda";
 import { createYouTubeSearchQueries } from "../recommender/prompts/createQueries/createQueries";
 import { recommendVideos } from "../recommender/prompts/recommendVideos/recommendVideos";
