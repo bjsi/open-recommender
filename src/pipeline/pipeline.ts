@@ -55,7 +55,9 @@ export class Pipeline<T extends PipelineArgs> {
       const result = await stage.run(args);
       return result;
     } catch (e) {
-      return failure(`Error thrown while running stage ${stage.name}: ${e}`);
+      return failure(
+        `Error thrown while running stage ${stage.name}: ${(e as any).message}`
+      );
     } finally {
       console.timeEnd(stage.name);
     }
@@ -79,8 +81,8 @@ export class Pipeline<T extends PipelineArgs> {
         `Failed to clone Run. Run with ID "${this.initialValue.cloneRunId}" not found`
       );
     }
-    const startIndex = this.initialValue.stage
-      ? this.stages.findIndex((s) => s.name === this.initialValue.stage)
+    let startIndex = this.initialValue.stage
+      ? this.stages.findIndex((stage) => stage.name === this.initialValue.stage)
       : 0;
     if (startIndex === -1) {
       return failure(`Stage ${this.initialValue.stage} not found`);
@@ -107,11 +109,13 @@ export class Pipeline<T extends PipelineArgs> {
       );
     }
 
-    let args = (
-      !clonedRun || !prevStage
-        ? await this.executeStage(stage1, this.initialValue)
-        : prevStage.result
-    ) as Either<T>;
+    let args: Either<T>;
+    if (!clonedRun || !prevStage) {
+      args = await this.executeStage(stage1, this.initialValue);
+      startIndex++;
+    } else {
+      args = prevStage?.result as Either<T>;
+    }
 
     this.saveStage(stage1, args);
     if (!args.success) {

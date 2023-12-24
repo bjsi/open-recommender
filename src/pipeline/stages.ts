@@ -8,13 +8,14 @@ import { Failure, Success, failure, success } from "./run";
 import { TranscriptCue } from "../youtube/transcript";
 import { PipelineArgs, pipelineArgsSchema } from "./pipeline";
 import { TranscriptClip } from "../recommender/prompts/recommendClips/helpers/transcriptClip";
-import _ from "remeda";
 import { createYouTubeSearchQueries } from "../recommender/prompts/createQueries/createQueries";
 import { recommendVideos } from "../recommender/prompts/recommendVideos/recommendVideos";
 import { appraiseTranscript } from "../recommender/prompts/appraiseTranscript/appraiseTranscript";
 import { recommendClips } from "../recommender/prompts/recommendClips/recommendClips";
 import { rerankClips } from "../recommender/prompts/rerankClips/rerankClips";
-import { pAll } from "./pAll";
+import { pAll } from "./utils/pAll";
+import { shuffle } from "./utils/shuffle";
+import { chunk } from "remeda";
 
 export const STAGES = [
   "validate-args",
@@ -290,8 +291,10 @@ export const appraiseTranscripts = {
   description: "Appraise transcripts",
   run: async function (args: AppraiseTranscriptsStageArgs) {
     const { resultsWithTranscripts } = args;
-    console.log(chalk.blue("Appraising transcripts..."));
-    const appraisedResults: SearchResultWithTranscript[] = _.compact(
+    console.log(
+      chalk.blue(`Appraising ${resultsWithTranscripts.length} transcripts...`)
+    );
+    const appraisedResults: SearchResultWithTranscript[] = (
       await pAll(
         resultsWithTranscripts.map((result) => async () => {
           const { recommend, reasoning } = await appraiseTranscript().execute({
@@ -316,7 +319,7 @@ export const appraiseTranscripts = {
         }),
         { concurrency: 10 }
       )
-    );
+    ).filter(Boolean) as SearchResultWithTranscript[];
     if (!appraisedResults.length) {
       const msg = "No transcripts passed the appraisal filter";
       console.log(chalk.red(msg));
@@ -348,7 +351,7 @@ export const chunkTranscripts = {
     | Failure
   > {
     const { appraisedResults, user } = args;
-    const chunkedTranscripts: TranscriptClip[] = _.compact(
+    const chunkedTranscripts: TranscriptClip[] = (
       await pAll(
         appraisedResults.map((result) => async () => {
           const chunks = await recommendClips().execute({
@@ -378,7 +381,9 @@ export const chunkTranscripts = {
         }),
         { concurrency: 10 }
       )
-    ).flat();
+    )
+      .filter(Boolean)
+      .flat() as TranscriptClip[];
 
     if (!chunkedTranscripts.length) {
       const msg = "No transcripts chunked";
@@ -411,13 +416,43 @@ export const rankClips = {
     | Failure
   > {
     // order globally over all transcripts and all clips
-    const allClips = _.shuffle(args.chunkedTranscripts);
-    const orderedClips = await rerankClips(11).execute({
-      user: args.user,
-      tweets: args.tweets,
-      clips: allClips,
-    });
+    const allClips = shuffle(args.chunkedTranscripts);
+    console.log(chalk.blue(`Ordering ${allClips.length} clips...`));
 
-    return success({ ...args, orderedClips });
+    // each window contains 8 clips
+    // we order then discard the bottom 4 clips
+    const maxDesiredNumClips = 30;
+    const windowSize = 8;
+    const numToDiscard = 4;
+
+    let remainingClips = allClips;
+
+    while (
+      remainingClips.length > windowSize - 1 &&
+      remainingClips.length > maxDesiredNumClips
+    ) {
+      let chunked = chunk(remainingClips, windowSize);
+      remainingClips = (
+        await pAll(
+          chunked.map((chunk) => async () => {
+            const orderedClips = await rerankClips({
+              windowSize,
+              numToDiscard,
+            }).execute({
+              user: args.user,
+              tweets: args.tweets,
+              clips: chunk,
+            });
+            return orderedClips;
+          }),
+          {
+            concurrency: 10,
+          }
+        )
+      ).flat();
+      console.log(chalk.blue(`Remaining clips: ${remainingClips.length}`));
+    }
+
+    return success({ ...args, orderedClips: remainingClips });
   },
 };

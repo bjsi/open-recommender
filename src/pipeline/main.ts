@@ -69,6 +69,10 @@ import { Command } from "commander";
     );
   } else {
     const maybeRecommendations = await pipeline.execute();
-    console.log(JSON.stringify(maybeRecommendations, null, 2));
+    if (maybeRecommendations.success) {
+      console.log(maybeRecommendations.result.orderedClips);
+    } else {
+      console.log(maybeRecommendations.result);
+    }
   }
 })();

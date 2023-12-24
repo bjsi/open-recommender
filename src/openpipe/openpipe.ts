@@ -63,7 +63,7 @@ export const openpipe = {
         logRequest: !!args.enableOpenPipeLogging,
       },
     });
-    if (args.verbose || true) {
+    if (args.verbose) {
       console.log(JSON.stringify(response, null, 2));
     }
     const valueText = response.choices[0]!.message.function_call!.arguments;

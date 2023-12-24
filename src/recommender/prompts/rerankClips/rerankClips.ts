@@ -8,7 +8,7 @@ import { zeroShotPrompt } from "./prompts/withExample";
 import { Tweet } from "../../../twitter/schemas";
 import { tweetsToString } from "../../../twitter/getUserContext";
 import { openpipe } from "../../../openpipe/openpipe";
-import _ from "remeda";
+import _, { uniq } from "remeda";
 import { TranscriptClip } from "../recommendClips/helpers/transcriptClip";
 import { searchChunkAndRank } from "../../dialogs/searchAndChunk";
 import { advancedRagDataset } from "./datasets/advancedRagDataset";
@@ -24,7 +24,9 @@ export class RerankClips extends Prompt<
   typeof rerankClipsInputSchema,
   typeof rerankClipsOutputSchema
 > {
-  constructor(public windowSize = 4) {
+  windowSize: number;
+  numToDiscard: number;
+  constructor(args: { windowSize: number; numToDiscard: number }) {
     super({
       name: RERANK_CLIPS,
       description:
@@ -35,6 +37,8 @@ export class RerankClips extends Prompt<
       output: rerankClipsOutputSchema,
       exampleData: [advancedRagDataset],
     });
+    this.windowSize = args.windowSize;
+    this.numToDiscard = args.numToDiscard;
   }
 
   async execute(args: {
@@ -83,7 +87,8 @@ ${clip.text}
       const initialWindow = args.clips.slice(0, this.windowSize);
       // initial rank
       const orderedClips = await callApi(initialWindow);
-      topClips = orderedClips.slice(0, this.windowSize - 1);
+      // remove numToDiscard clips
+      topClips = orderedClips.slice(0, this.windowSize - this.numToDiscard);
       // rank all
       for (let i = this.windowSize; i < args.clips.length; i++) {
         const window = topClips.concat(args.clips[i]);
@@ -91,13 +96,18 @@ ${clip.text}
         // discard the bottom ranked clip
         topClips = orderedWindow.slice(0, this.windowSize - 1);
       }
-      return _.uniq(topClips);
+      return uniq(topClips);
     }
   }
 }
 
-export const rerankClips = (windowSize?: number) =>
-  new RerankClips(windowSize)
+export const rerankClips = (
+  args: {
+    windowSize: number;
+    numToDiscard: number;
+  } = { windowSize: 4, numToDiscard: 1 }
+) =>
+  new RerankClips(args)
     .withCommand({
       name: "search chunk and rank",
       async action() {
