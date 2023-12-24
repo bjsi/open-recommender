@@ -8,10 +8,7 @@ import { CreateQueriesInput } from "../schemas/createQueriesInputSchema";
 import { CREATE_YOUTUBE_SEARCH_QUERIES } from "../createQueries";
 import { CreateQueriesOutput } from "../schemas/createQueriesOutputSchema";
 
-const promptData = {
-  prompt: sharedCreateQueriesInstructions,
-  exampleBio: `Currently building @OpenPipeAI. Formerly @ycombinator, @google. I am always down to go on a quest.`,
-  exampleTweets: `
+const exampleTweets = `
 ID: 0
 tweet: @sama (2023-11-17)
 i loved my time at openai. it was transformative for me personally, and hopefully the world a little bit. most of all i loved working with such talented people.
@@ -67,18 +64,23 @@ Liked by @corbtt
 @Teknium1 (2023-11-29)
 OpenHermes 2.5 is now on @lmsysorg's ChatBot Arena! Go and test out several models and compare them blind to determine who is the best!
 Website: https://t.co/NTChcOXZFL
-`.trim(),
+`.trim();
+
+const promptData = {
+  prompt: sharedCreateQueriesInstructions,
+  exampleBio: `Currently building @OpenPipeAI. Formerly @ycombinator, @google. I am always down to go on a quest.`,
+  exampleTweets,
   exampleQueries: [
     {
       query: "Sam Altman podcast",
       tweetIDs: [0, 1],
     },
     {
-      query: "Emmett Shear OpenAI",
+      query: "Emmett Shear OpenAI CEO",
       tweetIDs: [1],
     },
     {
-      query: "Open source LLMs podcast",
+      query: "Open source LLM podcast",
       tweetIDs: [2, 3, 5, 6, 8],
     },
     {

@@ -14,7 +14,7 @@ import { recommendVideos } from "../recommender/prompts/recommendVideos/recommen
 import { appraiseTranscript } from "../recommender/prompts/appraiseTranscript/appraiseTranscript";
 import { recommendClips } from "../recommender/prompts/recommendClips/recommendClips";
 import { rerankClips } from "../recommender/prompts/rerankClips/rerankClips";
-import pAll from "p-all";
+import { pAll } from "./pAll";
 
 export const STAGES = [
   "validate-args",
@@ -151,7 +151,7 @@ export const searchForVideos = {
           searchResults: rawSearchResultsForQuery,
         };
       }),
-      { concurrency: 5 }
+      { concurrency: 3 }
     );
     console.log(
       chalk.blue("Found " + rawSearchResults.length + " search results")
@@ -195,7 +195,7 @@ export const filterSearchResults = {
           searchResults: relevantResults,
         };
       }),
-      { concurrency: 5 }
+      { concurrency: 10 }
     );
     if (!filteredResults.length) {
       const msg = "No search results passed the search filter";
@@ -263,7 +263,7 @@ export const downloadTranscripts = {
             relevance: result.relevance,
           });
         }),
-        { concurrency: 5 }
+        { concurrency: 3 }
       );
     }
     if (!resultsWithTranscripts.length) {
@@ -314,7 +314,7 @@ export const appraiseTranscripts = {
             return result;
           }
         }),
-        { concurrency: 5 }
+        { concurrency: 10 }
       )
     );
     if (!appraisedResults.length) {
@@ -376,7 +376,7 @@ export const chunkTranscripts = {
             return chunks;
           }
         }),
-        { concurrency: 5 }
+        { concurrency: 10 }
       )
     ).flat();
 

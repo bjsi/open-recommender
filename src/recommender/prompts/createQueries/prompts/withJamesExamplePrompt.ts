@@ -8,10 +8,7 @@ import { CREATE_YOUTUBE_SEARCH_QUERIES } from "../createQueries";
 import { CreateQueriesOutput } from "../schemas/createQueriesOutputSchema";
 import { CreateQueriesInput } from "../schemas/createQueriesInputSchema";
 
-const promptData = {
-  instructions: sharedCreateQueriesInstructions,
-  exampleBio: `@experilearning: fascinated by LLM agents | building the best SRS app in the multiverse @rem_note`,
-  exampleTweets: `
+const exampleTweets = `
 ID: 0
 @experilearning (2023-11-07)
 Experimenting with creating a AI journalling assistant rn. Getting the RAG/chat memory right is the most important part. Here's the approach that got the best results so far:
@@ -71,7 +68,12 @@ The Three Body Problem is an e/acc piece of science fiction because, unlike the 
 reply: @experilearning (2023-11-22)
 Instead of killing scientists, the aliens drove them crazy and spread doomerism to throttle Earth's capacity to create new knowledge. Its not the knowledge you create that kills you, it's the knowledge you didn't create and the danger you didn't foresee
 https://t.co/gO6RPaJsjf
-`.trim(),
+`.trim();
+
+const promptData = {
+  instructions: sharedCreateQueriesInstructions,
+  exampleBio: `@experilearning: fascinated by LLM agents | building the best SRS app in the multiverse @rem_note`,
+  exampleTweets: exampleTweets,
   exampleQueries: [
     {
       query: "AI journalling assistant",

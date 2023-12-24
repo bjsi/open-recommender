@@ -25,7 +25,8 @@ export class CreateYouTubeSearchQueries extends Prompt<
   constructor() {
     super({
       name: CREATE_YOUTUBE_SEARCH_QUERIES,
-      description: "Create queries based on the user's recent tweets.",
+      description:
+        "Create YouTube video search queries based on the user's recent tweets.",
       prompts: [withJamesExamplePrompt, withKyleExamplePrompt],
       model: "gpt-4",
       input: createQueriesInputSchema,
