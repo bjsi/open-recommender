@@ -7,12 +7,13 @@
 <h3 align="center">⚠️ Work in Progress... ⚠️</h3>
 
 - [x] Build an MVP of the data pipeline
-- [ ] Iterate on the prompts until 8/10 recommendations are good
+- [x] Iterate on the prompts until 8/10 recommendations are good
 - [ ] Curate fine tune dataset
 - [ ] Create a website so people can sign up
 - [ ] Collect more fine tune data
 - [ ] Fine tune using [OpenPipe](https://openpipe.ai/)
-- [ ] Scale to millions of users :D
+- [ ] Scale to more users
+- [ ] Add more recommendation sources (e.g. articles, twitters, books, etc.)
 
 <br/>
 
@@ -74,6 +75,7 @@ A summary of the data pipeline:
 See more detailed working notes [here](https://www.remnote.com/a/YouTube-Recommender/655daa97d42611e86f8536ec)
 
 ## Papers and Blog Posts
+
 - [Building an LLM-Powered Open Source Recommendation System for YouTube](https://dev.to/experilearning/building-an-llm-powered-open-source-recommendation-system-40fg)
 - [BookGPT: A General Framework for Book Recommendation Based on a Large Language Model](https://arxiv.org/pdf/2305.15673.pdf)
 - [A Survey on Large Language Models for Recommendation](https://arxiv.org/abs/2305.19860)
