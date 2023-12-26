@@ -16,6 +16,7 @@ import { rerankClips } from "../recommender/prompts/rerankClips/rerankClips";
 import { pAll } from "./utils/pAll";
 import { shuffle } from "./utils/shuffle";
 import { chunk } from "remeda";
+import { chunkClipArray } from "./utils/chunkClipArray";
 
 export const STAGES = [
   "validate-args",
@@ -421,9 +422,12 @@ export const rankClips = {
 
     // each window contains 8 clips
     // we order then discard the bottom 4 clips
+    // we do some special handling for clips from the
+    // same video to ensure we don't have too many clips from the same video
     const maxDesiredNumClips = 30;
     const windowSize = 8;
-    const numToDiscard = 4;
+    const ratioToDiscard = 0.5;
+    const maxClipsPerVideo = 3;
 
     let remainingClips = allClips;
 
@@ -431,17 +435,25 @@ export const rankClips = {
       remainingClips.length > windowSize - 1 &&
       remainingClips.length > maxDesiredNumClips
     ) {
-      let chunked = chunk(remainingClips, windowSize);
+      let chunked = chunkClipArray({
+        clips: remainingClips,
+        windowSize,
+        shuffle: true,
+      });
       remainingClips = (
         await pAll(
           chunked.map((chunk) => async () => {
             const orderedClips = await rerankClips({
-              windowSize,
-              numToDiscard,
+              windowSize: chunk.clips.length,
+              numToDiscard:
+                chunk.type === "same-video" &&
+                chunk.clips.length > maxClipsPerVideo
+                  ? chunk.clips.length - maxClipsPerVideo
+                  : Math.floor(chunk.clips.length * ratioToDiscard),
             }).execute({
               user: args.user,
               tweets: args.tweets,
-              clips: chunk,
+              clips: chunk.clips,
             });
             return orderedClips;
           }),

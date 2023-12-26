@@ -70,7 +70,13 @@ import { Command } from "commander";
   } else {
     const maybeRecommendations = await pipeline.execute();
     if (maybeRecommendations.success) {
-      console.log(maybeRecommendations.result.orderedClips);
+      console.log(
+        maybeRecommendations.result.orderedClips.map((c) => ({
+          title: c.title,
+          summary: c.summary,
+          url: c.videoUrl,
+        }))
+      );
     } else {
       console.log(maybeRecommendations.result);
     }
