@@ -14,6 +14,7 @@
 - [ ] Fine tune using [OpenPipe](https://openpipe.ai/)
 - [ ] Scale to more users
 - [ ] Add more recommendation sources (e.g. articles, twitters, books, etc.)
+- [ ] Scale to millions of users
 
 <br/>
 
