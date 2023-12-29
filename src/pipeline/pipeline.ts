@@ -26,7 +26,7 @@ export const pipelineArgsSchema = z.object({
   searchFilterRelevancyCutOff: z.number().min(0).max(1).default(0.65),
   stage: z.enum(STAGES).optional(),
   print: z.string().optional(),
-  enableLogging: z.string().optional(),
+  enableLogging: z.boolean().optional(),
 });
 
 export type PipelineArgs = z.infer<typeof pipelineArgsSchema>;

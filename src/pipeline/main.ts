@@ -1,4 +1,4 @@
-import { Pipeline, pipelineArgsSchema } from "./pipeline";
+import { Pipeline, PipelineArgs, pipelineArgsSchema } from "./pipeline";
 import { getRunById } from "./run";
 import {
   appraiseTranscripts,
@@ -31,10 +31,17 @@ import { Command } from "commander";
       "The stage to begin from. Defaults to the first stage."
     )
     .option("-p, --print <key>", "Print the results to stdout.")
+    .option(
+      "-l, --enableLogging",
+      "Enable logging to OpenPipe (disable for tests and sensitive information)"
+    )
     .parse(process.argv);
 
-  const opts = pipelineArgsSchema.parse({
-    ...program.opts(),
+  const x = program.opts();
+  const opts: PipelineArgs = pipelineArgsSchema.parse({
+    ...x,
+    // enable logging by default
+    enableLogging: x.enableLogging !== undefined ? x.enableLogging : true,
     runId: new Date().toISOString(),
   });
   const pipeline = new Pipeline(opts)

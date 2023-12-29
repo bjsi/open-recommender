@@ -88,6 +88,7 @@ export const createQueries = {
     const { tweets, user } = args;
     console.log(chalk.blue("Creating search queries..."));
     const { queries } = await createYouTubeSearchQueries().execute({
+      enableOpenPipeLogging: args.enableLogging,
       tweets,
       user,
     });
@@ -182,6 +183,7 @@ export const filterSearchResults = {
     }[] = await pAll(
       rawSearchResults.map(({ query, tweets, searchResults }) => async () => {
         const filteredResultsForQuery = await recommendVideos().execute({
+          enableOpenPipeLogging: args.enableLogging,
           user,
           query: query,
           results: searchResults,
@@ -301,6 +303,7 @@ export const appraiseTranscripts = {
           const { recommend, reasoning } = await appraiseTranscript().execute({
             transcript: result.cues,
             title: result.searchResult.title,
+            enableOpenPipeLogging: args.enableLogging,
           });
           if (!recommend) {
             console.log(
@@ -357,6 +360,7 @@ export const chunkTranscripts = {
         appraisedResults.map((result) => async () => {
           const chunks = await recommendClips().execute({
             tweets: result.tweets,
+            enableOpenPipeLogging: args.enableLogging,
             user,
             transcript: result.cues,
             title: result.searchResult.title,
@@ -451,6 +455,7 @@ export const rankClips = {
                   ? chunk.clips.length - maxClipsPerVideo
                   : Math.floor(chunk.clips.length * ratioToDiscard),
             }).execute({
+              enableOpenPipeLogging: args.enableLogging,
               user: args.user,
               tweets: args.tweets,
               clips: chunk.clips,
