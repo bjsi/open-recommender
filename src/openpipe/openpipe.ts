@@ -7,6 +7,7 @@ import {
 } from "prompt-iteration-assistant";
 import { z } from "zod";
 import zodToJsonSchema from "zod-to-json-schema";
+import { RequestTagsLatest } from "./requestTags";
 
 const client = new OpenAI();
 
@@ -32,8 +33,15 @@ export const openpipe = {
     vars: Input;
     // Enable logging to OpenPipe (disable for tests and sensitive information)
     enableOpenPipeLogging?: boolean;
+    // Additional k-v pairs to add to the OpenPipe request tags
+    openPipeRequestTags?: RequestTagsLatest;
     verbose?: boolean;
   }) {
+    if (args.enableOpenPipeLogging && !args.openPipeRequestTags) {
+      throw new Error(
+        "You must provide openPipeRequestTags if enableOpenPipeLogging is true"
+      );
+    }
     const validArgs = args.function?.input?.parse?.(args.vars);
     const messages = args.prompt
       .withVariables((validArgs || {}) as Input)
@@ -55,10 +63,10 @@ export const openpipe = {
       },
       ...args.body,
       openpipe: {
-        // Optional tags (often used for prompt names)
+        // Optional tags (often used for prompt names, external foreign keys, flow ids etc.)
         // Helps you filter down your fine tuning dataset
         // see the section on tags here for more info: https://docs.openpipe.ai/getting-started/openpipe-sdk
-        tags: { prompt_id: args.prompt.name },
+        tags: { ...args.openPipeRequestTags },
         // Enable/disable data collection
         logRequest: !!args.enableOpenPipeLogging,
       },

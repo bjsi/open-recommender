@@ -12,6 +12,7 @@ import _, { uniq } from "remeda";
 import { TranscriptClip } from "../recommendClips/helpers/transcriptClip";
 import { searchChunkAndRank } from "../../dialogs/searchAndChunk";
 import { advancedRagDataset } from "./datasets/advancedRagDataset";
+import { RequestTagsLatest } from "../../../openpipe/requestTags";
 
 export const RERANK_CLIPS = "Rerank Clips";
 
@@ -46,6 +47,7 @@ export class RerankClips extends Prompt<
     tweets: Tweet[];
     clips: TranscriptClip[];
     enableOpenPipeLogging?: boolean;
+    openPipeRequestTags?: RequestTagsLatest;
   }) {
     const callApi = async (windowClips: TranscriptClip[]) => {
       const promptVariables: RerankClipsInput = {
@@ -73,6 +75,9 @@ ${clip.text}
           temperature: this.temperature,
           model: this.model,
         },
+        openPipeRequestTags: args.openPipeRequestTags
+          ? { ...args.openPipeRequestTags, promptName: this.name }
+          : undefined,
         enableOpenPipeLogging: args.enableOpenPipeLogging,
       });
       return orderedClipIds.map((id) => windowClips[id]);

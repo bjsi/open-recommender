@@ -13,6 +13,10 @@ import {
   transcriptCuesToVtt,
 } from "../../../youtube/transcript";
 import { openpipe } from "../../../openpipe/openpipe";
+import {
+  RequestTagsAlpha,
+  RequestTagsLatest,
+} from "../../../openpipe/requestTags";
 
 export const APPRAISE_TRANSCRIPT = "Appraise Transcript";
 
@@ -40,6 +44,7 @@ class AppraiseTranscriptPrompt extends Prompt<
   async execute(args: {
     transcript: TranscriptCue[];
     title: string;
+    openPipeRequestTags?: Omit<RequestTagsLatest, "promptName">;
     enableOpenPipeLogging?: boolean;
   }) {
     const transcript = firstNTokens(transcriptCuesToVtt(args.transcript), 1000);
@@ -61,6 +66,12 @@ class AppraiseTranscriptPrompt extends Prompt<
         temperature: this.temperature,
         model: this.model,
       },
+      openPipeRequestTags: args.openPipeRequestTags
+        ? {
+            ...args.openPipeRequestTags,
+            promptName: this.name,
+          }
+        : undefined,
       enableOpenPipeLogging: args.enableOpenPipeLogging,
     });
   }

@@ -15,6 +15,7 @@ import {
   elonAndRemNote,
   elonAndRemNoteSearchResults,
 } from "./datasets/elonAndRemNote";
+import { RequestTagsLatest } from "../../../openpipe/requestTags";
 
 export const RECOMMEND_VIDEOS = "Recommend Videos";
 
@@ -41,6 +42,7 @@ export class RecommendVideos extends Prompt<
     results: SearchResult[];
     query: string;
     enableOpenPipeLogging?: boolean;
+    openPipeRequestTags?: RequestTagsLatest;
   }) {
     const promptVariables: RecommendVideosInput = {
       query: args.query,
@@ -61,6 +63,9 @@ export class RecommendVideos extends Prompt<
         temperature: this.temperature,
         model: this.model,
       },
+      openPipeRequestTags: args.openPipeRequestTags
+        ? { ...args.openPipeRequestTags, promptName: this.name }
+        : undefined,
       enableOpenPipeLogging: args.enableOpenPipeLogging,
     });
     return _.sortBy(recommendedVideos, [(x) => x.relevance, "desc"]).map(

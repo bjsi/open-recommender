@@ -11,6 +11,10 @@ import { Tweet } from "../../../twitter/schemas";
 import { openpipe } from "../../../openpipe/openpipe";
 import { experilearningTweetsDataset } from "./datasets/experilearningTweetsDataset";
 import { corbttTweetsDataset } from "./datasets/corbttTweetsDataset";
+import {
+  RequestTagsLatest,
+  RequestTagsWithoutName,
+} from "../../../openpipe/requestTags";
 
 export const CREATE_YOUTUBE_SEARCH_QUERIES = "Create Queries";
 
@@ -45,6 +49,7 @@ export class CreateYouTubeSearchQueries extends Prompt<
   async execute(args: {
     user: string;
     tweets: Tweet[];
+    openPipeRequestTags?: RequestTagsWithoutName;
     enableOpenPipeLogging?: boolean;
   }) {
     const promptVariables: CreateQueriesInput = {
@@ -67,6 +72,9 @@ export class CreateYouTubeSearchQueries extends Prompt<
         model: this.model,
         stream: false,
       },
+      openPipeRequestTags: args.openPipeRequestTags
+        ? { ...args.openPipeRequestTags, promptName: this.name }
+        : undefined,
       enableOpenPipeLogging: args.enableOpenPipeLogging,
     });
   }

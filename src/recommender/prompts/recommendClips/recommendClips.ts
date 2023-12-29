@@ -19,6 +19,7 @@ import { openpipe } from "../../../openpipe/openpipe";
 import { Tweet } from "../../../twitter/schemas";
 import { TranscriptClip } from "./helpers/transcriptClip";
 import { searchAndChunk } from "../../dialogs/searchAndChunk";
+import { RequestTagsLatest } from "../../../openpipe/requestTags";
 
 export const RECOMMEND_CLIPS = "Recommend Clips";
 
@@ -45,6 +46,7 @@ export class RecommendClipsPrompt extends Prompt<
 
   async execute(args: {
     enableOpenPipeLogging?: boolean;
+    openPipeRequestTags?: RequestTagsLatest;
     user: string;
     tweets: Tweet[];
     transcript: TranscriptCue[];
@@ -84,6 +86,9 @@ ${cue.text}
           temperature: this.temperature,
           model: this.model,
         },
+        openPipeRequestTags: args.openPipeRequestTags
+          ? { ...args.openPipeRequestTags, promptName: this.name }
+          : undefined,
         enableOpenPipeLogging: args.enableOpenPipeLogging,
       });
       for (const clip of clips || []) {

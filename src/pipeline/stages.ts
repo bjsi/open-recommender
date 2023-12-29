@@ -17,6 +17,7 @@ import { pAll } from "./utils/pAll";
 import { shuffle } from "./utils/shuffle";
 import { chunk } from "remeda";
 import { chunkClipArray } from "./utils/chunkClipArray";
+import { createRequestTags } from "../openpipe/requestTags";
 
 export const STAGES = [
   "validate-args",
@@ -89,6 +90,7 @@ export const createQueries = {
     console.log(chalk.blue("Creating search queries..."));
     const { queries } = await createYouTubeSearchQueries().execute({
       enableOpenPipeLogging: args.enableLogging,
+      openPipeRequestTags: createRequestTags(args),
       tweets,
       user,
     });
