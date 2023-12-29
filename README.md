@@ -14,12 +14,15 @@
 - [ ] Fine tune using [OpenPipe](https://openpipe.ai/)
 - [ ] Scale to more users
 - [ ] Add more recommendation sources (e.g. articles, twitters, books, etc.)
+- [ ] Scale to millions of users
 
 <br/>
 
 ## 🚀 Overview
 
-Welcome to Open Recommender, an open source recommendation system for YouTube.
+Welcome to Open Recommender, an open source recommendation system for YouTube. _See the video intro below_
+
+[![Video](https://img.youtube.com/vi/KbBwhuVpqC0/hqdefault.jpg)](https://www.youtube.com/watch?v=KbBwhuVpqC0)
 
 ## 🏆 Goals
 
