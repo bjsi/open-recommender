@@ -37,11 +37,8 @@ import { Command } from "commander";
     )
     .parse(process.argv);
 
-  const x = program.opts();
   const opts: PipelineArgs = pipelineArgsSchema.parse({
-    ...x,
-    // enable logging by default
-    enableLogging: x.enableLogging !== undefined ? x.enableLogging : true,
+    ...program.opts(),
     runId: new Date().toISOString(),
   });
   const pipeline = new Pipeline(opts)
