@@ -41,7 +41,6 @@ export class RecommendClipsPrompt extends Prompt<
       input: recommendClipsInputSchema,
       output: recommendClipsOutputSchema,
       exampleData: [],
-      max_tokens: 1024,
     });
   }
 

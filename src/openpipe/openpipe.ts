@@ -76,8 +76,13 @@ export const openpipe = {
         console.log(JSON.stringify(response, null, 2));
       }
       const valueText = response.choices[0]!.message.function_call!.arguments;
-      const json = JSON.parse(valueText);
-      return args.function.output?.parse?.(json);
+      try {
+        const json = JSON.parse(valueText);
+        return args.function.output?.parse?.(json);
+      } catch (e) {
+        console.log("function_call.arguments", valueText);
+        throw e;
+      }
     } catch (e) {
       console.log("Error in openpipe.functionCall");
       console.log(e);
