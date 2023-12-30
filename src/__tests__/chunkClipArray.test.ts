@@ -1,66 +1,61 @@
 import { chunkClipArray } from "../pipeline/utils/chunkClipArray";
 
-test("chunkClipArray works", () => {
+test("chunkClipArray works", async () => {
   const clips = [
     {
+      text: ".",
+      videoId: "2",
+    },
+    {
+      text: ".",
+      videoId: "2",
+    },
+    {
+      text: ".",
+      videoId: "3",
+    },
+    {
+      text: ".",
+      videoId: "3",
+    },
+    {
+      text: ".",
+      videoId: "3",
+    },
+    {
+      text: ".",
       videoId: "1",
-    },
-    {
-      videoId: "2",
-    },
-    {
-      videoId: "2",
-    },
-    {
-      videoId: "3",
-    },
-    {
-      videoId: "3",
-    },
-    {
-      videoId: "3",
     },
   ];
 
-  const chunks = chunkClipArray({
+  const chunks = await chunkClipArray({
     clips,
-    windowSize: 2,
+    maxTokensPerChunk: Number.MAX_SAFE_INTEGER,
     shuffle: false,
   });
 
-  expect(chunks).toEqual([
-    {
-      type: "same-video",
-      clips: [
-        {
-          videoId: "2",
-        },
-        {
-          videoId: "2",
-        },
-      ],
-    },
-    {
-      type: "same-video",
-      clips: [
-        {
-          videoId: "3",
-        },
-        {
-          videoId: "3",
-        },
-      ],
-    },
-    {
-      type: "mix",
-      clips: [
-        {
-          videoId: "1",
-        },
-        {
-          videoId: "3",
-        },
-      ],
-    },
+  expect(chunks.length).toEqual(1);
+  expect(chunks[0]).toEqual(clips);
+
+  const chunks2 = await chunkClipArray({
+    clips,
+    maxTokensPerChunk: 2,
+    shuffle: false,
+  });
+
+  expect(chunks2.length).toEqual(3);
+  expect(chunks2).toEqual([
+    [
+      { text: ".", videoId: "2" },
+      { text: ".", videoId: "2" },
+    ],
+    [
+      { text: ".", videoId: "3" },
+      { text: ".", videoId: "3" },
+    ],
+    [
+      { text: ".", videoId: "3" },
+      { text: ".", videoId: "1" },
+    ],
   ]);
 });

@@ -18,6 +18,7 @@ import { shuffle } from "./utils/shuffle";
 import { chunk } from "remeda";
 import { chunkClipArray } from "./utils/chunkClipArray";
 import { createRequestTags } from "../openpipe/requestTags";
+import { transcriptClipsToString } from "../recommender/prompts/rerankClips/helpers/transcriptClipsToString";
 
 export const STAGES = [
   "validate-args",
@@ -186,6 +187,7 @@ export const filterSearchResults = {
       rawSearchResults.map(({ query, tweets, searchResults }) => async () => {
         const filteredResultsForQuery = await recommendVideos().execute({
           enableOpenPipeLogging: args.enableLogging,
+          openPipeRequestTags: createRequestTags(args),
           user,
           query: query,
           results: searchResults,
@@ -306,6 +308,7 @@ export const appraiseTranscripts = {
             transcript: result.cues,
             title: result.searchResult.title,
             enableOpenPipeLogging: args.enableLogging,
+            openPipeRequestTags: createRequestTags(args),
           });
           if (!recommend) {
             console.log(
@@ -362,6 +365,7 @@ export const chunkTranscripts = {
         appraisedResults.map((result) => async () => {
           const chunks = await recommendClips().execute({
             tweets: result.tweets,
+            openPipeRequestTags: createRequestTags(args),
             enableOpenPipeLogging: args.enableLogging,
             user,
             transcript: result.cues,
@@ -431,36 +435,43 @@ export const rankClips = {
     // we do some special handling for clips from the
     // same video to ensure we don't have too many clips from the same video
     const maxDesiredNumClips = 30;
-    const windowSize = 8;
+    // TODO: don't hardcode
+    const maxTokens =
+      8192 -
+      (
+        await rerankClips().calculateCost({
+          clips: "",
+          tweets: tweetsToString({ tweets: args.tweets, user: args.user }),
+        })
+      ).total;
     const ratioToDiscard = 0.5;
     const maxClipsPerVideo = 3;
 
     let remainingClips = allClips;
 
-    while (
-      remainingClips.length > windowSize - 1 &&
-      remainingClips.length > maxDesiredNumClips
-    ) {
-      let chunked = chunkClipArray({
+    // TODO: what if we start with less than maxDesired clips?
+    while (remainingClips.length > maxDesiredNumClips) {
+      let chunked = await chunkClipArray({
         clips: remainingClips,
-        windowSize,
+        maxTokensPerChunk: maxTokens,
         shuffle: true,
       });
       remainingClips = (
         await pAll(
           chunked.map((chunk) => async () => {
             const orderedClips = await rerankClips({
-              windowSize: chunk.clips.length,
+              windowSize: chunk.length,
               numToDiscard:
-                chunk.type === "same-video" &&
-                chunk.clips.length > maxClipsPerVideo
-                  ? chunk.clips.length - maxClipsPerVideo
-                  : Math.floor(chunk.clips.length * ratioToDiscard),
+                chunk.every((clip) => clip.videoId === chunk[0]?.videoId) &&
+                chunk.length > maxClipsPerVideo
+                  ? chunk.length - maxClipsPerVideo
+                  : Math.floor(chunk.length * ratioToDiscard),
             }).execute({
               enableOpenPipeLogging: args.enableLogging,
+              openPipeRequestTags: createRequestTags(args),
               user: args.user,
               tweets: args.tweets,
-              clips: chunk.clips,
+              clips: chunk,
             });
             return orderedClips;
           }),

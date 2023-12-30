@@ -19,7 +19,10 @@ import { openpipe } from "../../../openpipe/openpipe";
 import { Tweet } from "../../../twitter/schemas";
 import { TranscriptClip } from "./helpers/transcriptClip";
 import { searchAndChunk } from "../../dialogs/searchAndChunk";
-import { RequestTagsLatest } from "../../../openpipe/requestTags";
+import {
+  RequestTagsLatest,
+  RequestTagsWithoutName,
+} from "../../../openpipe/requestTags";
 
 export const RECOMMEND_CLIPS = "Recommend Clips";
 
@@ -46,7 +49,7 @@ export class RecommendClipsPrompt extends Prompt<
 
   async execute(args: {
     enableOpenPipeLogging?: boolean;
-    openPipeRequestTags?: RequestTagsLatest;
+    openPipeRequestTags?: RequestTagsWithoutName;
     user: string;
     tweets: Tweet[];
     transcript: TranscriptCue[];

@@ -1,55 +1,51 @@
-import { chunk, groupBy, shuffle } from "remeda";
+import { groupBy, shuffle } from "remeda";
+import { tokenize } from "../../tokenize";
 
-type Chunk<T extends { videoId: string }> = {
-  type: "same-video" | "mix";
-  clips: T[];
+type Clip = {
+  videoId: string;
+  text: string;
 };
 
-export function chunkClipArray<T extends { videoId: string }>(args: {
+async function chunkWithMaxTokens<T extends Clip>(args: {
   clips: T[];
-  windowSize: number;
+  maxTokensPerChunk: number;
+  shuffle?: boolean;
+}): Promise<T[][]> {
+  const chunks: T[][] = [];
+  let currentChunk: T[] = [];
+  let currentChunkTokens = 0;
+
+  for (const clip of args.clips) {
+    const clipTokens = (await tokenize(clip.text)).length;
+    if (currentChunkTokens + clipTokens > args.maxTokensPerChunk) {
+      chunks.push(currentChunk);
+      currentChunk = [];
+      currentChunkTokens = 0;
+    }
+    currentChunk.push(clip);
+    currentChunkTokens += clipTokens;
+  }
+  if (currentChunk.length > 0) {
+    chunks.push(currentChunk);
+  }
+  return chunks.map((chunk) => (args.shuffle ? shuffle(chunk) : chunk));
+}
+
+/**
+ * Create arrays of clips.
+ * Clip arrays are grouped by videoId if possible.
+ * Each clip array has a maximum number of tokens.
+ */
+export async function chunkClipArray<T extends Clip>(args: {
+  clips: T[];
+  maxTokensPerChunk: number;
   shuffle?: boolean;
 }) {
-  const chunks: Chunk<T>[] = Object.values(
-    groupBy(args.clips, (clip) => clip.videoId)
-  )
+  let xs = Object.values(groupBy(args.clips, (clip) => clip.videoId))
     .filter((clips) => clips.length > 1)
-    .flatMap((clips) => {
-      // Handle case where there one video has more than windowSize clips
-      if (clips.length > args.windowSize) {
-        // take the max number of chunks, leave the rest
-        const discardLast = clips.length % args.windowSize !== 0;
-        const numChunks = Math.floor(clips.length / args.windowSize);
-        const chunks = chunk(
-          args.shuffle ? shuffle(clips) : clips,
-          args.windowSize
-        );
-        return chunks
-          .slice(0, discardLast ? numChunks : numChunks - 1)
-          .map((clips) => ({
-            type: "same-video",
-            clips,
-          }));
-      } else {
-        return {
-          type: "same-video",
-          clips: args.shuffle ? shuffle(clips) : clips,
-        };
-      }
-    });
-
-  const remainingClips = args.clips.filter(
-    (clip) => !chunks.some((chunk) => chunk.clips.includes(clip))
+    .flat();
+  xs = xs.concat(
+    ...args.clips.filter((clip) => !xs.some((x) => x.videoId === clip.videoId))
   );
-
-  const chunkedRemainingClips = chunk(
-    args.shuffle ? shuffle(remainingClips) : remainingClips,
-    args.windowSize
-  );
-  return chunks.concat(
-    chunkedRemainingClips.map((clips) => ({
-      type: "mix",
-      clips,
-    }))
-  );
+  return await chunkWithMaxTokens({ ...args, clips: xs });
 }

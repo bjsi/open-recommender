@@ -12,7 +12,8 @@ import _, { uniq } from "remeda";
 import { TranscriptClip } from "../recommendClips/helpers/transcriptClip";
 import { searchChunkAndRank } from "../../dialogs/searchAndChunk";
 import { advancedRagDataset } from "./datasets/advancedRagDataset";
-import { RequestTagsLatest } from "../../../openpipe/requestTags";
+import { RequestTagsWithoutName } from "../../../openpipe/requestTags";
+import { transcriptClipsToString } from "./helpers/transcriptClipsToString";
 
 export const RERANK_CLIPS = "Rerank Clips";
 
@@ -47,19 +48,12 @@ export class RerankClips extends Prompt<
     tweets: Tweet[];
     clips: TranscriptClip[];
     enableOpenPipeLogging?: boolean;
-    openPipeRequestTags?: RequestTagsLatest;
+    openPipeRequestTags?: RequestTagsWithoutName;
   }) {
     const callApi = async (windowClips: TranscriptClip[]) => {
       const promptVariables: RerankClipsInput = {
         tweets: tweetsToString({ tweets: args.tweets, user: args.user }),
-        clips: windowClips
-          .map((clip, i) =>
-            `
-ID: ${i}
-${clip.text}
-`.trim()
-          )
-          .join("\n---\n"),
+        clips: transcriptClipsToString(windowClips),
       };
       const { orderedClipIds } = await openpipe.functionCall({
         function: {

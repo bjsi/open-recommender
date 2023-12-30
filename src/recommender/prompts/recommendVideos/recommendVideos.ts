@@ -15,7 +15,10 @@ import {
   elonAndRemNote,
   elonAndRemNoteSearchResults,
 } from "./datasets/elonAndRemNote";
-import { RequestTagsLatest } from "../../../openpipe/requestTags";
+import {
+  RequestTagsLatest,
+  RequestTagsWithoutName,
+} from "../../../openpipe/requestTags";
 
 export const RECOMMEND_VIDEOS = "Recommend Videos";
 
@@ -42,7 +45,7 @@ export class RecommendVideos extends Prompt<
     results: SearchResult[];
     query: string;
     enableOpenPipeLogging?: boolean;
-    openPipeRequestTags?: RequestTagsLatest;
+    openPipeRequestTags?: RequestTagsWithoutName;
   }) {
     const promptVariables: RecommendVideosInput = {
       query: args.query,

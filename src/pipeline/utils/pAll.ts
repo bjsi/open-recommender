@@ -42,6 +42,7 @@ export function pAll<T>(
           return; // no op!
         }
         rejected = true;
+        console.log(e);
         reject(e);
         return;
       });
