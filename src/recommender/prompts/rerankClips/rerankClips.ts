@@ -55,6 +55,7 @@ export class RerankClips extends Prompt<
         tweets: tweetsToString({ tweets: args.tweets, user: args.user }),
         clips: transcriptClipsToString(windowClips),
       };
+      const candidatePrompt = this.chooseCandidatePrompt(promptVariables);
       const { orderedClipIds } = await openpipe.functionCall({
         function: {
           name: this.name,
@@ -70,7 +71,7 @@ export class RerankClips extends Prompt<
           model: this.model,
         },
         openPipeRequestTags: args.openPipeRequestTags
-          ? { ...args.openPipeRequestTags, promptName: this.name }
+          ? { ...args.openPipeRequestTags, promptName: candidatePrompt.name }
           : undefined,
         enableOpenPipeLogging: args.enableOpenPipeLogging,
       });

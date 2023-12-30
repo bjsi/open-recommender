@@ -14,6 +14,7 @@ import { corbttTweetsDataset } from "./datasets/corbttTweetsDataset";
 import {
   RequestTagsLatest,
   RequestTagsWithoutName,
+  formatPromptName,
 } from "../../../openpipe/requestTags";
 
 export const CREATE_YOUTUBE_SEARCH_QUERIES = "Create Queries";
@@ -56,7 +57,7 @@ export class CreateYouTubeSearchQueries extends Prompt<
       user: args.user,
       tweets: tweetsToString({ tweets: args.tweets, user: args.user }),
     };
-    const prompt = this.chooseCandidatePrompt(promptVariables);
+    const candidatePrompt = this.chooseCandidatePrompt(promptVariables);
     return await openpipe.functionCall({
       function: {
         name: this.name,
@@ -65,7 +66,7 @@ export class CreateYouTubeSearchQueries extends Prompt<
         output: this.output!,
       },
       vars: promptVariables,
-      prompt,
+      prompt: candidatePrompt,
       body: {
         max_tokens: this.max_tokens,
         temperature: this.temperature,
@@ -73,7 +74,10 @@ export class CreateYouTubeSearchQueries extends Prompt<
         stream: false,
       },
       openPipeRequestTags: args.openPipeRequestTags
-        ? { ...args.openPipeRequestTags, promptName: this.name }
+        ? {
+            ...args.openPipeRequestTags,
+            promptName: formatPromptName(this.name, candidatePrompt.name),
+          }
         : undefined,
       enableOpenPipeLogging: args.enableOpenPipeLogging,
     });

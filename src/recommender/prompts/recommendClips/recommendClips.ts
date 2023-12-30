@@ -75,6 +75,8 @@ ${cue.text}
         transcript: part,
         title: args.title,
       };
+
+      const candidatePrompt = this.chooseCandidatePrompt(promptVariables);
       const { clips } = await openpipe.functionCall({
         function: {
           name: this.name,
@@ -83,14 +85,14 @@ ${cue.text}
           output: this.output!,
         },
         vars: promptVariables,
-        prompt: this.prompts[0],
+        prompt: candidatePrompt,
         body: {
           max_tokens: this.max_tokens,
           temperature: this.temperature,
           model: this.model,
         },
         openPipeRequestTags: args.openPipeRequestTags
-          ? { ...args.openPipeRequestTags, promptName: this.name }
+          ? { ...args.openPipeRequestTags, promptName: candidatePrompt.name }
           : undefined,
         enableOpenPipeLogging: args.enableOpenPipeLogging,
       });

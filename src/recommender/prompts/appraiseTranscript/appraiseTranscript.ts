@@ -14,8 +14,8 @@ import {
 } from "../../../youtube/transcript";
 import { openpipe } from "../../../openpipe/openpipe";
 import {
-  RequestTagsAlpha,
   RequestTagsLatest,
+  formatPromptName,
 } from "../../../openpipe/requestTags";
 
 export const APPRAISE_TRANSCRIPT = "Appraise Transcript";
@@ -52,6 +52,7 @@ class AppraiseTranscriptPrompt extends Prompt<
       transcript,
       videoTitle: args.title,
     };
+    const candidatePrompt = this.chooseCandidatePrompt(promptVariables);
     return await openpipe.functionCall({
       function: {
         input: this.input!,
@@ -60,7 +61,7 @@ class AppraiseTranscriptPrompt extends Prompt<
         description: this.description,
       },
       vars: promptVariables,
-      prompt: this.prompts[0],
+      prompt: candidatePrompt,
       body: {
         max_tokens: this.max_tokens,
         temperature: this.temperature,
@@ -69,7 +70,7 @@ class AppraiseTranscriptPrompt extends Prompt<
       openPipeRequestTags: args.openPipeRequestTags
         ? {
             ...args.openPipeRequestTags,
-            promptName: this.name,
+            promptName: formatPromptName(this.name, candidatePrompt.name),
           }
         : undefined,
       enableOpenPipeLogging: args.enableOpenPipeLogging,

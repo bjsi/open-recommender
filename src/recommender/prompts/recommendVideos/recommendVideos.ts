@@ -18,6 +18,7 @@ import {
 import {
   RequestTagsLatest,
   RequestTagsWithoutName,
+  formatPromptName,
 } from "../../../openpipe/requestTags";
 
 export const RECOMMEND_VIDEOS = "Recommend Videos";
@@ -52,8 +53,9 @@ export class RecommendVideos extends Prompt<
       results: searchResultsToString(args.results),
       tweets: tweetsToString({ tweets: args.tweets, user: args.user }),
     };
+    const candidatePrompt = this.prompts[0];
     const { recommendedVideos } = await openpipe.functionCall({
-      prompt: this.prompts[0],
+      prompt: candidatePrompt,
       function: {
         name: this.name,
         description: this.description,
@@ -67,7 +69,10 @@ export class RecommendVideos extends Prompt<
         model: this.model,
       },
       openPipeRequestTags: args.openPipeRequestTags
-        ? { ...args.openPipeRequestTags, promptName: this.name }
+        ? {
+            ...args.openPipeRequestTags,
+            promptName: formatPromptName(this.name, candidatePrompt.name),
+          }
         : undefined,
       enableOpenPipeLogging: args.enableOpenPipeLogging,
     });

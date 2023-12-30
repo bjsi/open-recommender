@@ -12,6 +12,10 @@ export type RequestTagsLatest = RequestTagsAlpha;
 
 export type RequestTagsWithoutName = Omit<RequestTagsLatest, "promptName">;
 
+export const formatPromptName = (promptName: string, candidateName: string) => {
+  return promptName + " - " + candidateName;
+};
+
 export const createRequestTags = (args: {
   runId: string;
   user: string;
