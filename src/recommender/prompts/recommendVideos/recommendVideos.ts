@@ -16,7 +16,6 @@ import {
   elonAndRemNoteSearchResults,
 } from "./datasets/elonAndRemNote";
 import {
-  RequestTagsLatest,
   RequestTagsWithoutName,
   formatPromptName,
 } from "../../../openpipe/requestTags";

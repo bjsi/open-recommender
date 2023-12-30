@@ -12,7 +12,6 @@ import { openpipe } from "../../../openpipe/openpipe";
 import { experilearningTweetsDataset } from "./datasets/experilearningTweetsDataset";
 import { corbttTweetsDataset } from "./datasets/corbttTweetsDataset";
 import {
-  RequestTagsLatest,
   RequestTagsWithoutName,
   formatPromptName,
 } from "../../../openpipe/requestTags";
@@ -39,13 +38,6 @@ export class CreateYouTubeSearchQueries extends Prompt<
       exampleData: [],
     });
   }
-  override chooseCandidatePrompt = (vars: Partial<CreateQueriesInput>) => {
-    if (vars.user === "experilearning") {
-      return withKyleExamplePrompt;
-    } else {
-      return withJamesExamplePrompt;
-    }
-  };
 
   async execute(args: {
     user: string;
@@ -102,15 +94,3 @@ export const createYouTubeSearchQueries = () =>
         tweets: corbttTweetsDataset.tweets.value,
       },
     });
-
-if (require.main === module) {
-  createYouTubeSearchQueries()
-    .run({
-      promptVariables: {
-        user: experilearningTweetsDataset.user.value,
-        tweets: experilearningTweetsDataset.tweets.value,
-      },
-      stream: false,
-    })
-    .then(console.log);
-}
