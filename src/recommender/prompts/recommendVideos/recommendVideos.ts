@@ -19,6 +19,7 @@ import {
   RequestTagsWithoutName,
   formatPromptName,
 } from "../../../openpipe/requestTags";
+import { sortBy } from "remeda";
 
 export const RECOMMEND_VIDEOS = "Recommend Videos";
 
@@ -53,7 +54,7 @@ export class RecommendVideos extends Prompt<
       tweets: tweetsToString({ tweets: args.tweets, user: args.user }),
     };
     const candidatePrompt = this.prompts[0];
-    const { recommendedVideos } = await openpipe.functionCall({
+    const res = await openpipe.functionCall({
       prompt: candidatePrompt,
       function: {
         name: this.name,
@@ -75,12 +76,13 @@ export class RecommendVideos extends Prompt<
         : undefined,
       enableOpenPipeLogging: args.enableOpenPipeLogging,
     });
-    return _.sortBy(recommendedVideos, [(x) => x.relevance, "desc"]).map(
-      ({ id, relevance }) => ({
-        result: args.results[id],
-        relevance,
-      })
-    );
+    return sortBy(res?.recommendedVideos || [], [
+      (x) => x.relevance,
+      "desc",
+    ]).map(({ id, relevance }) => ({
+      result: args.results[id],
+      relevance,
+    }));
   }
 }
 

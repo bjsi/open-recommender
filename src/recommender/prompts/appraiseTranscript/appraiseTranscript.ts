@@ -53,7 +53,7 @@ class AppraiseTranscriptPrompt extends Prompt<
       videoTitle: args.title,
     };
     const candidatePrompt = this.chooseCandidatePrompt(promptVariables);
-    return await openpipe.functionCall({
+    const res = await openpipe.functionCall({
       function: {
         input: this.input!,
         output: this.output!,
@@ -75,6 +75,13 @@ class AppraiseTranscriptPrompt extends Prompt<
         : undefined,
       enableOpenPipeLogging: args.enableOpenPipeLogging,
     });
+    return (
+      res || {
+        recommend: false,
+
+        reason: "No response from OpenAI",
+      }
+    );
   }
 }
 

@@ -50,7 +50,7 @@ export class CreateYouTubeSearchQueries extends Prompt<
       tweets: tweetsToString({ tweets: args.tweets, user: args.user }),
     };
     const candidatePrompt = this.chooseCandidatePrompt(promptVariables);
-    return await openpipe.functionCall({
+    const res = await openpipe.functionCall({
       function: {
         name: this.name,
         description: this.description,
@@ -73,6 +73,7 @@ export class CreateYouTubeSearchQueries extends Prompt<
         : undefined,
       enableOpenPipeLogging: args.enableOpenPipeLogging,
     });
+    return res || { queries: [] };
   }
 }
 

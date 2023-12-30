@@ -46,36 +46,44 @@ export const openpipe = {
     const messages = args.prompt
       .withVariables((validArgs || {}) as Input)
       .compile();
-    const response = await client.chat.completions.create({
-      messages:
-        typeof messages === "string"
-          ? [ChatMessage.system(messages)]
-          : messages,
-      functions: [
-        {
+    try {
+      const response = await client.chat.completions.create({
+        messages:
+          typeof messages === "string"
+            ? [ChatMessage.system(messages)]
+            : messages,
+        functions: [
+          {
+            name: toCamelCase(args.function.name),
+            description: args.function.description,
+            parameters: zodToJsonSchema(args.function.output),
+          },
+        ],
+        function_call: {
           name: toCamelCase(args.function.name),
-          description: args.function.description,
-          parameters: zodToJsonSchema(args.function.output),
         },
-      ],
-      function_call: {
-        name: toCamelCase(args.function.name),
-      },
-      ...args.body,
-      openpipe: {
-        // Optional tags (often used for prompt names, external foreign keys, flow ids etc.)
-        // Helps you filter down your fine tuning dataset
-        // see the section on tags here for more info: https://docs.openpipe.ai/getting-started/openpipe-sdk
-        tags: { ...args.openPipeRequestTags },
-        // Enable/disable data collection
-        logRequest: !!args.enableOpenPipeLogging,
-      },
-    });
-    if (args.verbose) {
-      console.log(JSON.stringify(response, null, 2));
+        ...args.body,
+        openpipe: {
+          // Optional tags (often used for prompt names, external foreign keys, flow ids etc.)
+          // Helps you filter down your fine tuning dataset
+          // see the section on tags here for more info: https://docs.openpipe.ai/getting-started/openpipe-sdk
+          tags: { ...args.openPipeRequestTags },
+          // Enable/disable data collection
+          logRequest: !!args.enableOpenPipeLogging,
+        },
+      });
+      if (args.verbose) {
+        console.log(JSON.stringify(response, null, 2));
+      }
+      const valueText = response.choices[0]!.message.function_call!.arguments;
+      const json = JSON.parse(valueText);
+      return args.function.output?.parse?.(json);
+    } catch (e) {
+      console.log("Error in openpipe.functionCall");
+      console.log(e);
+      console.log("args", JSON.stringify(args, null, 2));
+      console.log("response", JSON.stringify(e, null, 2));
     }
-    const valueText = response.choices[0]!.message.function_call!.arguments;
-    const json = JSON.parse(valueText);
-    return args.function.output?.parse?.(json);
+    return undefined;
   },
 };

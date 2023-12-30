@@ -19,10 +19,7 @@ import { openpipe } from "../../../openpipe/openpipe";
 import { Tweet } from "../../../twitter/schemas";
 import { TranscriptClip } from "./helpers/transcriptClip";
 import { searchAndChunk } from "../../dialogs/searchAndChunk";
-import {
-  RequestTagsLatest,
-  RequestTagsWithoutName,
-} from "../../../openpipe/requestTags";
+import { RequestTagsWithoutName } from "../../../openpipe/requestTags";
 
 export const RECOMMEND_CLIPS = "Recommend Clips";
 
@@ -44,6 +41,7 @@ export class RecommendClipsPrompt extends Prompt<
       input: recommendClipsInputSchema,
       output: recommendClipsOutputSchema,
       exampleData: [],
+      max_tokens: 1024,
     });
   }
 
@@ -77,7 +75,7 @@ ${cue.text}
       };
 
       const candidatePrompt = this.chooseCandidatePrompt(promptVariables);
-      const { clips } = await openpipe.functionCall({
+      const res = await openpipe.functionCall({
         function: {
           name: this.name,
           description: this.description,
@@ -96,7 +94,7 @@ ${cue.text}
           : undefined,
         enableOpenPipeLogging: args.enableOpenPipeLogging,
       });
-      for (const clip of clips || []) {
+      for (const clip of res?.clips || []) {
         const cues = args.transcript.slice(clip.startId, clip.endId + 1);
         chunks.push({
           title: clip.title,

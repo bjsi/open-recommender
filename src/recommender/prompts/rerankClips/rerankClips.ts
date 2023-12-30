@@ -56,7 +56,7 @@ export class RerankClips extends Prompt<
         clips: transcriptClipsToString(windowClips),
       };
       const candidatePrompt = this.chooseCandidatePrompt(promptVariables);
-      const { orderedClipIds } = await openpipe.functionCall({
+      const res = await openpipe.functionCall({
         function: {
           name: this.name,
           description: this.description,
@@ -75,7 +75,7 @@ export class RerankClips extends Prompt<
           : undefined,
         enableOpenPipeLogging: args.enableOpenPipeLogging,
       });
-      return orderedClipIds.map((id) => windowClips[id]);
+      return (res?.orderedClipIds || []).map((id) => windowClips[id]);
     };
 
     if (args.clips.length === 0) {
