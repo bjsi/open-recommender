@@ -438,6 +438,8 @@ export const rankClips = {
     // TODO: don't hardcode
     const maxTokens =
       8192 -
+      // TODO: fix root err here
+      200 -
       (
         await rerankClips().calculateCost({
           clips: "",
