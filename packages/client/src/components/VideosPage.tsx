@@ -1,5 +1,5 @@
 import React from "react";
-import { userClipsMap } from "../data/testData";
+import { userClipsMap } from "./testData";
 import { Video } from "./Video";
 import { useParams } from "react-router-dom";
 

@@ -1,5 +1,5 @@
 import React from "react";
-import { userClipsMap } from "../data/testData";
+import { userClipsMap } from "./testData";
 import { Link } from "react-router-dom";
 
 export function Homepage() {

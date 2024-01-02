@@ -5,7 +5,7 @@ import ThumbUpIcon from "@mui/icons-material/ThumbUp";
 import ThumbDownIcon from "@mui/icons-material/ThumbDown";
 import NearMeIcon from "@mui/icons-material/NearMe";
 import ReactPlayer from "react-player";
-import { IVideo } from "../data/testData";
+import { IVideo } from "./testData";
 
 interface VideoProps {
   setVideoRef: (ref: HTMLDivElement) => void;
