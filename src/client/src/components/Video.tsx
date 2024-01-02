@@ -1,11 +1,11 @@
 import React, { useRef, useState } from "react";
 import "./Video.css";
-import { IVideo } from "../App";
 import { Avatar } from "@mui/material";
 import ThumbUpIcon from "@mui/icons-material/ThumbUp";
 import ThumbDownIcon from "@mui/icons-material/ThumbDown";
 import NearMeIcon from "@mui/icons-material/NearMe";
 import ReactPlayer from "react-player";
+import { IVideo } from "../data/testData";
 
 interface VideoProps {
   setVideoRef: (ref: HTMLDivElement) => void;
@@ -21,7 +21,7 @@ export function Video(props: VideoProps) {
     if (props.inView) {
       console.log("in view");
       setPlaying(true);
-      const startSeconds = props.video.videoUrl.match(/t=(\d+)/)?.[1];
+      const startSeconds = props.video.url.match(/t=(\d+)/)?.[1];
       if (startSeconds) {
         playerRef.current?.seekTo(parseInt(startSeconds) - 2);
       }
@@ -43,7 +43,7 @@ export function Video(props: VideoProps) {
             controls
             playing={playing}
             ref={playerRef}
-            url={props.video.videoUrl}
+            url={props.video.url}
           />
         </div>
       ) : (
