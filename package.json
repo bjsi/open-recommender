@@ -1,5 +1,9 @@
 {
   "license": "MIT",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
   "dependencies": {
     "better-sqlite3": "^9.1.1",
     "chalk": "^4.1.2",
@@ -31,7 +35,8 @@
     "yt:clips": "npx tsx ./src/recommender/chunkTranscript.ts",
     "twitter:context": "npx ts-node -T ./src/twitter/getUserContext.ts",
     "main": "npx ts-node -T ./src/pipeline/main.ts",
-    "test": "jest"
+    "test": "jest",
+    "client": "yarn workspace client dev"
   },
   "devDependencies": {
     "@deepkit/type-compiler": "^1.0.1-alpha.108",

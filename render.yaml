@@ -1,0 +1,22 @@
+services:
+  # Static site service for the client
+  - type: web
+    name: open-recommender-ui
+    env: static
+    buildCommand: cd packages/client && yarn && yarn build
+    staticPublishPath: ./packages/client/dist
+    branch: main
+
+  # # Web service for the server
+  # - type: web
+  #   plan: free
+  #   name: chat-with-popper-api
+  #   env: docker
+  #   dockerfilePath: ./packages/ui/server/Dockerfile
+  #   dockerContext: ./
+  #   branch: main
+  #   envVars:
+  #     - key: NODE_VERSION
+  #       value: 18.18.0
+  #     - key: SKIP_INSTALL_DEPS
+  #       value: true
