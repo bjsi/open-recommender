@@ -6,6 +6,9 @@ services:
     buildCommand: cd packages/client && yarn && yarn build
     staticPublishPath: ./packages/client/dist
     branch: main
+    envVars:
+      - key: SKIP_INSTALL_DEPS
+        value: true
 
   # # Web service for the server
   # - type: web
