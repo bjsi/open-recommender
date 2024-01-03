@@ -3,9 +3,9 @@ import "./Video.css";
 import { Avatar } from "@mui/material";
 import ThumbUpIcon from "@mui/icons-material/ThumbUp";
 import ThumbDownIcon from "@mui/icons-material/ThumbDown";
-import NearMeIcon from "@mui/icons-material/NearMe";
 import ReactPlayer from "react-player";
 import { IVideo } from "./testData";
+import { ShareClipButton } from "./ShareClipButton";
 
 interface VideoProps {
   setVideoRef: (ref: HTMLDivElement) => void;
@@ -16,23 +16,23 @@ interface VideoProps {
 export function Video(props: VideoProps) {
   const playerRef = useRef<ReactPlayer>(null);
   const [playing, setPlaying] = useState(false);
+  const [liked, setLiked] = useState<-1 | 0 | 1>(0);
+  const [notes, setNotes] = useState<string>("");
 
   React.useEffect(() => {
     if (props.inView) {
-      console.log("in view");
       setPlaying(true);
       const startSeconds = props.video.url.match(/t=(\d+)/)?.[1];
       if (startSeconds) {
         playerRef.current?.seekTo(parseInt(startSeconds) - 2);
       }
     } else {
-      console.log("out of view");
       setPlaying(false);
     }
   }, [props.inView]);
 
   return (
-    <div className="video">
+    <div className="video h-[100%]">
       {props.inView ? (
         <div className="player-wrapper">
           <ReactPlayer
@@ -61,32 +61,51 @@ export function Video(props: VideoProps) {
           loading...
         </div>
       )}
+      <div className="w-[100%] p-4">
+        <textarea
+          title="notes"
+          className="w-[100%] box-border p-2"
+          placeholder="notes..."
+          value={notes}
+          onChange={(e) => {
+            setNotes(e.target.value);
+          }}
+        />
+      </div>
       <div className="shortsContainer">
-        <div className="shortsVideoSideIcons">
-          <div className="shortsVideoSideIcon">
-            <ThumbUpIcon />
-            <p>0</p>
-          </div>
-          <div className="shortsVideoSideIcon">
-            <ThumbDownIcon />
-            <p>0</p>
-          </div>
-          <div className="shortsVideoSideIcon">
-            <NearMeIcon />
-            <p></p>
-          </div>
-        </div>
-        <div ref={props.setVideoRef} className="shortsBottom">
-          <div className="shortsDesc">
-            <p className="description">{props.video.summary}</p>
-          </div>
-          <div className="shortDetails">
-            <Avatar
-              src={
-                "https://lh3.googleusercontent.com/ogw/ADGmqu8BCzU8GejYorGqXeu98A1kfEFYKFT85I3_9KJBzfw=s32-c-mo"
-              }
-            />
-            <p>{props.video.title}</p>
+        <div
+          ref={props.setVideoRef}
+          className="flex flex-row items-center shortsBottom"
+        >
+          <div>
+            <div className="flex flex-row items-center gap-2 px-2 shortsDesc">
+              <p className="text-xs sm:text-base description">
+                {props.video.summary}
+              </p>
+              <div className="flex flex-col items-center gap-4">
+                <ThumbUpIcon
+                  onClick={() => setLiked(liked === 1 ? 0 : 1)}
+                  fontSize="small"
+                  color={liked === 1 ? "primary" : undefined}
+                />
+                <ThumbDownIcon
+                  onClick={() => {
+                    setLiked(liked === -1 ? 0 : -1);
+                  }}
+                  fontSize="small"
+                  color={liked === -1 ? "primary" : undefined}
+                />
+                <ShareClipButton clip={props.video} notes={notes} />
+              </div>
+            </div>
+            <div className="shortDetails">
+              <Avatar
+                src={
+                  "https://lh3.googleusercontent.com/ogw/ADGmqu8BCzU8GejYorGqXeu98A1kfEFYKFT85I3_9KJBzfw=s32-c-mo"
+                }
+              />
+              <p>{props.video.title}</p>
+            </div>
           </div>
         </div>
       </div>

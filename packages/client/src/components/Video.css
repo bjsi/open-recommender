@@ -1,6 +1,5 @@
 .video {
   position: relative;
-  width: 700px;
   height: 90vh;
   scroll-snap-align: start;
   border-radius: 20px;

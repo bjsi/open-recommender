@@ -22,6 +22,7 @@ export function VideosPage() {
       setTimeout(() => {
         videoRefs.current.forEach((videoRef, index) => {
           const top = videoRef.getBoundingClientRect().top;
+          console.log(top, window.innerHeight);
           if (top > 0 && top < window.innerHeight) {
             console.log(index, top, window.innerHeight);
             setInViewIndex(index);
@@ -57,7 +58,7 @@ export function VideosPage() {
 
   return (
     <div className="app">
-      <div ref={appVideosRef} className="app__videos">
+      <div ref={appVideosRef} className="app__videos xl:max-w-[1200px]">
         {clips.map((vid, i) => (
           <Video
             setVideoRef={handleVideoRef(i)}
