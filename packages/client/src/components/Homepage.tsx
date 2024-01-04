@@ -39,7 +39,7 @@ export function Homepage() {
       <p></p>
       <p>Changelog</p>
       <ul className="list-disc list-inside">
-        <li>2024-01-02: Create UI v1</li>
+        <li>2024-01-04: Fix clip seeking bug.</li>
         <li>
           2024-01-03: Add{" "}
           <ShareClipOnboardingModal shouldOpen>
@@ -49,6 +49,7 @@ export function Homepage() {
             .
           </ShareClipOnboardingModal>
         </li>
+        <li>2024-01-02: Create UI v1</li>
       </ul>
       <br></br>
       <p>Users:</p>

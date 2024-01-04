@@ -18,18 +18,25 @@ export function Video(props: VideoProps) {
   const [playing, setPlaying] = useState(false);
   const [liked, setLiked] = useState<-1 | 0 | 1>(0);
   const [notes, setNotes] = useState<string>("");
+  const [isReady, setIsReady] = React.useState(false);
 
-  React.useEffect(() => {
-    if (props.inView) {
-      setPlaying(true);
-      const startSeconds = props.video.url.match(/t=(\d+)/)?.[1];
-      if (startSeconds) {
-        playerRef.current?.seekTo(parseInt(startSeconds) - 2);
-      }
-    } else {
-      setPlaying(false);
+  const seekToStart = () => {
+    const startSeconds = props.video.url.match(/t=(\d+)/)?.[1];
+    if (startSeconds) {
+      console.log("seeking to", startSeconds);
+      playerRef.current?.seekTo(parseInt(startSeconds) - 2);
     }
-  }, [props.inView]);
+  };
+
+  const onReady = React.useCallback(() => {
+    if (!isReady) {
+      seekToStart();
+      setIsReady(true);
+      setPlaying(true);
+    }
+  }, [isReady, props.inView]);
+
+  const isInitialPlay = React.useRef(true);
 
   return (
     <div className="video h-[100%]">
@@ -44,6 +51,14 @@ export function Video(props: VideoProps) {
             playing={playing}
             ref={playerRef}
             url={props.video.url}
+            onReady={onReady}
+            onPlay={() => {
+              // hack to get around YouTube's last play position memory
+              if (isInitialPlay.current) {
+                isInitialPlay.current = false;
+                seekToStart();
+              }
+            }}
           />
         </div>
       ) : (
