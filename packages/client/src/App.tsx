@@ -1,6 +1,6 @@
 import React from "react";
 import "./App.css";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Routes, Route, HashRouter } from "react-router-dom";
 import { Layout } from "./components/Layout";
 import { VideosPage } from "./components/VideosPage";
 import { Homepage } from "./components/Homepage";
@@ -8,7 +8,7 @@ import { NoPage } from "./components/NoPage";
 
 function App() {
   return (
-    <BrowserRouter>
+    <HashRouter>
       <Routes>
         <Route path="/" element={<Layout />}>
           <Route index element={<Homepage />} />
@@ -16,7 +16,7 @@ function App() {
           <Route path="*" element={<NoPage />} />
         </Route>
       </Routes>
-    </BrowserRouter>
+    </HashRouter>
   );
 }
 
