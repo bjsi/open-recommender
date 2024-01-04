@@ -5,6 +5,44 @@ export interface IVideo {
 }
 
 export const userClipsMap: Record<string, IVideo[]> = {
+  tnewbold: [
+    {
+      title: "Impact of AI on Art and the Artist's Process",
+      summary:
+        "Given your interest in AI-generated artwork, as seen from your tweets, you might appreciate this clip. It discusses the influence of AI art on the artist's style and approach.",
+      url: "https://www.youtube.com/watch?v=bS8t-D1QsMM&t=146s",
+    },
+    {
+      title: "AI Chef in Action",
+      summary:
+        "You've shown interest in AI and its application in the culinary field. This clip shows how AI was used to generate a recipe and prepare a dish, aligning with your interest in AI-powered cooking innovations.",
+      url: "https://www.youtube.com/watch?v=GyEHRXA_aA4&t=0s",
+    },
+    {
+      title: "Density Atlas Explained",
+      summary:
+        "Your interest in the Density.io Atlas upgrade, especially its new features and functionality is directly addressed in this clip where Emri explains the specifics about the new system.",
+      url: "https://www.youtube.com/watch?v=nSxyTzSKIgE&t=0s",
+    },
+    {
+      title: "Creating AI Art with Midjourney",
+      summary:
+        "Based on your interest in AI art and the Midjourney art generator as demonstrated in your retweet, this clip provides a step-by-step guide on how to use Midjourney to generate your own AI-based works.",
+      url: "https://www.youtube.com/watch?v=zf4z8A-OWBY&t=0s",
+    },
+    {
+      title: "Explanation of the XRP Lawsuit",
+      summary:
+        "This clip provides an overview of the XRP lawsuit, which is a topic you engaged with on Twitter. It breaks down the core issues of the lawsuit and the position of Ripple, the company implicated in the case.",
+      url: "https://www.youtube.com/watch?v=I-PlQzZoIVU&t=0s",
+    },
+    {
+      title: "Influence of AI on the Artistic Process",
+      summary:
+        "Considering your shared interest in AI Art as observed from your tweets and retweets, you will find this artist's reflection on how AI has influenced their creative process interesting.",
+      url: "https://www.youtube.com/watch?v=bS8t-D1QsMM&t=1021s",
+    },
+  ],
   StephenAPWales: [
     {
       title: "The Observable Universe and Beyond",
