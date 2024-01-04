@@ -19,7 +19,10 @@ import { openpipe } from "../../../openpipe/openpipe";
 import { Tweet } from "../../../twitter/schemas";
 import { TranscriptClip } from "./helpers/transcriptClip";
 import { searchAndChunk } from "../../dialogs/searchAndChunk";
-import { RequestTagsWithoutName } from "../../../openpipe/requestTags";
+import {
+  RequestTagsWithoutName,
+  formatPromptName,
+} from "../../../openpipe/requestTags";
 
 export const RECOMMEND_CLIPS = "Recommend Clips";
 
@@ -89,7 +92,10 @@ ${cue.text}
           model: this.model,
         },
         openPipeRequestTags: args.openPipeRequestTags
-          ? { ...args.openPipeRequestTags, promptName: candidatePrompt.name }
+          ? {
+              ...args.openPipeRequestTags,
+              promptName: formatPromptName(this.name, candidatePrompt.name),
+            }
           : undefined,
         enableOpenPipeLogging: args.enableOpenPipeLogging,
       });
