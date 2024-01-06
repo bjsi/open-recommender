@@ -10,6 +10,12 @@
     },
     {
       "path": "./packages/client"
+    },
+    {
+      "path": "./packages/server"
+    },
+    {
+      "path": "./packages/recommender"
     }
   ]
 }
