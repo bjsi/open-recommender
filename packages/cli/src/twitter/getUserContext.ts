@@ -4,7 +4,7 @@
  * TODO: bios of recent follows?
  */
 
-import { readFileSync } from "fs";
+import { readFileSync, writeFileSync } from "fs";
 import { TweetSchema, Tweet, UserSchema } from "./schemas";
 import path from "path";
 import { TwitterAPI, initTwitterAPI } from "./twitterAPI";
@@ -241,14 +241,17 @@ if (require.main === module) {
       console.log("No tweets found");
       return;
     }
-    // writeFileSync(
-    //   path.join(__dirname, `${user}ExampleTweets.json`),
-    //   JSON.stringify(tweets, null, 2)
-    // );
+
+    writeFileSync(
+      path.join(
+        __dirname,
+        `${user}ExampleTweets-${new Date().toISOString()}.json`
+      ),
+      JSON.stringify(tweets, null, 2)
+    );
 
     console.log(tweets);
     const str = tweetsToString({ tweets, user });
     console.log(str);
-    // console.log("Profile: ", profile);
   })();
 }

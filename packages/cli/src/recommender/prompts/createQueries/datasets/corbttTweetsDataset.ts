@@ -1,13 +1,11 @@
 import { ExampleDataSet } from "prompt-iteration-assistant";
-import { createQueriesInputSchema } from "../schemas/createQueriesInputSchema";
+import { CreateQueriesInput } from "../schemas/createQueriesInputSchema";
 import {
   loadExampleTweetHistory,
   tweetsToString,
 } from "../../../../twitter/getUserContext";
 
-export const corbttTweetsDataset: ExampleDataSet<
-  typeof createQueriesInputSchema
-> = {
+export const corbttTweetsDataset: ExampleDataSet<CreateQueriesInput> = {
   tweets: {
     name: "corbtt tweets",
     value: tweetsToString({

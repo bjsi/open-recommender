@@ -6,6 +6,6 @@ accounts.txt
 accounts.db
 __pycache__
 *.db
-src/pipeline/runs/*.json
 dist
 .yarn/cache
+runs

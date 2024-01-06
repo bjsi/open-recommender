@@ -3,11 +3,9 @@ import {
   tweetsToString,
   loadExampleTweetHistory,
 } from "../../../../twitter/getUserContext";
-import { createQueriesInputSchema } from "../schemas/createQueriesInputSchema";
+import { CreateQueriesInput } from "../schemas/createQueriesInputSchema";
 
-export const experilearningTweetsDataset: ExampleDataSet<
-  typeof createQueriesInputSchema
-> = {
+export const experilearningTweetsDataset: ExampleDataSet<CreateQueriesInput> = {
   tweets: {
     name: "experilearning tweets",
     value: tweetsToString({

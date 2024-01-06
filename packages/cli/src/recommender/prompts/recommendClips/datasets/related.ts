@@ -1,15 +1,14 @@
 import { ExampleDataSet } from "prompt-iteration-assistant/dist/lib/prompt";
-import { recommendClipsInputSchema } from "../schemas/recommendClipsInputSchema";
+import { RecommendClipsInput } from "../schemas/recommendClipsInputSchema";
 
-export const relatedDataset: ExampleDataSet<typeof recommendClipsInputSchema> =
-  {
-    title: {
-      name: "lex-pod",
-      value: "Advanced RAG 01",
-    },
-    tweets: {
-      name: "ai-therapist-tweets",
-      value: `
+export const relatedDataset: ExampleDataSet<RecommendClipsInput> = {
+  title: {
+    name: "lex-pod",
+    value: "Advanced RAG 01",
+  },
+  tweets: {
+    name: "ai-therapist-tweets",
+    value: `
 ID: 91
 tweet: @experilearning (2023-11-07)
 Experimenting with creating a AI journalling assistant rn. Getting the RAG/chat memory right is the most important part. Here's the approach that got the best results so far:
@@ -30,10 +29,10 @@ Experimenting with creating a AI journalling assistant rn. Getting the RAG/chat 
 - when writing a new journal entry, extract themes (emotions/topics/people), then include all the summaries for those themes and get the AI to question you
 It feels way better than naive RAG. Obviously it's more work, more expensive and you end up having to keep doing LLM calls to update the summaries over time, but I think it's worth it.
 `,
-    },
-    transcript: {
-      name: "advanced-rag",
-      value: `
+  },
+  transcript: {
+    name: "advanced-rag",
+    value: `
 ID: 0
 Okay.
 ---
@@ -658,5 +657,5 @@ please check out my channel click like and subscribe et cetera.
 ID: 207
 i will talk to you in the next video bye for now
 `.trim(),
-    },
-  };
+  },
+};

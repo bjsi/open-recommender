@@ -1,7 +1,7 @@
 import { ExampleDataSet } from "prompt-iteration-assistant/dist/lib/prompt";
-import { recommendClipsInputSchema } from "../schemas/recommendClipsInputSchema";
+import { RecommendClipsInput } from "../schemas/recommendClipsInputSchema";
 
-export const eaccDataset: ExampleDataSet<typeof recommendClipsInputSchema> = {
+export const eaccDataset: ExampleDataSet<RecommendClipsInput> = {
   title: {
     name: "lex-pod",
     value:
