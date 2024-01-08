@@ -2,9 +2,6 @@
   "name": "cli",
   "license": "MIT",
   "private": true,
-  "workspaces": [
-    "packages/*"
-  ],
   "dependencies": {
     "@deepkit/app": "^1.0.1-alpha.96",
     "@deepkit/core": "^1.0.1-alpha.108",
@@ -24,7 +21,7 @@
     "js-tiktoken": "^1.0.8",
     "openai": "^4.20.1",
     "openpipe": "^0.6.3",
-    "prompt-iteration-assistant": "^0.0.29",
+    "prompt-iteration-assistant": "^0.0.34",
     "promptfoo": "^0.28.1",
     "pybridge": "^1.1.0",
     "remeda": "^1.29.0",

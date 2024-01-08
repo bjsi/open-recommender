@@ -1,760 +1,1212 @@
 import { ExampleDataSet } from "prompt-iteration-assistant/dist/lib/prompt";
-import { recommendClipsInputSchema } from "../schemas/recommendClipsInputSchema";
+import { RecommendClipsCustomInput } from "../schemas/recommendClipsInputSchema";
+import { Tweet } from "../../../../twitter/schemas";
+import { TranscriptCue } from "../../../../youtube/transcript";
+
+const tweets: Tweet[] = [
+  {
+    id: 1732293110988734700,
+    id_str: "1732293110988734681",
+    url: "https://twitter.com/experilearning/status/1732293110988734681",
+    date: "2023-12-06 06:57:16+00:00",
+    user: {
+      id: 1318176552652243000,
+      id_str: "1318176552652242944",
+      url: "https://twitter.com/experilearning",
+      username: "experilearning",
+      displayname: "Jamesb",
+      rawDescription:
+        "fascinated by LLM agents | building the best SRS app in the multiverse @rem_note",
+      created: "2020-10-19 13:06:10+00:00",
+      followersCount: 888,
+      friendsCount: 368,
+      statusesCount: 847,
+      favouritesCount: 1118,
+      listedCount: 32,
+      mediaCount: 179,
+      location: "Oxford, UK",
+      profileImageUrl:
+        "https://pbs.twimg.com/profile_images/1318177040563044352/wc9oSp4b_normal.jpg",
+      profileBannerUrl: null,
+      protected: null,
+      verified: false,
+      blue: true,
+      blueType: null,
+      descriptionLinks: [
+        {
+          url: "https://bjsi.github.io/",
+          text: "bjsi.github.io",
+          tcourl: "https://t.co/pUoG8zy05Z",
+        },
+      ],
+      _type: "snscrape.modules.twitter.User",
+    },
+    lang: "en",
+    rawContent:
+      "POV: 26 mins in to the recommendation flow, the pipeline explodes at the final stage\n\nbefore adding checkpointing: 😠 FUCK\nafter adding checkpointing: 🤷‍♂️ ez restore and re-run\n\nread more about the data pipeline here: https://t.co/C2E2EFOlph https://t.co/5unxPqhkrL",
+    replyCount: 0,
+    retweetCount: 0,
+    likeCount: 1,
+    quoteCount: 0,
+    conversationId: 1732293110988734700,
+    hashtags: [],
+    cashtags: [],
+    mentionedUsers: [],
+    links: [
+      {
+        url: "https://dev.to/experilearning/managing-long-running-llm-data-processing-pipelines-48f9",
+        text: "dev.to/experilearning…",
+        tcourl: "https://t.co/C2E2EFOlph",
+      },
+    ],
+    viewCount: 219,
+    retweetedTweet: null,
+    quotedTweet: {
+      id: 1731570914112807000,
+      id_str: "1731570914112807040",
+      url: "https://twitter.com/experilearning/status/1731570914112807040",
+      date: "2023-12-04 07:07:31+00:00",
+      user: {
+        id: 1318176552652243000,
+        id_str: "1318176552652242944",
+        url: "https://twitter.com/experilearning",
+        username: "experilearning",
+        displayname: "Jamesb",
+        rawDescription:
+          "fascinated by LLM agents | building the best SRS app in the multiverse @rem_note",
+        created: "2020-10-19 13:06:10+00:00",
+        followersCount: 888,
+        friendsCount: 368,
+        statusesCount: 847,
+        favouritesCount: 1118,
+        listedCount: 32,
+        mediaCount: 179,
+        location: "Oxford, UK",
+        profileImageUrl:
+          "https://pbs.twimg.com/profile_images/1318177040563044352/wc9oSp4b_normal.jpg",
+        profileBannerUrl: null,
+        protected: null,
+        verified: false,
+        blue: true,
+        blueType: null,
+        descriptionLinks: [
+          {
+            url: "https://bjsi.github.io/",
+            text: "bjsi.github.io",
+            tcourl: "https://t.co/pUoG8zy05Z",
+          },
+        ],
+        _type: "snscrape.modules.twitter.User",
+      },
+      lang: "en",
+      rawContent:
+        "@ErikBjare data pipeline is looking clean ✨ it takes a while to run and can be tough to debug so I added a pipeline abstraction to save the inputs, outputs and errors of each stage allowing me to restart a run from a particular stage https://t.co/CbbIQV9RTK",
+      replyCount: 3,
+      retweetCount: 0,
+      likeCount: 2,
+      quoteCount: 1,
+      conversationId: 1727204603719238000,
+      hashtags: [],
+      cashtags: [],
+      mentionedUsers: [
+        {
+          id: 324745557,
+          username: "ErikBjare",
+          displayname: "Erik Bjäreholt",
+          _type: "snscrape.modules.twitter.UserRef",
+        },
+      ],
+      links: [],
+      viewCount: 430,
+      retweetedTweet: null,
+      quotedTweet: null,
+      place: null,
+      coordinates: null,
+      inReplyToTweetId: 1727204603719238000,
+      inReplyToUser: {
+        id: 1318176552652243000,
+        username: "experilearning",
+        displayname: "Jamesb",
+        _type: "snscrape.modules.twitter.UserRef",
+      },
+      source:
+        '<a href="https://mobile.twitter.com" rel="nofollow">Twitter Web App</a>',
+      sourceUrl: "https://mobile.twitter.com",
+      sourceLabel: "Twitter Web App",
+      media: {
+        photos: [
+          {
+            url: "https://pbs.twimg.com/media/GAfGHsYWwAAC8xV.jpg",
+          },
+        ],
+        videos: [],
+        animated: [],
+      },
+      _type: "snscrape.modules.twitter.Tweet",
+    },
+    place: null,
+    coordinates: null,
+    inReplyToTweetId: null,
+    inReplyToUser: null,
+    source:
+      '<a href="https://mobile.twitter.com" rel="nofollow">Twitter Web App</a>',
+    sourceUrl: "https://mobile.twitter.com",
+    sourceLabel: "Twitter Web App",
+    media: {
+      photos: [
+        {
+          url: "https://pbs.twimg.com/media/GApPf3VWsAEvA9W.jpg",
+        },
+      ],
+      videos: [],
+      animated: [],
+    },
+    _type: "snscrape.modules.twitter.Tweet",
+  },
+  {
+    id: 1732293110988734700,
+    id_str: "1732293110988734681",
+    url: "https://twitter.com/experilearning/status/1732293110988734681",
+    date: "2023-12-06 06:57:16+00:00",
+    user: {
+      id: 1318176552652243000,
+      id_str: "1318176552652242944",
+      url: "https://twitter.com/experilearning",
+      username: "experilearning",
+      displayname: "Jamesb",
+      rawDescription:
+        "fascinated by LLM agents | building the best SRS app in the multiverse @rem_note",
+      created: "2020-10-19 13:06:10+00:00",
+      followersCount: 888,
+      friendsCount: 368,
+      statusesCount: 847,
+      favouritesCount: 1118,
+      listedCount: 32,
+      mediaCount: 179,
+      location: "Oxford, UK",
+      profileImageUrl:
+        "https://pbs.twimg.com/profile_images/1318177040563044352/wc9oSp4b_normal.jpg",
+      profileBannerUrl: null,
+      protected: null,
+      verified: false,
+      blue: true,
+      blueType: null,
+      descriptionLinks: [
+        {
+          url: "https://bjsi.github.io/",
+          text: "bjsi.github.io",
+          tcourl: "https://t.co/pUoG8zy05Z",
+        },
+      ],
+      _type: "snscrape.modules.twitter.User",
+    },
+    lang: "en",
+    rawContent:
+      "POV: 26 mins in to the recommendation flow, the pipeline explodes at the final stage\n\nbefore adding checkpointing: 😠 FUCK\nafter adding checkpointing: 🤷‍♂️ ez restore and re-run\n\nread more about the data pipeline here: https://t.co/C2E2EFOlph https://t.co/5unxPqhkrL",
+    replyCount: 0,
+    retweetCount: 0,
+    likeCount: 1,
+    quoteCount: 0,
+    conversationId: 1732293110988734700,
+    hashtags: [],
+    cashtags: [],
+    mentionedUsers: [],
+    links: [
+      {
+        url: "https://dev.to/experilearning/managing-long-running-llm-data-processing-pipelines-48f9",
+        text: "dev.to/experilearning…",
+        tcourl: "https://t.co/C2E2EFOlph",
+      },
+    ],
+    viewCount: 219,
+    retweetedTweet: null,
+    quotedTweet: {
+      id: 1731570914112807000,
+      id_str: "1731570914112807040",
+      url: "https://twitter.com/experilearning/status/1731570914112807040",
+      date: "2023-12-04 07:07:31+00:00",
+      user: {
+        id: 1318176552652243000,
+        id_str: "1318176552652242944",
+        url: "https://twitter.com/experilearning",
+        username: "experilearning",
+        displayname: "Jamesb",
+        rawDescription:
+          "fascinated by LLM agents | building the best SRS app in the multiverse @rem_note",
+        created: "2020-10-19 13:06:10+00:00",
+        followersCount: 888,
+        friendsCount: 368,
+        statusesCount: 847,
+        favouritesCount: 1118,
+        listedCount: 32,
+        mediaCount: 179,
+        location: "Oxford, UK",
+        profileImageUrl:
+          "https://pbs.twimg.com/profile_images/1318177040563044352/wc9oSp4b_normal.jpg",
+        profileBannerUrl: null,
+        protected: null,
+        verified: false,
+        blue: true,
+        blueType: null,
+        descriptionLinks: [
+          {
+            url: "https://bjsi.github.io/",
+            text: "bjsi.github.io",
+            tcourl: "https://t.co/pUoG8zy05Z",
+          },
+        ],
+        _type: "snscrape.modules.twitter.User",
+      },
+      lang: "en",
+      rawContent:
+        "@ErikBjare data pipeline is looking clean ✨ it takes a while to run and can be tough to debug so I added a pipeline abstraction to save the inputs, outputs and errors of each stage allowing me to restart a run from a particular stage https://t.co/CbbIQV9RTK",
+      replyCount: 3,
+      retweetCount: 0,
+      likeCount: 2,
+      quoteCount: 1,
+      conversationId: 1727204603719238000,
+      hashtags: [],
+      cashtags: [],
+      mentionedUsers: [
+        {
+          id: 324745557,
+          username: "ErikBjare",
+          displayname: "Erik Bjäreholt",
+          _type: "snscrape.modules.twitter.UserRef",
+        },
+      ],
+      links: [],
+      viewCount: 430,
+      retweetedTweet: null,
+      quotedTweet: null,
+      place: null,
+      coordinates: null,
+      inReplyToTweetId: 1727204603719238000,
+      inReplyToUser: {
+        id: 1318176552652243000,
+        username: "experilearning",
+        displayname: "Jamesb",
+        _type: "snscrape.modules.twitter.UserRef",
+      },
+      source:
+        '<a href="https://mobile.twitter.com" rel="nofollow">Twitter Web App</a>',
+      sourceUrl: "https://mobile.twitter.com",
+      sourceLabel: "Twitter Web App",
+      media: {
+        photos: [
+          {
+            url: "https://pbs.twimg.com/media/GAfGHsYWwAAC8xV.jpg",
+          },
+        ],
+        videos: [],
+        animated: [],
+      },
+      _type: "snscrape.modules.twitter.Tweet",
+    },
+    place: null,
+    coordinates: null,
+    inReplyToTweetId: null,
+    inReplyToUser: null,
+    source:
+      '<a href="https://mobile.twitter.com" rel="nofollow">Twitter Web App</a>',
+    sourceUrl: "https://mobile.twitter.com",
+    sourceLabel: "Twitter Web App",
+    media: {
+      photos: [
+        {
+          url: "https://pbs.twimg.com/media/GApPf3VWsAEvA9W.jpg",
+        },
+      ],
+      videos: [],
+      animated: [],
+    },
+    _type: "snscrape.modules.twitter.Tweet",
+  },
+  {
+    id: 1732280684956496000,
+    id_str: "1732280684956495906",
+    url: "https://twitter.com/experilearning/status/1732280684956495906",
+    date: "2023-12-06 06:07:54+00:00",
+    user: {
+      id: 1318176552652243000,
+      id_str: "1318176552652242944",
+      url: "https://twitter.com/experilearning",
+      username: "experilearning",
+      displayname: "Jamesb",
+      rawDescription:
+        "fascinated by LLM agents | building the best SRS app in the multiverse @rem_note",
+      created: "2020-10-19 13:06:10+00:00",
+      followersCount: 888,
+      friendsCount: 368,
+      statusesCount: 847,
+      favouritesCount: 1118,
+      listedCount: 32,
+      mediaCount: 179,
+      location: "Oxford, UK",
+      profileImageUrl:
+        "https://pbs.twimg.com/profile_images/1318177040563044352/wc9oSp4b_normal.jpg",
+      profileBannerUrl: null,
+      protected: null,
+      verified: false,
+      blue: true,
+      blueType: null,
+      descriptionLinks: [
+        {
+          url: "https://bjsi.github.io/",
+          text: "bjsi.github.io",
+          tcourl: "https://t.co/pUoG8zy05Z",
+        },
+      ],
+      _type: "snscrape.modules.twitter.User",
+    },
+    lang: "en",
+    rawContent:
+      "@ritvvijparrikh just published the first article :) https://t.co/689x0xUG5w",
+    replyCount: 0,
+    retweetCount: 0,
+    likeCount: 0,
+    quoteCount: 0,
+    conversationId: 1731947626747040300,
+    hashtags: [],
+    cashtags: [],
+    mentionedUsers: [
+      {
+        id: 270977983,
+        username: "ritvvijparrikh",
+        displayname: "ritvvij.parrikh.com",
+        _type: "snscrape.modules.twitter.UserRef",
+      },
+    ],
+    links: [
+      {
+        url: "https://x.com/experilearning/status/1732116915605082225?s=20",
+        text: "x.com/experilearning…",
+        tcourl: "https://t.co/689x0xUG5w",
+      },
+    ],
+    viewCount: 21,
+    retweetedTweet: null,
+    quotedTweet: {
+      id: 1732116915605082000,
+      id_str: "1732116915605082225",
+      url: "https://twitter.com/experilearning/status/1732116915605082225",
+      date: "2023-12-05 19:17:08+00:00",
+      user: {
+        id: 1318176552652243000,
+        id_str: "1318176552652242944",
+        url: "https://twitter.com/experilearning",
+        username: "experilearning",
+        displayname: "Jamesb",
+        rawDescription:
+          "fascinated by LLM agents | building the best SRS app in the multiverse @rem_note",
+        created: "2020-10-19 13:06:10+00:00",
+        followersCount: 888,
+        friendsCount: 368,
+        statusesCount: 847,
+        favouritesCount: 1118,
+        listedCount: 32,
+        mediaCount: 179,
+        location: "Oxford, UK",
+        profileImageUrl:
+          "https://pbs.twimg.com/profile_images/1318177040563044352/wc9oSp4b_normal.jpg",
+        profileBannerUrl: null,
+        protected: null,
+        verified: false,
+        blue: true,
+        blueType: null,
+        descriptionLinks: [
+          {
+            url: "https://bjsi.github.io/",
+            text: "bjsi.github.io",
+            tcourl: "https://t.co/pUoG8zy05Z",
+          },
+        ],
+        _type: "snscrape.modules.twitter.User",
+      },
+      lang: "en",
+      rawContent:
+        "Just published an article about Open Recommender (aka the recommendation system for the terminally online)\n\nOpen Recommender is an open source, LLM-powered recommendation system that takes your Twitter as input and gives you YouTube video recommendations\n\nhttps://t.co/BdJ3KfKikv",
+      replyCount: 1,
+      retweetCount: 2,
+      likeCount: 15,
+      quoteCount: 1,
+      conversationId: 1732116915605082000,
+      hashtags: [],
+      cashtags: [],
+      mentionedUsers: [],
+      links: [
+        {
+          url: "https://dev.to/experilearning/building-an-llm-powered-open-source-recommendation-system-40fg",
+          text: "dev.to/experilearning…",
+          tcourl: "https://t.co/BdJ3KfKikv",
+        },
+      ],
+      viewCount: 737,
+      retweetedTweet: null,
+      quotedTweet: null,
+      place: null,
+      coordinates: null,
+      inReplyToTweetId: null,
+      inReplyToUser: null,
+      source:
+        '<a href="https://mobile.twitter.com" rel="nofollow">Twitter Web App</a>',
+      sourceUrl: "https://mobile.twitter.com",
+      sourceLabel: "Twitter Web App",
+      media: {
+        photos: [],
+        videos: [],
+        animated: [],
+      },
+      _type: "snscrape.modules.twitter.Tweet",
+    },
+    place: null,
+    coordinates: null,
+    inReplyToTweetId: 1731972951761977600,
+    inReplyToUser: {
+      id: 270977983,
+      username: "ritvvijparrikh",
+      displayname: "ritvvij.parrikh.com",
+      _type: "snscrape.modules.twitter.UserRef",
+    },
+    source:
+      '<a href="https://mobile.twitter.com" rel="nofollow">Twitter Web App</a>',
+    sourceUrl: "https://mobile.twitter.com",
+    sourceLabel: "Twitter Web App",
+    media: {
+      photos: [],
+      videos: [],
+      animated: [],
+    },
+    _type: "snscrape.modules.twitter.Tweet",
+  },
+];
+
+const cues: TranscriptCue[] = [
+  {
+    videoTitle: "The 10 AI Innovations Expected to Revolutionize 2024 - 2025",
+    text: "",
+
+    url: "https://www.youtube.com/watch?v=XrjcDKCisEI&t=0s",
+    start: 0,
+    end: 16,
+  },
+  {
+    videoTitle: "The 10 AI Innovations Expected to Revolutionize 2024 - 2025",
+    text: "",
+
+    url: "https://www.youtube.com/watch?v=XrjcDKCisEI&t=15s",
+    start: 15,
+    end: 16,
+  },
+  {
+    videoTitle: "The 10 AI Innovations Expected to Revolutionize 2024 - 2025",
+    text: "hello and welcome to another episode of",
+
+    url: "https://www.youtube.com/watch?v=XrjcDKCisEI&t=17s",
+    start: 17,
+    end: 18,
+  },
+  {
+    videoTitle: "The 10 AI Innovations Expected to Revolutionize 2024 - 2025",
+    text: "let's argue about plants the podcast for",
+
+    url: "https://www.youtube.com/watch?v=XrjcDKCisEI&t=20s",
+    start: 20,
+    end: 21,
+  },
+  {
+    videoTitle: "The 10 AI Innovations Expected to Revolutionize 2024 - 2025",
+    text: "people who love plants but not always",
+
+    url: "https://www.youtube.com/watch?v=XrjcDKCisEI&t=23s",
+    start: 23,
+    end: 24,
+  },
+  {
+    videoTitle: "The 10 AI Innovations Expected to Revolutionize 2024 - 2025",
+    text: "the same ones I'm Carol Collins I'm",
+
+    url: "https://www.youtube.com/watch?v=XrjcDKCisEI&t=25s",
+    start: 25,
+    end: 26,
+  },
+  {
+    videoTitle: "The 10 AI Innovations Expected to Revolutionize 2024 - 2025",
+    text: "associate editor at fine gardening",
+
+    url: "https://www.youtube.com/watch?v=XrjcDKCisEI&t=27s",
+    start: 27,
+    end: 28,
+  },
+  {
+    videoTitle: "The 10 AI Innovations Expected to Revolutionize 2024 - 2025",
+    text: "magazine and I'm Danielle Shar I'm the",
+
+    url: "https://www.youtube.com/watch?v=XrjcDKCisEI&t=30s",
+    start: 30,
+    end: 31,
+  },
+  {
+    videoTitle: "The 10 AI Innovations Expected to Revolutionize 2024 - 2025",
+    text: "executive editor hey Carol Happy",
+
+    url: "https://www.youtube.com/watch?v=XrjcDKCisEI&t=33s",
+    start: 33,
+    end: 34,
+  },
+  {
+    videoTitle: "The 10 AI Innovations Expected to Revolutionize 2024 - 2025",
+    text: "official fall how you doing I am much",
+
+    url: "https://www.youtube.com/watch?v=XrjcDKCisEI&t=36s",
+    start: 36,
+    end: 37,
+  },
+  {
+    videoTitle: "The 10 AI Innovations Expected to Revolutionize 2024 - 2025",
+    text: "cooler now that the fall weather is",
+
+    url: "https://www.youtube.com/watch?v=XrjcDKCisEI&t=38s",
+    start: 38,
+    end: 39,
+  },
+  {
+    videoTitle: "The 10 AI Innovations Expected to Revolutionize 2024 - 2025",
+    text: "setting in right we had like a a fall",
+
+    url: "https://www.youtube.com/watch?v=XrjcDKCisEI&t=42s",
+    start: 42,
+    end: 43,
+  },
+  {
+    videoTitle: "The 10 AI Innovations Expected to Revolutionize 2024 - 2025",
+    text: "start to fall I think here in New",
+
+    url: "https://www.youtube.com/watch?v=XrjcDKCisEI&t=44s",
+    start: 44,
+    end: 45,
+  },
+  {
+    videoTitle: "The 10 AI Innovations Expected to Revolutionize 2024 - 2025",
+    text: "England this year folks it was uh 90",
+
+    url: "https://www.youtube.com/watch?v=XrjcDKCisEI&t=47s",
+    start: 47,
+    end: 48,
+  },
+  {
+    videoTitle: "The 10 AI Innovations Expected to Revolutionize 2024 - 2025",
+    text: "degrees uh we actually did hit 90 there",
+
+    url: "https://www.youtube.com/watch?v=XrjcDKCisEI&t=50s",
+    start: 50,
+    end: 51,
+  },
+  {
+    videoTitle: "The 10 AI Innovations Expected to Revolutionize 2024 - 2025",
+    text: "were some record-breaking temperatures",
+
+    url: "https://www.youtube.com/watch?v=XrjcDKCisEI&t=52s",
+    start: 52,
+    end: 53,
+  },
+  {
+    videoTitle: "The 10 AI Innovations Expected to Revolutionize 2024 - 2025",
+    text: "it was humid as Florida and yeah it made",
+
+    url: "https://www.youtube.com/watch?v=XrjcDKCisEI&t=55s",
+    start: 55,
+    end: 56,
+  },
+  {
+    videoTitle: "The 10 AI Innovations Expected to Revolutionize 2024 - 2025",
+    text: "me really truly appreciate this morning",
+
+    url: "https://www.youtube.com/watch?v=XrjcDKCisEI&t=58s",
+    start: 58,
+    end: 59,
+  },
+  {
+    videoTitle: "The 10 AI Innovations Expected to Revolutionize 2024 - 2025",
+    text: "waking up to the first fall weather that",
+
+    url: "https://www.youtube.com/watch?v=XrjcDKCisEI&t=60s",
+    start: 60,
+    end: 61,
+  },
+  {
+    videoTitle: "The 10 AI Innovations Expected to Revolutionize 2024 - 2025",
+    text: "we've really had like a nice cool 60 and",
+
+    url: "https://www.youtube.com/watch?v=XrjcDKCisEI&t=64s",
+    start: 64,
+    end: 65,
+  },
+  {
+    videoTitle: "The 10 AI Innovations Expected to Revolutionize 2024 - 2025",
+    text: "dry this is why we live here this is why",
+
+    url: "https://www.youtube.com/watch?v=XrjcDKCisEI&t=66s",
+    start: 66,
+    end: 67,
+  },
+  {
+    videoTitle: "The 10 AI Innovations Expected to Revolutionize 2024 - 2025",
+    text: "we live here but with that being said we",
+
+    url: "https://www.youtube.com/watch?v=XrjcDKCisEI&t=70s",
+    start: 70,
+    end: 71,
+  },
+  {
+    videoTitle: "The 10 AI Innovations Expected to Revolutionize 2024 - 2025",
+    text: "decided to we've delved into fall a",
+
+    url: "https://www.youtube.com/watch?v=XrjcDKCisEI&t=73s",
+    start: 73,
+    end: 74,
+  },
+  {
+    videoTitle: "The 10 AI Innovations Expected to Revolutionize 2024 - 2025",
+    text: "little bit so far this season but Carol",
+
+    url: "https://www.youtube.com/watch?v=XrjcDKCisEI&t=75s",
+    start: 75,
+    end: 76,
+  },
+  {
+    videoTitle: "The 10 AI Innovations Expected to Revolutionize 2024 - 2025",
+    text: "what's our topic today we're GNA talk",
+
+    url: "https://www.youtube.com/watch?v=XrjcDKCisEI&t=79s",
+    start: 79,
+    end: 80,
+  },
+  {
+    videoTitle: "The 10 AI Innovations Expected to Revolutionize 2024 - 2025",
+    text: "about plant this with that fall Edition",
+
+    url: "https://www.youtube.com/watch?v=XrjcDKCisEI&t=82s",
+    start: 82,
+    end: 83,
+  },
+  {
+    videoTitle: "The 10 AI Innovations Expected to Revolutionize 2024 - 2025",
+    text: "so what you know combos of plants that",
+
+    url: "https://www.youtube.com/watch?v=XrjcDKCisEI&t=85s",
+    start: 85,
+    end: 86,
+  },
+  {
+    videoTitle: "The 10 AI Innovations Expected to Revolutionize 2024 - 2025",
+    text: "look great together at the end of the",
+
+    url: "https://www.youtube.com/watch?v=XrjcDKCisEI&t=87s",
+    start: 87,
+    end: 88,
+  },
+  {
+    videoTitle: "The 10 AI Innovations Expected to Revolutionize 2024 - 2025",
+    text: "season like now yes y love it I love it",
+
+    url: "https://www.youtube.com/watch?v=XrjcDKCisEI&t=91s",
+    start: 91,
+    end: 92,
+  },
+  {
+    videoTitle: "The 10 AI Innovations Expected to Revolutionize 2024 - 2025",
+    text: "I love it um truth be told how I got par",
+
+    url: "https://www.youtube.com/watch?v=XrjcDKCisEI&t=94s",
+    start: 94,
+    end: 95,
+  },
+  {
+    videoTitle: "The 10 AI Innovations Expected to Revolutionize 2024 - 2025",
+    text: "for this is I walked around my garden",
+
+    url: "https://www.youtube.com/watch?v=XrjcDKCisEI&t=97s",
+    start: 97,
+    end: 98,
+  },
+  {
+    videoTitle: "The 10 AI Innovations Expected to Revolutionize 2024 - 2025",
+    text: "I'm like oh you look good with you all",
+
+    url: "https://www.youtube.com/watch?v=XrjcDKCisEI&t=99s",
+    start: 99,
+    end: 100,
+  },
+  {
+    videoTitle: "The 10 AI Innovations Expected to Revolutionize 2024 - 2025",
+    text: "right let's take a picture and I'm gonna",
+
+    url: "https://www.youtube.com/watch?v=XrjcDKCisEI&t=100s",
+    start: 100,
+    end: 101,
+  },
+  {
+    videoTitle: "The 10 AI Innovations Expected to Revolutionize 2024 - 2025",
+    text: "talk about that one so I will say",
+
+    url: "https://www.youtube.com/watch?v=XrjcDKCisEI&t=104s",
+    start: 104,
+    end: 105,
+  },
+  {
+    videoTitle: "The 10 AI Innovations Expected to Revolutionize 2024 - 2025",
+    text: "disclosure these aren't like you know",
+
+    url: "https://www.youtube.com/watch?v=XrjcDKCisEI&t=106s",
+    start: 106,
+    end: 107,
+  },
+  {
+    videoTitle: "The 10 AI Innovations Expected to Revolutionize 2024 - 2025",
+    text: "the most groundbreaking combinations but",
+
+    url: "https://www.youtube.com/watch?v=XrjcDKCisEI&t=108s",
+    start: 108,
+    end: 109,
+  },
+  {
+    videoTitle: "The 10 AI Innovations Expected to Revolutionize 2024 - 2025",
+    text: "it's what was like truly inspiring me in",
+
+    url: "https://www.youtube.com/watch?v=XrjcDKCisEI&t=111s",
+    start: 111,
+    end: 112,
+  },
+  {
+    videoTitle: "The 10 AI Innovations Expected to Revolutionize 2024 - 2025",
+    text: "my garden right now yes and I must admit",
+
+    url: "https://www.youtube.com/watch?v=XrjcDKCisEI&t=115s",
+    start: 115,
+    end: 116,
+  },
+  {
+    videoTitle: "The 10 AI Innovations Expected to Revolutionize 2024 - 2025",
+    text: "that my I switched it up a little maybe",
+
+    url: "https://www.youtube.com/watch?v=XrjcDKCisEI&t=118s",
+    start: 118,
+    end: 119,
+  },
+  {
+    videoTitle: "The 10 AI Innovations Expected to Revolutionize 2024 - 2025",
+    text: "since the last time you saw the lineup",
+
+    url: "https://www.youtube.com/watch?v=XrjcDKCisEI&t=120s",
+    start: 120,
+    end: 121,
+  },
+  {
+    videoTitle: "The 10 AI Innovations Expected to Revolutionize 2024 - 2025",
+    text: "but I was inspired by one of your",
+
+    url: "https://www.youtube.com/watch?v=XrjcDKCisEI&t=123s",
+    start: 123,
+    end: 124,
+  },
+  {
+    videoTitle: "The 10 AI Innovations Expected to Revolutionize 2024 - 2025",
+    text: "combinations so we'll we'll get to that",
+
+    url: "https://www.youtube.com/watch?v=XrjcDKCisEI&t=124s",
+    start: 124,
+    end: 125,
+  },
+  {
+    videoTitle: "The 10 AI Innovations Expected to Revolutionize 2024 - 2025",
+    text: "later in the show but yes I I I also did",
+
+    url: "https://www.youtube.com/watch?v=XrjcDKCisEI&t=128s",
+    start: 128,
+    end: 129,
+  },
+  {
+    videoTitle: "The 10 AI Innovations Expected to Revolutionize 2024 - 2025",
+    text: "a walkabout for inspiration same thing I",
+
+    url: "https://www.youtube.com/watch?v=XrjcDKCisEI&t=131s",
+    start: 131,
+    end: 132,
+  },
+  {
+    videoTitle: "The 10 AI Innovations Expected to Revolutionize 2024 - 2025",
+    text: "I had a feeling because if you're",
+
+    url: "https://www.youtube.com/watch?v=XrjcDKCisEI&t=133s",
+    start: 133,
+    end: 134,
+  },
+  {
+    videoTitle: "The 10 AI Innovations Expected to Revolutionize 2024 - 2025",
+    text: "watching this on YouTube which you can",
+
+    url: "https://www.youtube.com/watch?v=XrjcDKCisEI&t=135s",
+    start: 135,
+    end: 136,
+  },
+  {
+    videoTitle: "The 10 AI Innovations Expected to Revolutionize 2024 - 2025",
+    text: "watch this podcast as opposed to listen",
+
+    url: "https://www.youtube.com/watch?v=XrjcDKCisEI&t=138s",
+    start: 138,
+    end: 139,
+  },
+  {
+    videoTitle: "The 10 AI Innovations Expected to Revolutionize 2024 - 2025",
+    text: "only to this podcast on YouTube if you",
+
+    url: "https://www.youtube.com/watch?v=XrjcDKCisEI&t=140s",
+    start: 140,
+    end: 141,
+  },
+  {
+    videoTitle: "The 10 AI Innovations Expected to Revolutionize 2024 - 2025",
+    text: "go to the Fine gardening YouTube channel",
+
+    url: "https://www.youtube.com/watch?v=XrjcDKCisEI&t=142s",
+    start: 142,
+    end: 143,
+  },
+  {
+    videoTitle: "The 10 AI Innovations Expected to Revolutionize 2024 - 2025",
+    text: "you can see Carol and I in all of our",
+
+    url: "https://www.youtube.com/watch?v=XrjcDKCisEI&t=144s",
+    start: 144,
+    end: 145,
+  },
+  {
+    videoTitle: "The 10 AI Innovations Expected to Revolutionize 2024 - 2025",
+    text: "early morning recording Glory but Carol",
+
+    url: "https://www.youtube.com/watch?v=XrjcDKCisEI&t=147s",
+    start: 147,
+    end: 148,
+  },
+  {
+    videoTitle: "The 10 AI Innovations Expected to Revolutionize 2024 - 2025",
+    text: "always has generally a vase behind her",
+
+    url: "https://www.youtube.com/watch?v=XrjcDKCisEI&t=151s",
+    start: 151,
+    end: 152,
+  },
+  {
+    videoTitle: "The 10 AI Innovations Expected to Revolutionize 2024 - 2025",
+    text: "in her office where the plants that are",
+
+    url: "https://www.youtube.com/watch?v=XrjcDKCisEI&t=154s",
+    start: 154,
+    end: 155,
+  },
+  {
+    videoTitle: "The 10 AI Innovations Expected to Revolutionize 2024 - 2025",
+    text: "in the vase often times are a preview of",
+
+    url: "https://www.youtube.com/watch?v=XrjcDKCisEI&t=158s",
+    start: 158,
+    end: 159,
+  },
+  {
+    videoTitle: "The 10 AI Innovations Expected to Revolutionize 2024 - 2025",
+    text: "what Carol is going to talk about and I",
+
+    url: "https://www.youtube.com/watch?v=XrjcDKCisEI&t=160s",
+    start: 160,
+    end: 161,
+  },
+  {
+    videoTitle: "The 10 AI Innovations Expected to Revolutionize 2024 - 2025",
+    text: "spy with my little eye a plant back",
+
+    url: "https://www.youtube.com/watch?v=XrjcDKCisEI&t=163s",
+    start: 163,
+    end: 164,
+  },
+  {
+    videoTitle: "The 10 AI Innovations Expected to Revolutionize 2024 - 2025",
+    text: "there that I know I'm gonna talk about",
+
+    url: "https://www.youtube.com/watch?v=XrjcDKCisEI&t=165s",
+    start: 165,
+    end: 166,
+  },
+  {
+    videoTitle: "The 10 AI Innovations Expected to Revolutionize 2024 - 2025",
+    text: "so I have a feeling I know how you mixed",
+
+    url: "https://www.youtube.com/watch?v=XrjcDKCisEI&t=167s",
+    start: 167,
+    end: 168,
+  },
+  {
+    videoTitle: "The 10 AI Innovations Expected to Revolutionize 2024 - 2025",
+    text: "it up that is it we usually try to avoid",
+
+    url: "https://www.youtube.com/watch?v=XrjcDKCisEI&t=171s",
+    start: 171,
+    end: 172,
+  },
+  {
+    videoTitle: "The 10 AI Innovations Expected to Revolutionize 2024 - 2025",
+    text: "talking about the same plants but I",
+
+    url: "https://www.youtube.com/watch?v=XrjcDKCisEI&t=173s",
+    start: 173,
+    end: 174,
+  },
+  {
+    videoTitle: "The 10 AI Innovations Expected to Revolutionize 2024 - 2025",
+    text: "thought this might be fun to you know",
+
+    url: "https://www.youtube.com/watch?v=XrjcDKCisEI&t=175s",
+    start: 175,
+    end: 176,
+  },
+  {
+    videoTitle: "The 10 AI Innovations Expected to Revolutionize 2024 - 2025",
+    text: "combos that play off a different a plant",
+
+    url: "https://www.youtube.com/watch?v=XrjcDKCisEI&t=178s",
+    start: 178,
+    end: 179,
+  },
+  {
+    videoTitle: "The 10 AI Innovations Expected to Revolutionize 2024 - 2025",
+    text: "with a different take on the same",
+
+    url: "https://www.youtube.com/watch?v=XrjcDKCisEI&t=180s",
+    start: 180,
+    end: 181,
+  },
+  {
+    videoTitle: "The 10 AI Innovations Expected to Revolutionize 2024 - 2025",
+    text: "absolutely absolutely well I won't force",
+
+    url: "https://www.youtube.com/watch?v=XrjcDKCisEI&t=183s",
+    start: 183,
+    end: 184,
+  },
+  {
+    videoTitle: "The 10 AI Innovations Expected to Revolutionize 2024 - 2025",
+    text: "your hand to talk about that particular",
+
+    url: "https://www.youtube.com/watch?v=XrjcDKCisEI&t=185s",
+    start: 185,
+    end: 186,
+  },
+  {
+    videoTitle: "The 10 AI Innovations Expected to Revolutionize 2024 - 2025",
+    text: "plant but what is your first combo plant",
+
+    url: "https://www.youtube.com/watch?v=XrjcDKCisEI&t=189s",
+    start: 189,
+    end: 190,
+  },
+  {
+    videoTitle: "The 10 AI Innovations Expected to Revolutionize 2024 - 2025",
+    text: "this with that the fall Edition so this",
+
+    url: "https://www.youtube.com/watch?v=XrjcDKCisEI&t=192s",
+    start: 192,
+    end: 193,
+  },
+  {
+    videoTitle: "The 10 AI Innovations Expected to Revolutionize 2024 - 2025",
+    text: "one is a kind of a classic Cottage",
+
+    url: "https://www.youtube.com/watch?v=XrjcDKCisEI&t=195s",
+    start: 195,
+    end: 196,
+  },
+  {
+    videoTitle: "The 10 AI Innovations Expected to Revolutionize 2024 - 2025",
+    text: "Garden combo what I have is white drift",
+
+    url: "https://www.youtube.com/watch?v=XrjcDKCisEI&t=198s",
+    start: 198,
+    end: 199,
+  },
+  {
+    videoTitle: "The 10 AI Innovations Expected to Revolutionize 2024 - 2025",
+    text: "Rose that's Rosa",
+
+    url: "https://www.youtube.com/watch?v=XrjcDKCisEI&t=200s",
+    start: 200,
+    end: 201,
+  },
+  {
+    videoTitle: "The 10 AI Innovations Expected to Revolutionize 2024 - 2025",
+    text: "myerland um with tall Garden flocks and",
+
+    url: "https://www.youtube.com/watch?v=XrjcDKCisEI&t=204s",
+    start: 204,
+    end: 205,
+  },
+  {
+    videoTitle: "The 10 AI Innovations Expected to Revolutionize 2024 - 2025",
+    text: "that's flocks",
+
+    url: "https://www.youtube.com/watch?v=XrjcDKCisEI&t=206s",
+    start: 206,
+    end: 207,
+  },
+  {
+    videoTitle: "The 10 AI Innovations Expected to Revolutionize 2024 - 2025",
+    text: "panicula I do not know the cultivar of",
+
+    url: "https://www.youtube.com/watch?v=XrjcDKCisEI&t=209s",
+    start: 209,
+    end: 210,
+  },
+  {
+    videoTitle: "The 10 AI Innovations Expected to Revolutionize 2024 - 2025",
+    text: "my flocks I do not I the the it's a",
+
+    url: "https://www.youtube.com/watch?v=XrjcDKCisEI&t=213s",
+    start: 213,
+    end: 214,
+  },
+  {
+    videoTitle: "The 10 AI Innovations Expected to Revolutionize 2024 - 2025",
+    text: "mystery the tag is lost to the sands of",
+
+    url: "https://www.youtube.com/watch?v=XrjcDKCisEI&t=216s",
+    start: 216,
+    end: 217,
+  },
+  {
+    videoTitle: "The 10 AI Innovations Expected to Revolutionize 2024 - 2025",
+    text: "time but um tall Garden flocks is Hardy",
+
+    url: "https://www.youtube.com/watch?v=XrjcDKCisEI&t=220s",
+    start: 220,
+    end: 221,
+  },
+  {
+    videoTitle: "The 10 AI Innovations Expected to Revolutionize 2024 - 2025",
+    text: "from zones 4 to eight the white drift",
+
+    url: "https://www.youtube.com/watch?v=XrjcDKCisEI&t=223s",
+    start: 223,
+    end: 224,
+  },
+  {
+    videoTitle: "The 10 AI Innovations Expected to Revolutionize 2024 - 2025",
+    text: "row zones 4 to 11 so this a super cold",
+
+    url: "https://www.youtube.com/watch?v=XrjcDKCisEI&t=226s",
+    start: 226,
+    end: 227,
+  },
+  {
+    videoTitle: "The 10 AI Innovations Expected to Revolutionize 2024 - 2025",
+    text: "hearty combo the white drift Rose is",
+
+    url: "https://www.youtube.com/watch?v=XrjcDKCisEI&t=230s",
+    start: 230,
+    end: 231,
+  },
+  {
+    videoTitle: "The 10 AI Innovations Expected to Revolutionize 2024 - 2025",
+    text: "considered a landscape Rose and or a",
+
+    url: "https://www.youtube.com/watch?v=XrjcDKCisEI&t=233s",
+    start: 233,
+    end: 234,
+  },
+  {
+    videoTitle: "The 10 AI Innovations Expected to Revolutionize 2024 - 2025",
+    text: "ground cover Rose and so it grows like 2",
+
+    url: "https://www.youtube.com/watch?v=XrjcDKCisEI&t=237s",
+    start: 237,
+    end: 238,
+  },
+  {
+    videoTitle: "The 10 AI Innovations Expected to Revolutionize 2024 - 2025",
+    text: "feet tall 3 feet wide uh like SP Sun",
+
+    url: "https://www.youtube.com/watch?v=XrjcDKCisEI&t=241s",
+    start: 241,
+    end: 242,
+  },
+  {
+    videoTitle: "The 10 AI Innovations Expected to Revolutionize 2024 - 2025",
+    text: "Rich well- drained soil you know it's",
+
+    url: "https://www.youtube.com/watch?v=XrjcDKCisEI&t=243s",
+    start: 243,
+    end: 244,
+  },
+  {
+    videoTitle: "The 10 AI Innovations Expected to Revolutionize 2024 - 2025",
+    text: "you know it's a rose but it's pretty",
+
+    url: "https://www.youtube.com/watch?v=XrjcDKCisEI&t=245s",
+    start: 245,
+    end: 246,
+  },
+  {
+    videoTitle: "The 10 AI Innovations Expected to Revolutionize 2024 - 2025",
+    text: "trouble-free it it stays disease-free",
+
+    url: "https://www.youtube.com/watch?v=XrjcDKCisEI&t=248s",
+    start: 248,
+    end: 249,
+  },
+  {
+    videoTitle: "The 10 AI Innovations Expected to Revolutionize 2024 - 2025",
+    text: "throughout the summer and unlike some of",
+
+    url: "https://www.youtube.com/watch?v=XrjcDKCisEI&t=251s",
+    start: 251,
+    end: 252,
+  },
+  {
+    videoTitle: "The 10 AI Innovations Expected to Revolutionize 2024 - 2025",
+    text: "the other roses that maybe you know your",
+
+    url: "https://www.youtube.com/watch?v=XrjcDKCisEI&t=253s",
+    start: 253,
+    end: 254,
+  },
+];
 
 /**
  * Sanity check to make sure the prompt doesn't always recommend clips.
  * This example takes my tweets about recommendation systems and compares them to a podcast about plants.
  */
-export const unrelatedDataset2: ExampleDataSet<
-  typeof recommendClipsInputSchema
-> = {
+export const unrelatedDataset2: ExampleDataSet<RecommendClipsCustomInput> = {
+  videoId: {
+    name: "plants-pod",
+    value: "XrjcDKCisEI",
+  },
+  user: {
+    name: "experilearning",
+    value: "experilearning",
+  },
+  url: {
+    name: "plants-pod",
+    value: "https://www.youtube.com/watch?v=XrjcDKCisEI",
+  },
   title: {
     name: "plants-pod",
     value: "Episode 144: Plant This with That-Fall Edition",
   },
   tweets: {
     name: "rec-sys-tweets",
-    value: `
-ID: 34
-@experilearning (2023-12-04)
-@ErikBjare data pipeline is looking clean ✨ it takes a while to run and can be tough to debug so I added a pipeline abstraction to save the inputs, outputs and errors of each stage allowing me to restart a run from a particular stage https://t.co/CbbIQV9RTK
----
-ID: 35
-Liked by @experilearning
-@ritvvijparrikh (2023-12-05)
-@experilearning Write about it? Would love to read more on this.. and even chime in if I can :)
----
-ID: 36
-tweet: @experilearning (2023-12-05)
-Just published an article about Open Recommender (aka the recommendation system for the terminally online)
-Open Recommender is an open source, LLM-powered recommendation system that takes your Twitter as input and gives you YouTube video recommendations
-https://t.co/BdJ3KfKikv
-reply: @experilearning (2023-12-06)
-@ritvvijparrikh just published the first article :) https://t.co/689x0xUG5w
-`.trim(),
+    value: tweets,
   },
   transcript: {
     name: "plants-pod",
-    value: `
-ID: 2
-hello and welcome to another episode of
----
-ID: 3
-let's argue about plants the podcast for
----
-ID: 4
-people who love plants but not always
----
-ID: 5
-the same ones I'm Carol Collins I'm
----
-ID: 6
-associate editor at fine gardening
----
-ID: 7
-magazine and I'm Danielle Shar I'm the
----
-ID: 8
-executive editor hey Carol Happy
----
-ID: 9
-official fall how you doing I am much
----
-ID: 10
-cooler now that the fall weather is
----
-ID: 11
-setting in right we had like a a fall
----
-ID: 12
-start to fall I think here in New
----
-ID: 13
-England this year folks it was uh 90
----
-ID: 14
-degrees uh we actually did hit 90 there
----
-ID: 15
-were some record-breaking temperatures
----
-ID: 16
-it was humid as Florida and yeah it made
----
-ID: 17
-me really truly appreciate this morning
----
-ID: 18
-waking up to the first fall weather that
----
-ID: 19
-we've really had like a nice cool 60 and
----
-ID: 20
-dry this is why we live here this is why
----
-ID: 21
-we live here but with that being said we
----
-ID: 22
-decided to we've delved into fall a
----
-ID: 23
-little bit so far this season but Carol
----
-ID: 24
-what's our topic today we're GNA talk
----
-ID: 25
-about plant this with that fall Edition
----
-ID: 26
-so what you know combos of plants that
----
-ID: 27
-look great together at the end of the
----
-ID: 28
-season like now yes y love it I love it
----
-ID: 29
-I love it um truth be told how I got par
----
-ID: 30
-for this is I walked around my garden
----
-ID: 31
-I'm like oh you look good with you all
----
-ID: 32
-right let's take a picture and I'm gonna
----
-ID: 33
-talk about that one so I will say
----
-ID: 34
-disclosure these aren't like you know
----
-ID: 35
-the most groundbreaking combinations but
----
-ID: 36
-it's what was like truly inspiring me in
----
-ID: 37
-my garden right now yes and I must admit
----
-ID: 38
-that my I switched it up a little maybe
----
-ID: 39
-since the last time you saw the lineup
----
-ID: 40
-but I was inspired by one of your
----
-ID: 41
-combinations so we'll we'll get to that
----
-ID: 42
-later in the show but yes I I I also did
----
-ID: 43
-a walkabout for inspiration same thing I
----
-ID: 44
-I had a feeling because if you're
----
-ID: 45
-watching this on YouTube which you can
----
-ID: 46
-watch this podcast as opposed to listen
----
-ID: 47
-only to this podcast on YouTube if you
----
-ID: 48
-go to the Fine gardening YouTube channel
----
-ID: 49
-you can see Carol and I in all of our
----
-ID: 50
-early morning recording Glory but Carol
----
-ID: 51
-always has generally a vase behind her
----
-ID: 52
-in her office where the plants that are
----
-ID: 53
-in the vase often times are a preview of
----
-ID: 54
-what Carol is going to talk about and I
----
-ID: 55
-spy with my little eye a plant back
----
-ID: 56
-there that I know I'm gonna talk about
----
-ID: 57
-so I have a feeling I know how you mixed
----
-ID: 58
-it up that is it we usually try to avoid
----
-ID: 59
-talking about the same plants but I
----
-ID: 60
-thought this might be fun to you know
----
-ID: 61
-combos that play off a different a plant
----
-ID: 62
-with a different take on the same
----
-ID: 63
-absolutely absolutely well I won't force
----
-ID: 64
-your hand to talk about that particular
----
-ID: 65
-plant but what is your first combo plant
----
-ID: 66
-this with that the fall Edition so this
----
-ID: 67
-one is a kind of a classic Cottage
----
-ID: 68
-Garden combo what I have is white drift
----
-ID: 69
-Rose that's Rosa
----
-ID: 70
-myerland um with tall Garden flocks and
----
-ID: 71
-that's flocks
----
-ID: 72
-panicula I do not know the cultivar of
----
-ID: 73
-my flocks I do not I the the it's a
----
-ID: 74
-mystery the tag is lost to the sands of
----
-ID: 75
-time but um tall Garden flocks is Hardy
----
-ID: 76
-from zones 4 to eight the white drift
----
-ID: 77
-row zones 4 to 11 so this a super cold
----
-ID: 78
-hearty combo the white drift Rose is
----
-ID: 79
-considered a landscape Rose and or a
----
-ID: 80
-ground cover Rose and so it grows like 2
----
-ID: 81
-feet tall 3 feet wide uh like SP Sun
----
-ID: 82
-Rich well- drained soil you know it's
----
-ID: 83
-you know it's a rose but it's pretty
----
-ID: 84
-trouble-free it it stays disease-free
----
-ID: 85
-throughout the summer and unlike some of
----
-ID: 86
-the other roses that maybe you know your
----
-ID: 87
-grandparents had or your mom had this
----
-ID: 88
-one will rebloom throughout the season
----
-ID: 89
-so you will get that early summer flush
----
-ID: 90
-of beautiful little tiny miniature white
----
-ID: 91
-roses but it will rebloom throughout the
----
-ID: 92
-summer um so it's just it's a nice solid
----
-ID: 93
-base for many combos throughout the
----
-ID: 94
-season but as you get toward fall I have
----
-ID: 95
-this blocks that's been you know at
----
-ID: 96
-first it's they started out side by side
----
-ID: 97
-now it's kind of growing up through the
----
-ID: 98
-rose and it gets taller than the rose
----
-ID: 99
-which only hits about you know three
----
-ID: 100
-feet at the most and so you have these
----
-ID: 101
-you know these this cloud of flock
----
-ID: 102
-flowers sort of floating above the white
----
-ID: 103
-roses and I I love it and it's a little
----
-ID: 104
-bit um fruy for me but but I'm okay with
----
-ID: 105
-that um and I would say you you know the
----
-ID: 106
-the flocks that I have it's very pretty
----
-ID: 107
-it's got you know sort of a pink petal
----
-ID: 108
-with a darker pink eye and what I
----
-ID: 109
-noticed this year we had a very hot
----
-ID: 110
-humid summer and especially toward the
----
-ID: 111
-end not a speck of mildew on it and
----
-ID: 112
-that's not always the cas yeah so that's
----
-ID: 113
-and and then again you know the white
----
-ID: 114
-drift roads also quite disease free so I
----
-ID: 115
-think that's an important part of this
----
-ID: 116
-combination but um when I was traveling
----
-ID: 117
-this summer I got to see some awesome
----
-ID: 118
-fles uh from the garden girl series and
----
-ID: 119
-those tall fles are upright mildo
----
-ID: 120
-resistant reblooming so you're going to
----
-ID: 121
-you know they bloom maybe even longer
----
-ID: 122
-into the fall than mine does and um so
----
-ID: 123
-what I'm going to do is I'm going to
----
-ID: 124
-drop photos into the in my combo will be
----
-ID: 125
-in the show notes but also I'm going to
----
-ID: 126
-drop in a picture of flocks with Uptown
----
-ID: 127
-Girl and Glamour Girl up uptown Uptown
----
-ID: 128
-girl has is light pink with a darker
----
-ID: 129
-pink eye Glamour Girl is coral pink um
----
-ID: 130
-and it has dark purple stems just
----
-ID: 131
-gorgeous really you know the the garden
----
-ID: 132
-girl series
----
-ID: 133
-are selected for you know they're
----
-ID: 134
-they're quite different from each other
----
-ID: 135
-but they're all you know have that
----
-ID: 136
-disease fre re Blooming Thing so um
----
-ID: 137
-straight species of garden flocks it's
----
-ID: 138
-native to the eastern US pollinators
----
-ID: 139
-loveed it and I just I love the smell of
----
-ID: 140
-flocks in the fall it reminds me of
----
-ID: 141
-gathering apples from like abandoned
----
-ID: 142
-homesteads with my parents because you
----
-ID: 143
-know when I was a kid we we would know
----
-ID: 144
-where the good apple trees were and
----
-ID: 145
-flocks was often nearby these are the
----
-ID: 146
-two things that people planted long ago
----
-ID: 147
-and they just kept going so oh so it's a
----
-ID: 148
-trigger a trigger fragrance for you yeah
----
-ID: 149
-it's nice fall memories go with the
----
-ID: 150
-smell of flocks for me so that's yeah
----
-ID: 151
-that's just an added bonus that's
----
-ID: 152
-amazing all right so so the Uptown Girl
----
-ID: 153
-series of flocks not necessarily the
----
-ID: 154
-flocks that you have but a very close
----
-ID: 155
-dupe and a good suggestion because of
----
-ID: 156
-them being so disease resistant and then
----
-ID: 157
-say what the drift Rose was again so
----
-ID: 158
-it's the sort of the brand name for it
----
-ID: 159
-if you will it's white drift Rose and
----
-ID: 160
-that's what what you'll see it sold as
----
-ID: 161
-but its botanical name is Rosa Miser
----
-ID: 162
-land me i z o r l n d so uh you know if
----
-ID: 163
-you if you look it up you'll Pro you may
----
-ID: 164
-be seeing it like that but I think most
----
-ID: 165
-people are selling it as white drift
----
-ID: 166
-Carol this was like this was mindblowing
----
-ID: 167
-as far as your first combo because a I
----
-ID: 168
-think of roses and flocks as both being
----
-ID: 169
-summer not
----
-ID: 170
-fall B I always think of them being
----
-ID: 171
-super problematic plants because of them
----
-ID: 172
-being you know so susceptible to
----
-ID: 173
-especially you know the the humidity
----
-ID: 174
-diseases black spot brown spot rust
----
-ID: 175
-powdery mildew so the fact that you know
----
-ID: 176
-both of these look good after the humid
----
-ID: 177
-weather and look so good that they were
----
-ID: 178
-a dynamic combo enough for you to talk
----
-ID: 179
-about I mean I think both of that like
----
-ID: 180
-that you know recommendation is so
----
-ID: 181
-awesome because it's very unexpected I
----
-ID: 182
-mean the second you said Rosen FL I was
----
-ID: 183
-like all right this is going to be good
----
-ID: 184
-let's see where this
----
-ID: 185
-goes yeah it sounded like it was going
----
-ID: 186
-to be a dis disease Fest right but right
----
-ID: 187
-I'm like like wait what what's the great
----
-ID: 188
-pairing here black spot with mildew like
----
-ID: 189
-what's going on but okay that is very
----
-ID: 190
-cool I'm going to have to write down the
----
-ID: 191
-names of both of those because I think
----
-ID: 192
-my garden might need those all right
----
-ID: 193
-Carol so I'm going for it I think I'm
----
-ID: 194
-going to talk about the pairing that
----
-ID: 195
-makes me the happiest right now and I
----
-ID: 196
-think that we're going to have one plant
----
-ID: 197
-in common from this pairing but I was
----
-ID: 198
-walking around and I saw my limelight
----
-ID: 199
-panicle hydrangea which is a hydrange
----
-ID: 200
-paniculata Limelight zones 3
----
-ID: 201
-to9 just dancing in unison Like Dancing
----
-ID: 202
-with the Stars and they were like the
----
-ID: 203
-number one like couple my son King
----
-ID: 204
-Aurelia which is Aurelia cordada Sun
----
-ID: 205
-King and that zones three to nine and
----
-ID: 206
-man they just look awesome together
----
-ID: 207
-right now I mean end of September
----
-ID: 208
-beginning of October the Limelight
----
-ID: 209
-panicle hydram ninja which you know is a
----
-ID: 210
-sizable entry into this pairing it's
----
-ID: 211
-mine is probably topping out over six
----
-ID: 212
-feet tall at this point and it's got
----
-ID: 213
-humongous panicles on it these you know
----
-ID: 214
-the size of my head which you know for
----
-ID: 215
-those who aren't watching the YouTube
----
-ID: 216
-channel I guess it's about the size of a
----
-ID: 217
-baseball mitt it is a huge flower head
----
-ID: 218
-and they start out chartreuse when they
----
-ID: 219
-start blooming in you know early to
----
-ID: 220
-Midsummer but these panicles of flowers
----
-ID: 221
-have now shifted and they've got kind of
----
-ID: 222
-a Rosy blush to them so you've got a a
----
-ID: 223
-hue of chartreuse a hue of creamy white
----
-ID: 224
-and a hue of of just this beautiful
----
-ID: 225
-blush color and they're kind of you know
----
-ID: 226
-hanging out on the top of the of the
----
-ID: 227
-shrub at this point in time and then my
----
-ID: 228
-Sun King aelia which is planted next to
----
-ID: 229
-it has now sized up similarly it's about
----
-ID: 230
-four and a half feet tall I know that
----
-ID: 231
-they say everywhere 3 by3 for a Sun King
----
-ID: 232
-aelia that is crap that is not accurate
----
-ID: 233
-they don't know what they're talking
----
-ID: 234
-about my son King aelia is about the
----
-ID: 235
-same size as me and I'm 5 foot three so
----
-ID: 236
-it's a big beefer and they're just kind
----
-ID: 237
-of growing in unison and at that point
----
-ID: 238
-where they're touching each other is
----
-ID: 239
-beautiful the Aurelia at this point in
----
-ID: 240
-time has just a really beautiful golden
----
-ID: 241
-hue to it
-`.trim(),
+    value: cues,
   },
 };

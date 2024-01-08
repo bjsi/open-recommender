@@ -1,6 +1,6 @@
 import chalk from "chalk";
 import { execSync } from "child_process";
-import { existsSync, readFileSync } from "fs";
+import { existsSync, readFileSync, writeFileSync } from "fs";
 import path from "path";
 import { dataFolder } from "../filesystem";
 import { parseSync, stringifySync } from "subtitle";
@@ -188,6 +188,10 @@ if (require.main === module) {
     videoId,
     "The 10 AI Innovations Expected to Revolutionize 2024 - 2025"
   ).then((result) => {
+    writeFileSync(
+      path.join(__dirname, `${videoId}.json`),
+      JSON.stringify(result, null, 2)
+    );
     const formatted = result?.cues
       ?.map((x, i) => ({
         id: i,

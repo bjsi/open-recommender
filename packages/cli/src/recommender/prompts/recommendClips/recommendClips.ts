@@ -1,22 +1,16 @@
 import { Prompt } from "prompt-iteration-assistant";
-import { recommendClipsInputSchema } from "./schemas/recommendClipsInputSchema";
 import {
-  MAX_CLIP_LENGTH,
-  MIN_CLIP_LENGTH,
-  withExamplePrompt,
-} from "./prompts/withExample";
-import {
-  RecommendClipsOutput,
-  recommendClipsOutputSchema,
-} from "./schemas/recommendClipsOutputSchema";
+  RecommendClipsCustomInput,
+  recommendClipsInputSchema,
+} from "./schemas/recommendClipsInputSchema";
+import { withExamplePrompt } from "./prompts/withExample";
+import { recommendClipsOutputSchema } from "./schemas/recommendClipsOutputSchema";
 import { unrelatedDataset1 } from "./datasets/unrelated1";
 import { unrelatedDataset2 } from "./datasets/unrelated2";
 import { relatedDataset } from "./datasets/related";
-import { TranscriptCue } from "../../../youtube/transcript";
 import { splitTranscript } from "./helpers/splitTranscript";
 import { tweetsToString } from "../../../twitter/getUserContext";
 import { openpipe } from "../../../openpipe/openpipe";
-import { Tweet } from "../../../twitter/schemas";
 import { TranscriptClip } from "./helpers/transcriptClip";
 import { searchAndChunk } from "../../dialogs/searchAndChunk";
 import {
@@ -47,17 +41,12 @@ export class RecommendClipsPrompt extends Prompt<
     });
   }
 
-  async execute(args: {
-    enableOpenPipeLogging?: boolean;
-    openPipeRequestTags?: RequestTagsWithoutName;
-    user: string;
-    tweets: Tweet[];
-    transcript: TranscriptCue[];
-    title: string;
-    url: string;
-    videoId: string;
-    verbose?: boolean;
-  }): Promise<TranscriptClip[]> {
+  async execute(
+    args: {
+      enableOpenPipeLogging?: boolean;
+      openPipeRequestTags?: RequestTagsWithoutName;
+    } & RecommendClipsCustomInput
+  ): Promise<TranscriptClip[]> {
     const text = args.transcript
       .map((cue, i) =>
         `
@@ -89,7 +78,7 @@ ${cue.text}
         body: {
           max_tokens: this.max_tokens,
           temperature: this.temperature,
-          model: this.model,
+          model: "openpipe:two-towns-joke",
         },
         openPipeRequestTags: args.openPipeRequestTags
           ? {
@@ -117,71 +106,61 @@ ${cue.text}
   }
 }
 
-const testClipLength = (output: RecommendClipsOutput) => {
-  const clips = output.clips || [];
-  const wrongLength = clips.find((clip) => {
-    const n_cues = clip.endId - clip.startId;
-    return n_cues < MIN_CLIP_LENGTH || n_cues > MAX_CLIP_LENGTH;
-  });
-  if (wrongLength) {
-    return {
-      score: 0,
-      reason:
-        "At least one clip is too short or too long:\n" +
-        JSON.stringify(wrongLength, null, 2),
-      pass: false,
-    };
-  }
-  return {
-    score: 1,
-    reason: "",
-    pass: true,
-  };
-};
-
-export const recommendClips = () =>
-  new RecommendClipsPrompt()
-    .withTest(
+export const recommendClips = () => {
+  const recClipsPrompt = new RecommendClipsPrompt();
+  recClipsPrompt
+    .withCustomTest(
       {
         name: "medium related",
         vars: {
           tweets: unrelatedDataset1.tweets.value,
           title: unrelatedDataset1.title.value,
           transcript: unrelatedDataset1.transcript.value,
+          user: unrelatedDataset1.user.value,
+          videoId: unrelatedDataset1.videoId.value,
+          url: unrelatedDataset1.url.value,
         },
       },
-      testClipLength
+      recClipsPrompt.execute.bind(recClipsPrompt)
     )
-    .withTest(
+    .withCustomTest(
       {
         name: "unrelated",
         vars: {
           tweets: unrelatedDataset2.tweets.value,
           title: unrelatedDataset2.title.value,
           transcript: unrelatedDataset2.transcript.value,
+          user: unrelatedDataset2.user.value,
+          videoId: unrelatedDataset2.videoId.value,
+          url: unrelatedDataset2.url.value,
         },
       },
-      // expect no clips to be created
+      recClipsPrompt.execute.bind(recClipsPrompt),
       (output) => {
-        const clips = output.clips || [];
+        const clips: TranscriptClip[] = JSON.parse(output);
         return {
           score: clips.length === 0 ? 1 : 0,
-          reason: "",
+          reason:
+            clips.length === 0
+              ? "No clips"
+              : "Expected no clips, got " + JSON.stringify(clips, null, 2),
           pass: clips.length === 0,
         };
-      },
-      testClipLength
+      }
     )
-    .withTest(
+    .withCustomTest(
       {
         name: "strongly related",
         vars: {
           tweets: relatedDataset.tweets.value,
           title: relatedDataset.title.value,
           transcript: relatedDataset.transcript.value,
+          user: relatedDataset.user.value,
+          videoId: relatedDataset.videoId.value,
+          url: relatedDataset.url.value,
         },
       },
-      testClipLength
+      recClipsPrompt.execute.bind(recClipsPrompt)
     )
     .withCommand({
       name: "search and chunk",
@@ -189,3 +168,5 @@ export const recommendClips = () =>
         await searchAndChunk();
       },
     });
+  return recClipsPrompt;
+};

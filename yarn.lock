@@ -3584,7 +3584,7 @@ __metadata:
     js-tiktoken: "npm:^1.0.8"
     openai: "npm:^4.20.1"
     openpipe: "npm:^0.6.3"
-    prompt-iteration-assistant: "npm:^0.0.29"
+    prompt-iteration-assistant: "npm:^0.0.34"
     promptfoo: "npm:^0.28.1"
     pybridge: "npm:^1.1.0"
     remeda: "npm:^1.29.0"
@@ -8587,9 +8587,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"prompt-iteration-assistant@npm:^0.0.29":
-  version: 0.0.29
-  resolution: "prompt-iteration-assistant@npm:0.0.29"
+"prompt-iteration-assistant@npm:^0.0.34":
+  version: 0.0.34
+  resolution: "prompt-iteration-assistant@npm:0.0.34"
   dependencies:
     "@inquirer/prompts": "npm:^3.3.0"
     boxen: "npm:^7.1.1"
@@ -8610,7 +8610,7 @@ __metadata:
     tty-table: "npm:^4.2.3"
     zod: "npm:^3.22.4"
     zod-to-json-schema: "npm:^3.22.1"
-  checksum: e4469ed4ffcd0880f43a2dd7969e6b2cfb78ebb096504dc65706bf9a8f1814ea598d447d7de84ae2a2d2ea1a7d030d61eab9c24d593b0b46651e5fbc7759d9f6
+  checksum: cf59b33eef731b6bfa9c7198861be00aa6742b0449dd3dcf70caff33296fe053229bc9295d9caeeef1386ede280e028fafafb4966b42b8d5aa09014e96cdedc2
   languageName: node
   linkType: hard
 
@@ -9022,6 +9022,12 @@ __metadata:
   checksum: 6fa848cf63d1b82ab4e985f4cf72bd55b7dcfd8e0a376905804e48c3634b7e749170940ba77b32804d5fe93b3cc521aa95a8d7e7d725f830da6d93f3669ce66b
   languageName: node
   linkType: hard
+
+"recommender@workspace:packages/recommender":
+  version: 0.0.0-use.local
+  resolution: "recommender@workspace:packages/recommender"
+  languageName: unknown
+  linkType: soft
 
 "redeyed@npm:~2.1.0":
   version: 2.1.1
@@ -9472,6 +9478,12 @@ __metadata:
   checksum: fa9f0e21a540a28f301258dfe1e57bb4f81cd460d28f0e973860477dd4acef946a1f41748b5bd41c73b621bea2029569c935faa38578fd34cd42a9b4947088ba
   languageName: node
   linkType: hard
+
+"server@workspace:packages/server":
+  version: 0.0.0-use.local
+  resolution: "server@workspace:packages/server"
+  languageName: unknown
+  linkType: soft
 
 "set-blocking@npm:^2.0.0":
   version: 2.0.0
