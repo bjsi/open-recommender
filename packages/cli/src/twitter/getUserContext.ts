@@ -21,9 +21,14 @@ export const tweetToString = (args: {
   const type = tweet.type;
   const hasContext = type === "quote" || type === "reply";
   const date = hasContext ? tweet.replyDate : tweet.date;
-  const content = hasContext ? tweet.replyContent : tweet.content;
+  let content = hasContext ? tweet.replyContent : tweet.content;
+  for (const link of data.links) {
+    if (link.tcourl) {
+      content = content.replace(link.tcourl, link.url);
+    }
+  }
   const formattedTweet = [
-    id && `ID: ${id}`,
+    id != null && `ID: ${id}`,
     tweet.type === "like" && `Liked by @${user}`,
     hasContext && `tweet: @${tweet.contextUser} (${tweet.contextDate})`,
     hasContext && tweet.contextContent,

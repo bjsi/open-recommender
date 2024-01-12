@@ -3582,6 +3582,7 @@ __metadata:
     inquirer-search-list: "npm:^1.2.6"
     jest: "npm:^29.7.0"
     js-tiktoken: "npm:^1.0.8"
+    metaphor-node: "npm:^1.0.30"
     openai: "npm:^4.20.1"
     openpipe: "npm:^0.6.3"
     prompt-iteration-assistant: "npm:^0.0.34"
@@ -3960,6 +3961,15 @@ __metadata:
   version: 1.1.1
   resolution: "create-require@npm:1.1.1"
   checksum: 157cbc59b2430ae9a90034a5f3a1b398b6738bf510f713edc4d4e45e169bc514d3d99dd34d8d01ca7ae7830b5b8b537e46ae8f3c8f932371b0875c0151d7ec91
+  languageName: node
+  linkType: hard
+
+"cross-fetch@npm:^4.0.0":
+  version: 4.0.0
+  resolution: "cross-fetch@npm:4.0.0"
+  dependencies:
+    node-fetch: "npm:^2.6.12"
+  checksum: 386727dc4c6b044746086aced959ff21101abb85c43df5e1d151547ccb6f338f86dec3f28b9dbddfa8ff5b9ec8662ed2263ad4607a93b2dc354fb7fe3bbb898a
   languageName: node
   linkType: hard
 
@@ -7420,6 +7430,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"metaphor-node@npm:^1.0.30":
+  version: 1.0.30
+  resolution: "metaphor-node@npm:1.0.30"
+  dependencies:
+    cross-fetch: "npm:^4.0.0"
+  checksum: 932610d8e83dc9859405f9f7e2880dedbfc3a98769ec9d3280ebaf6a8ce2b2f22ecbc2c7bb67e9dd6692adccf8cdbb4701136a41dae194d8b15ea32bab972094
+  languageName: node
+  linkType: hard
+
 "methods@npm:~1.1.2":
   version: 1.1.2
   resolution: "methods@npm:1.1.2"
@@ -7814,7 +7833,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"node-fetch@npm:^2.6.7":
+"node-fetch@npm:^2.6.12, node-fetch@npm:^2.6.7":
   version: 2.7.0
   resolution: "node-fetch@npm:2.7.0"
   dependencies:

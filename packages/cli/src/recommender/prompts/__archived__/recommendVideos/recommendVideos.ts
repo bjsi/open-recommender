@@ -6,11 +6,11 @@ import { Prompt } from "prompt-iteration-assistant";
 import { recommendVideosOutputSchema } from "./schemas/recommendVideosOutputSchema";
 import { mainPrompt } from "./prompts/withExample";
 import _ from "lodash";
-import { tweetsToString } from "../../../twitter/getUserContext";
-import { Tweet } from "../../../twitter/schemas";
-import { searchResultsToString } from "../../../youtube/formatting";
-import { SearchResult } from "../../../youtube/search";
-import { openpipe } from "../../../openpipe/openpipe";
+import { tweetsToString } from "../../../../twitter/getUserContext";
+import { Tweet } from "../../../../twitter/schemas";
+import { searchResultsToString } from "../../../../youtube/formatting";
+import { SearchResult } from "../../../../youtube/search";
+import { openpipe } from "../../../../openpipe/openpipe";
 import {
   elonAndRemNote,
   elonAndRemNoteSearchResults,
@@ -18,7 +18,7 @@ import {
 import {
   RequestTagsWithoutName,
   formatPromptName,
-} from "../../../openpipe/requestTags";
+} from "../../../../openpipe/requestTags";
 import { sortBy } from "remeda";
 
 export const RECOMMEND_VIDEOS = "Recommend Videos";

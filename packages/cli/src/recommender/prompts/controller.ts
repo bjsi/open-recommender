@@ -14,8 +14,20 @@ import {
 import {
   RECOMMEND_VIDEOS,
   recommendVideos,
-} from "./recommendVideos/recommendVideos";
+} from "./__archived__/recommendVideos/recommendVideos";
 import { RERANK_CLIPS, rerankClips } from "./rerankClips/rerankClips";
+import {
+  EXTRACT_RELEVANT_TWEETS,
+  extractRelevantTweets,
+} from "./__archived__/filterIrrelevantTweets/filterIrrelevantTweets";
+import {
+  SUMMARIZE_TWEETS,
+  recursivelySummarizeTweets,
+} from "./recursiveTwitterSummarizer/recursiveTwitterSummarizer";
+import {
+  CREATE_SEARCH_QUERIES_FROM_PROFILE,
+  createQueriesFromProfile,
+} from "./createQueriesFromProfile/createQueriesFromProfile";
 
 /**
  * Container for all the prompts in the recommender.
@@ -26,4 +38,7 @@ export const promptController = new PromptController({
   [CREATE_YOUTUBE_SEARCH_QUERIES]: createYouTubeSearchQueries,
   [RECOMMEND_VIDEOS]: recommendVideos,
   [RERANK_CLIPS]: rerankClips,
+  [EXTRACT_RELEVANT_TWEETS]: extractRelevantTweets,
+  [SUMMARIZE_TWEETS]: recursivelySummarizeTweets,
+  [CREATE_SEARCH_QUERIES_FROM_PROFILE]: createQueriesFromProfile,
 });

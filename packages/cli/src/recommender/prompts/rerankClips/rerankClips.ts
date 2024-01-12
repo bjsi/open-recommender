@@ -14,6 +14,7 @@ import { searchChunkAndRank } from "../../dialogs/searchAndChunk";
 import { advancedRagDataset } from "./datasets/advancedRagDataset";
 import { RequestTagsWithoutName } from "../../../openpipe/requestTags";
 import { transcriptClipsToString } from "./helpers/transcriptClipsToString";
+import { zeroShotPromptWithUserProfile } from "./prompts/withProfileSummary";
 
 export const RERANK_CLIPS = "Rerank Clips";
 
@@ -33,7 +34,7 @@ export class RerankClips extends Prompt<
       name: RERANK_CLIPS,
       description:
         "Order YouTube video clips based on their relevance to the user's interests.",
-      prompts: [zeroShotPrompt],
+      prompts: [zeroShotPromptWithUserProfile, zeroShotPrompt],
       model: "gpt-4",
       input: rerankClipsInputSchema,
       output: rerankClipsOutputSchema,
@@ -47,6 +48,7 @@ export class RerankClips extends Prompt<
     user: string;
     tweets: Tweet[];
     clips: TranscriptClip[];
+    profile: string;
     enableOpenPipeLogging?: boolean;
     openPipeRequestTags?: RequestTagsWithoutName;
   }) {
@@ -54,6 +56,7 @@ export class RerankClips extends Prompt<
       const promptVariables: RerankClipsInput = {
         tweets: tweetsToString({ tweets: args.tweets, user: args.user }),
         clips: transcriptClipsToString(windowClips),
+        profile: args.profile,
       };
       const candidatePrompt = this.chooseCandidatePrompt(promptVariables);
       const res = await openpipe.functionCall({
@@ -120,6 +123,7 @@ export const rerankClips = (
         vars: {
           clips: advancedRagDataset.clips.value,
           tweets: advancedRagDataset.tweets.value,
+          profile: advancedRagDataset.profile.value,
         },
       },
       (output) => {

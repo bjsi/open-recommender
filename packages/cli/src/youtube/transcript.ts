@@ -1,10 +1,11 @@
 import chalk from "chalk";
 import { execSync } from "child_process";
-import { existsSync, readFileSync, writeFileSync } from "fs";
+import { existsSync, readFileSync, readdirSync, writeFileSync } from "fs";
 import path from "path";
 import { dataFolder } from "../filesystem";
 import { parseSync, stringifySync } from "subtitle";
 import { tokenize } from "../tokenize";
+import { readBuilderProgram } from "typescript";
 
 export interface Transcript {
   cues: TranscriptCue[];
@@ -13,30 +14,68 @@ export interface Transcript {
   videoId: string;
 }
 
+const tryReadFileSync = (file: string) => {
+  try {
+    return readFileSync(file, "utf-8");
+  } catch (error) {
+    return undefined;
+  }
+};
+
 export async function fetchTranscript(
   videoId: string,
   videoTitle: string
 ): Promise<Transcript | undefined> {
-  const command = [
+  const bestQualityTranscriptCmd = [
     "yt-dlp",
-    "--write-sub",
-    "--write-auto-sub",
-    "--sub-lang",
-    "en",
-    "--sub-format",
-    "vtt",
+    "--write-subs",
+    "--sub-lang='en.*'",
     "--skip-download",
     "-o",
     `"${dataFolder}/${videoId}.%(ext)s"`,
     `https://www.youtube.com/watch?v=${videoId}`,
   ];
-  const transcriptFile = path.join(dataFolder, `${videoId}.en.vtt`);
-  console.log(transcriptFile);
+
+  const fallbackAutoSubsCmd = [
+    "yt-dlp",
+    "--write-subs",
+    "--write-auto-sub",
+    "--sub-lang='en.*'",
+    "--skip-download",
+    "-o",
+    `"${dataFolder}/${videoId}.%(ext)s"`,
+    `https://www.youtube.com/watch?v=${videoId}`,
+  ];
+
+  // search for file similar to ${id}.en-ehkg1hFWq8A.vtt
+  // the other id is a random code
+  let transcriptFile = readdirSync(dataFolder).find((x) =>
+    x.match(`${videoId}.en-.*.vtt`)
+  );
+
   try {
-    if (!existsSync(transcriptFile)) {
-      execSync(command.join(" "));
+    if (!transcriptFile || !existsSync(transcriptFile)) {
+      execSync(bestQualityTranscriptCmd.join(" "));
     }
-    const transcriptText = readFileSync(transcriptFile, "utf-8");
+    transcriptFile = readdirSync(dataFolder).find((x) =>
+      x.match(`${videoId}.en-.*.vtt`)
+    );
+    let transcriptText = transcriptFile && tryReadFileSync(transcriptFile);
+    if (!transcriptText) {
+      execSync(fallbackAutoSubsCmd.join(" "));
+      transcriptText = tryReadFileSync(
+        path.join(dataFolder, `${videoId}.en.vtt`)
+      );
+    }
+    if (!transcriptText) {
+      console.error(
+        chalk.red(
+          `Failed to download transcript for video ID ${videoId}: ${transcriptText}`
+        )
+      );
+      return;
+    }
+
     const cues = await parseTranscript({
       transcript: transcriptText,
       videoId,

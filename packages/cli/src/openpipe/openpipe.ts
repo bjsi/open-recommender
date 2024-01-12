@@ -8,6 +8,9 @@ import {
 import { z } from "zod";
 import zodToJsonSchema from "zod-to-json-schema";
 import { RequestTagsLatest } from "./requestTags";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 const client = new OpenAI();
 
@@ -75,12 +78,15 @@ export const openpipe = {
       if (args.verbose) {
         console.log(JSON.stringify(response, null, 2));
       }
-      const valueText = response.choices[0]!.message.function_call!.arguments;
+      const fnArgs = response.choices[0]!.message.function_call!.arguments;
+      // remove quotes at the beginning and end of the string
+      // replace any newlines with spaces
+      const valueText = fnArgs.trim().replace(/^"|"$/g, "").replace(/\n/g, " ");
       try {
         const json = JSON.parse(valueText);
         return args.function.output?.parse?.(json);
       } catch (e) {
-        console.log("function_call.arguments", valueText);
+        console.log("function_call.arguments", "`" + valueText + "`");
         throw e;
       }
     } catch (e) {

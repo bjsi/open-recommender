@@ -44,13 +44,31 @@ class AppraiseTranscriptPrompt extends Prompt<
   async execute(args: {
     transcript: TranscriptCue[];
     title: string;
+    profile: string;
     openPipeRequestTags?: Omit<RequestTagsLatest, "promptName">;
     enableOpenPipeLogging?: boolean;
   }) {
-    const transcript = firstNTokens(transcriptCuesToVtt(args.transcript), 1000);
+    // take a max of 2000 transcript tokens, depending on the length of the prompt + profile
+    const maxTranscriptTokens =
+      8192 -
+      // for output
+      400 -
+      (
+        await this.calculateCost({
+          transcript: "",
+          profile: args.profile,
+          videoTitle: args.title,
+        })
+      ).total;
+    const transcript = firstNTokens(
+      transcriptCuesToVtt(args.transcript),
+      Math.min(maxTranscriptTokens, 2000)
+    );
+
     const promptVariables: AppraiseTranscriptInput = {
       transcript,
       videoTitle: args.title,
+      profile: args.profile,
     };
     const candidatePrompt = this.chooseCandidatePrompt(promptVariables);
     const res = await openpipe.functionCall({
@@ -78,8 +96,7 @@ class AppraiseTranscriptPrompt extends Prompt<
     return (
       res || {
         recommend: false,
-
-        reason: "No response from OpenAI",
+        reasoning: "No response from OpenAI",
       }
     );
   }
@@ -92,6 +109,7 @@ export const appraiseTranscript = () =>
         name: "quality-250-tokens",
         vars: {
           transcript: firstNTokens(learningVideoDataSet.transcript.value, 250),
+          profile: learningVideoDataSet.profile.value,
         },
       },
       (output) => {
@@ -107,6 +125,7 @@ export const appraiseTranscript = () =>
         name: "quality-500-tokens",
         vars: {
           transcript: firstNTokens(learningVideoDataSet.transcript.value, 500),
+          profile: learningVideoDataSet.profile.value,
         },
       },
       (output) => {
@@ -122,6 +141,7 @@ export const appraiseTranscript = () =>
         name: "quality-1000-tokens",
         vars: {
           transcript: firstNTokens(learningVideoDataSet.transcript.value, 1000),
+          profile: learningVideoDataSet.profile.value,
         },
       },
       (output) => {
@@ -138,6 +158,7 @@ export const appraiseTranscript = () =>
         name: "spam-350-tokens",
         vars: {
           transcript: firstNTokens(spamVideoDataset.transcript.value, 350),
+          profile: learningVideoDataSet.profile.value,
         },
       },
       (output) => {
@@ -153,6 +174,7 @@ export const appraiseTranscript = () =>
         name: "spam-500-tokens",
         vars: {
           transcript: firstNTokens(spamVideoDataset.transcript.value, 500),
+          profile: learningVideoDataSet.profile.value,
         },
       },
       (output) => {
@@ -168,6 +190,7 @@ export const appraiseTranscript = () =>
         name: "spam-1000-tokens",
         vars: {
           transcript: firstNTokens(spamVideoDataset.transcript.value, 1000),
+          profile: learningVideoDataSet.profile.value,
         },
       },
       (output) => {

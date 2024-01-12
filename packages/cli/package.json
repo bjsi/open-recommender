@@ -19,6 +19,7 @@
     "inquirer": "^8.0.0",
     "inquirer-search-list": "^1.2.6",
     "js-tiktoken": "^1.0.8",
+    "metaphor-node": "^1.0.30",
     "openai": "^4.20.1",
     "openpipe": "^0.6.3",
     "prompt-iteration-assistant": "^0.0.34",
@@ -40,6 +41,10 @@
     "yt:filter": "npx tsx ./src/recommender/filterSearchResults.ts",
     "yt:clips": "npx tsx ./src/recommender/chunkTranscript.ts",
     "twitter:context": "npx ts-node -T ./src/twitter/getUserContext.ts",
+    "twitter:filter": "npx tsx ./src/recommender/prompts/filterIrrelevantTweets/filterIrrelevantTweets.ts",
+    "twitter:summarize": "npx tsx ./src/recommender/prompts/recursiveTwitterSummarizer/recursiveTwitterSummarizer.ts",
+    "metaphor:search": "npx tsx ./src/metaphor/search.ts",
+    "twitter:queries": "npx tsx ./src/recommender/prompts/createQueriesFromProfile/createQueriesFromProfile.ts",
     "main": "npx ts-node -T ./src/pipeline/main.ts",
     "test": "jest",
     "client": "yarn workspace client dev"

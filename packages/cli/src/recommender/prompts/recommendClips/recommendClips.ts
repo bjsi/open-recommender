@@ -1,6 +1,7 @@
 import { Prompt } from "prompt-iteration-assistant";
 import {
   RecommendClipsCustomInput,
+  RecommendClipsInput,
   recommendClipsInputSchema,
 } from "./schemas/recommendClipsInputSchema";
 import { withExamplePrompt } from "./prompts/withExample";
@@ -17,6 +18,7 @@ import {
   RequestTagsWithoutName,
   formatPromptName,
 } from "../../../openpipe/requestTags";
+import { withProfileSummary } from "./prompts/withProfileSummary";
 
 export const RECOMMEND_CLIPS = "Recommend Clips";
 
@@ -33,7 +35,7 @@ export class RecommendClipsPrompt extends Prompt<
       name: RECOMMEND_CLIPS,
       description:
         "Recommend relevant clips from a transcript to the user based on their interests.",
-      prompts: [withExamplePrompt],
+      prompts: [withProfileSummary, withExamplePrompt],
       model: "gpt-4",
       input: recommendClipsInputSchema,
       output: recommendClipsOutputSchema,
@@ -59,10 +61,11 @@ ${cue.text}
     const parts = await splitTranscript({ text, separators: ["---"] });
     const chunks: TranscriptClip[] = [];
     for (const part of parts) {
-      const promptVariables = {
+      const promptVariables: RecommendClipsInput = {
         tweets: tweetsToString({ tweets: args.tweets, user: args.user }),
         transcript: part,
         title: args.title,
+        profile: args.profile,
       };
 
       const candidatePrompt = this.chooseCandidatePrompt(promptVariables);
@@ -78,7 +81,7 @@ ${cue.text}
         body: {
           max_tokens: this.max_tokens,
           temperature: this.temperature,
-          model: "openpipe:two-towns-joke",
+          model: this.model,
         },
         openPipeRequestTags: args.openPipeRequestTags
           ? {
@@ -119,6 +122,7 @@ export const recommendClips = () => {
           user: unrelatedDataset1.user.value,
           videoId: unrelatedDataset1.videoId.value,
           url: unrelatedDataset1.url.value,
+          profile: unrelatedDataset1.profile.value,
         },
       },
       recClipsPrompt.execute.bind(recClipsPrompt)
@@ -133,6 +137,7 @@ export const recommendClips = () => {
           user: unrelatedDataset2.user.value,
           videoId: unrelatedDataset2.videoId.value,
           url: unrelatedDataset2.url.value,
+          profile: unrelatedDataset2.profile.value,
         },
       },
       recClipsPrompt.execute.bind(recClipsPrompt),
@@ -158,6 +163,7 @@ export const recommendClips = () => {
           user: relatedDataset.user.value,
           videoId: relatedDataset.videoId.value,
           url: relatedDataset.url.value,
+          profile: relatedDataset.profile.value,
         },
       },
       recClipsPrompt.execute.bind(recClipsPrompt)
