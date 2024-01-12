@@ -3,12 +3,12 @@ import { getRunById } from "./run";
 import {
   appraiseTranscripts,
   chunkTranscripts,
-  createQueries,
+  createQueriesMetaphor,
   downloadTranscripts,
-  filterSearchResults,
   getTweets,
   rankClips,
   searchForVideos,
+  summarizeTweets,
   validateArgs,
 } from "./stages";
 import { Command } from "commander";
@@ -44,9 +44,9 @@ import { Command } from "commander";
   const pipeline = new Pipeline(opts)
     .addStage(validateArgs)
     .addStage(getTweets)
-    .addStage(createQueries)
+    .addStage(summarizeTweets)
+    .addStage(createQueriesMetaphor)
     .addStage(searchForVideos)
-    .addStage(filterSearchResults)
     .addStage(downloadTranscripts)
     .addStage(appraiseTranscripts)
     .addStage(chunkTranscripts)

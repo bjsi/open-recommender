@@ -7,8 +7,6 @@ import { Failure, Success, failure, success } from "./run";
 import { TranscriptCue } from "../youtube/transcript";
 import { PipelineArgs, pipelineArgsSchema } from "./pipeline";
 import { TranscriptClip } from "../recommender/prompts/recommendClips/helpers/transcriptClip";
-import { createYouTubeSearchQueries } from "../recommender/prompts/createQueries/createQueries";
-import { recommendVideos } from "../recommender/prompts/__archived__/recommendVideos/recommendVideos";
 import { appraiseTranscript } from "../recommender/prompts/appraiseTranscript/appraiseTranscript";
 import { recommendClips } from "../recommender/prompts/recommendClips/recommendClips";
 import { rerankClips } from "../recommender/prompts/rerankClips/rerankClips";
@@ -63,10 +61,12 @@ export const getTweets = {
     // get user context
 
     console.log(chalk.blue("Fetching tweets..."));
-    const tweets = await twitter.tweets.fetch({
-      user,
-      n_tweets: 300,
-    });
+    const tweets = (
+      await twitter.tweets.fetch({
+        user,
+        n_tweets: 200,
+      })
+    ).slice(0, 300);
     if (!tweets.length) {
       console.log(chalk.red("No tweets found"));
     } else {
@@ -386,6 +386,7 @@ export const rankClips = {
       (
         await rerankClips().calculateCost({
           clips: "",
+          profile: args.profile,
           tweets: tweetsToString({ tweets: args.tweets, user: args.user }),
         })
       ).total;
@@ -416,6 +417,7 @@ export const rankClips = {
               openPipeRequestTags: createRequestTags(args),
               user: args.user,
               tweets: args.tweets,
+              profile: args.profile,
               clips: chunk,
             });
             return orderedClips;
