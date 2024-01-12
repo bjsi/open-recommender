@@ -17,6 +17,7 @@ import {
   RequestTagsLatest,
   formatPromptName,
 } from "../../../openpipe/requestTags";
+import { withProfilePrompt } from "./prompts/withUserProfile";
 
 export const APPRAISE_TRANSCRIPT = "Appraise Transcript";
 
@@ -35,7 +36,7 @@ class AppraiseTranscriptPrompt extends Prompt<
         "Appraise a video transcript and decide whether to recommend it to the user.",
       input: appraiseTranscriptInputSchema,
       output: appraiseTrancriptOuputSchema,
-      prompts: [noTitlePrompt],
+      prompts: [withProfilePrompt, noTitlePrompt],
       model: "gpt-4",
       exampleData: [spamVideoDataset, learningVideoDataSet],
     });

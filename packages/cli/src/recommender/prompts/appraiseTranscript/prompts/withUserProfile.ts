@@ -1,7 +1,7 @@
 import { CandidatePrompt } from "prompt-iteration-assistant";
 import { AppraiseTranscriptInput } from "../schemas/appraiseTranscriptInputSchema";
 
-export const noTitlePrompt = new CandidatePrompt<AppraiseTranscriptInput>({
+export const withProfilePrompt = new CandidatePrompt<AppraiseTranscriptInput>({
   name: "with user profile",
   compile: function () {
     return [

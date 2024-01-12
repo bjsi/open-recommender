@@ -19,7 +19,7 @@ export async function searchYouTubeVideos(
 ): Promise<MetaphorYouTubeResult[]> {
   try {
     const response = await metaphor.search(query, {
-      numResults: 10,
+      numResults: 5,
       includeDomains: ["youtube.com"],
       useAutoprompt: true,
     });
