@@ -133,7 +133,9 @@ export class RecursiveTwitterSummarizer extends Prompt<
     const summarizeRecursively = async (
       summaries: string[]
     ): Promise<string | undefined> => {
-      summaries = summaries.filter((x) => x.trim().length > 0);
+      summaries = summaries
+        .filter((x) => x.trim().length > 0)
+        .map((x) => x.replace(/\r?\n/g, " "));
       if (
         summaries.length <= 1 ||
         (await tokenize(summaries.reduce((a, b) => a + " " + b))).length <= 1200

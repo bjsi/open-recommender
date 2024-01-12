@@ -26,43 +26,43 @@ export async function fetchTranscript(
   videoId: string,
   videoTitle: string
 ): Promise<Transcript | undefined> {
+  "yt-dlp --write-sub --sub-lang='en.*' --skip-download -o";
   const bestQualityTranscriptCmd = [
     "yt-dlp",
-    "--write-subs",
+    "--write-sub",
     "--sub-lang='en.*'",
     "--skip-download",
     "-o",
-    `"${dataFolder}/${videoId}.%(ext)s"`,
+    `\"${dataFolder}/${videoId}\"`,
     `https://www.youtube.com/watch?v=${videoId}`,
-  ];
+  ].join(" ");
 
   const fallbackAutoSubsCmd = [
     "yt-dlp",
-    "--write-subs",
     "--write-auto-sub",
-    "--sub-lang='en.*'",
     "--skip-download",
     "-o",
     `"${dataFolder}/${videoId}.%(ext)s"`,
     `https://www.youtube.com/watch?v=${videoId}`,
-  ];
+  ].join(" ");
 
   // search for file similar to ${id}.en-ehkg1hFWq8A.vtt
   // the other id is a random code
-  let transcriptFile = readdirSync(dataFolder).find((x) =>
-    x.match(`${videoId}.en-.*.vtt`)
-  );
-
+  // match using regex
+  const files = readdirSync(dataFolder);
+  let transcriptFile = files.find((x) => x.startsWith(videoId));
   try {
     if (!transcriptFile || !existsSync(transcriptFile)) {
-      execSync(bestQualityTranscriptCmd.join(" "));
+      execSync(bestQualityTranscriptCmd);
     }
-    transcriptFile = readdirSync(dataFolder).find((x) =>
-      x.match(`${videoId}.en-.*.vtt`)
-    );
-    let transcriptText = transcriptFile && tryReadFileSync(transcriptFile);
+    const files2 = readdirSync(dataFolder);
+    transcriptFile = files2.find((x) => x.startsWith(videoId));
+    let transcriptText = transcriptFile
+      ? tryReadFileSync(path.join(dataFolder, transcriptFile))
+      : undefined;
     if (!transcriptText) {
-      execSync(fallbackAutoSubsCmd.join(" "));
+      console.log("Falling back to auto subs");
+      execSync(fallbackAutoSubsCmd);
       transcriptText = tryReadFileSync(
         path.join(dataFolder, `${videoId}.en.vtt`)
       );
@@ -175,47 +175,6 @@ export const transcriptCuesToVtt = (cues: TranscriptCue[]) => {
   );
 };
 
-async function mergeChunks(chunks: TranscriptCue[], videoTitle: string) {
-  let mergedChunks: TranscriptCue[] = [];
-  let tempText = "";
-  let tempStart = 0;
-  let tempEnd = 0;
-
-  for (let i = 0; i < chunks.length; i++) {
-    const chunk = chunks[i];
-    const newTokens = (await tokenize(chunk.text)).length;
-    const existingTokens = (await tokenize(tempText)).length;
-
-    if (existingTokens + newTokens <= 256) {
-      tempText = tempText ? `${tempText} ${chunk.text}` : chunk.text;
-      tempEnd = chunk.end;
-      if (tempStart === 0) tempStart = chunk.start;
-    } else {
-      mergedChunks.push({
-        text: tempText,
-        url: chunk.url,
-        start: tempStart,
-        end: tempEnd,
-        videoTitle,
-      });
-      tempText = chunk.text;
-      tempStart = chunk.start;
-      tempEnd = chunk.end;
-    }
-  }
-
-  // Add any remaining text
-  if (tempText) {
-    mergedChunks.push({
-      text: tempText,
-      url: chunks[chunks.length - 1].url,
-      start: tempStart,
-      end: tempEnd,
-      videoTitle,
-    });
-  }
-}
-
 if (require.main === module) {
   const videoId = process.argv[2] || "eAnNGqwI2AQ";
   if (!videoId) {
@@ -227,10 +186,6 @@ if (require.main === module) {
     videoId,
     "The 10 AI Innovations Expected to Revolutionize 2024 - 2025"
   ).then((result) => {
-    writeFileSync(
-      path.join(__dirname, `${videoId}.json`),
-      JSON.stringify(result, null, 2)
-    );
     const formatted = result?.cues
       ?.map((x, i) => ({
         id: i,
