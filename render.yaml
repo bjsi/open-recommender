@@ -2,9 +2,12 @@ services:
   - type: web
     name: open-recommender-ui
     env: static
-    buildCommand: cd packages/client && yarn && yarn build
+    buildCommand: cd packages/shared && yarn && cd ../client && yarn && yarn build
     staticPublishPath: ./packages/client/dist
     branch: main
+    buildFilter:
+      - packages/client/**/*
+      - packages/shared/**/*
     envVars:
       - key: SKIP_INSTALL_DEPS
         value: true
@@ -12,9 +15,12 @@ services:
     plan: free
     name: open-recommender-api
     env: node
-    buildCommand: cd packages/server && yarn
+    buildCommand: cd packages/shared && yarn && cd ../server && yarn
     startCommand: cd packages/server && yarn start
     branch: main
+    buildFilter:
+      - packages/server/**/*
+      - packages/shared/**/*
     envVars:
       - key: SKIP_INSTALL_DEPS
         value: true
