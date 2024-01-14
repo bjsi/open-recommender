@@ -6,7 +6,6 @@ services:
     staticPublishPath: ./packages/client/dist
     branch: main
     buildFilter:
-    buildFilter:
       paths:
         - packages/client/**/*.ts
         - packages/client/**/*.tsx
