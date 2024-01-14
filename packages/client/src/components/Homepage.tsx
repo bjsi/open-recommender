@@ -1,16 +1,18 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { ShareClipOnboardingModal } from "./ShareClipOnboardingModal";
 import { User } from "shared/types/user";
 import { GetUsersOutput } from "shared/schemas/getUsers";
-import { useAuth } from "../lib/useAuth";
+import { AuthInfo } from "../lib/types";
 
-export function Homepage() {
-  const auth = useAuth();
+interface HomepageProps {
+  auth: AuthInfo | undefined;
+}
+
+export function Homepage(props: HomepageProps) {
   const [users, setUsers] = React.useState<User[]>();
 
   React.useEffect(() => {
-    fetch("http://localhost:3000/api/top-users", {
+    fetch(`${import.meta.env.VITE_SERVER_URL}/api/top-users`, {
       method: "GET",
       credentials: "include",
       headers: {
@@ -34,17 +36,19 @@ export function Homepage() {
 
   return (
     <div className="p-4">
-      {auth?.authenticated ? (
+      {props.auth?.authenticated ? (
         <>
-          <div>Welcome back, {auth.user.name}</div>
+          <div>Welcome back to Open Recommender, {props.auth.user.name}</div>
           <br></br>
         </>
-      ) : (
-        "Not logged in"
-      )}
+      ) : null}
       <p>
         I want to build a system that borrows the best elements from YouTube
-        shorts, TikTok, <a href="">spaced repetition</a> and{" "}
+        shorts, TikTok,{" "}
+        <a href="https://www.youtube.com/watch?v=fkU0p1pUVSs">
+          spaced repetition
+        </a>{" "}
+        and{" "}
         <a href="https://www.youtube.com/watch?v=oNCLLNZEtz0">
           incremental reading
         </a>{" "}
@@ -61,13 +65,7 @@ export function Homepage() {
         Interested?{" "}
         <a href="https://buy.stripe.com/bIY7tbco90f23sY9AC">Subscribe here</a>{" "}
         and I'll add you to the beta. Got ideas?{" "}
-        <a href="https://twitter.com/experilearning">DM me on Twitter</a>. Or
-        even better:{" "}
-        <ShareClipOnboardingModal shouldOpen>
-          <span className="text-blue-600 underline cursor-pointer hover:text-blue-800">
-            share a Tweet into my recommendation queue.
-          </span>
-        </ShareClipOnboardingModal>
+        <a href="https://twitter.com/experilearning">DM me on Twitter</a>.
       </p>
       <br></br>
       <p></p>
@@ -79,24 +77,13 @@ export function Homepage() {
           2024-01-08: Integrate <a href="https://metaphor.systems/">metaphor</a>
           .
         </li>
-        <li>2024-01-04: Fix clip seeking bug.</li>
-        <li>
-          2024-01-03: Add{" "}
-          <ShareClipOnboardingModal shouldOpen>
-            <span className="text-blue-600 underline cursor-pointer hover:text-blue-800">
-              clip sharing system
-            </span>
-            .
-          </ShareClipOnboardingModal>
-        </li>
-        <li>2024-01-02: Create UI v1</li>
       </ul>
       <br></br>
       <p>Top Users:</p>
       <ul className="list-disc list-inside">
         {(users || []).map((user) => (
           <li key={user?.id}>
-            <Link to={`/user/${user.username}`}>
+            <Link to={`/user/${user.username}/feed`}>
               {user.name} (@{user.username}) - {user.recommendations.length}{" "}
               clips
             </Link>

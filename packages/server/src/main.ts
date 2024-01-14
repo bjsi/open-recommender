@@ -17,7 +17,7 @@ passport.use(
     {
       consumerKey: process.env.TWITTER_CONSUMER_KEY!,
       consumerSecret: process.env.TWITTER_CONSUMER_SECRET!,
-      callbackURL: "http://localhost:3000/auth/twitter/callback",
+      callbackURL: `${process.env.SERVER_URL}/auth/twitter/callback`,
     },
     async function (_, __, profile, done) {
       try {
@@ -81,7 +81,7 @@ app.use(passport.session()); // if using sessions
 // set up cors to allow us to accept requests from our client
 app.use(
   cors({
-    origin: "http://localhost:5173", // allow to server to accept request from different origin
+    origin: process.env.CLIENT_URL!, // allow to server to accept request from different origin
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
     credentials: true, // allow session cookie from browser to pass through
   })

@@ -9,7 +9,7 @@ import { debounce } from "./debounce";
 export async function getNote(args: GetNoteForRecommendationInput) {
   try {
     const res = await fetch(
-      "http://localhost:3000/api/get-note-for-recommendation",
+      `${import.meta.env.VITE_SERVER_URL}/api/get-note-for-recommendation`,
       {
         method: "POST",
         credentials: "include",
@@ -34,7 +34,7 @@ export async function updateNote(args: UpdateNoteForRecommendationInput) {
   return await debounce(async () => {
     try {
       const res = await fetch(
-        "http://localhost:3000/api/update-note-for-recommendation",
+        `${import.meta.env.VITE_SERVER_URL}/api/update-note-for-recommendation`,
         {
           method: "POST",
           credentials: "include",

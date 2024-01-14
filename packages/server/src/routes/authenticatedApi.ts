@@ -11,6 +11,11 @@ import {
   updateNoteForRecommendationInputSchema,
 } from "shared/schemas/getNotes";
 import { updateSummaryInputSchema } from "shared/schemas/updateSummary";
+import {
+  GetSummariesOutput,
+  getSummariesSchema,
+} from "shared/schemas/getSummaries";
+import { summarySchema } from "shared/types/summary";
 
 const authenticatedApiRoutes = Router();
 
@@ -158,6 +163,28 @@ authenticatedApiRoutes.post("/update-summary", async (req, res) => {
       content: data.summary,
     },
   });
+});
+
+authenticatedApiRoutes.post("/get-summaries", async (req, res) => {
+  const data = getSummariesSchema.parse(req.body);
+  const user = await prisma.user.findUnique({
+    where: {
+      username: data.username,
+    },
+  });
+  if (!user) {
+    res.status(400).json({ error: "user not found" });
+    return;
+  }
+  const raw = await prisma.summary.findMany({
+    where: {
+      userId: user.id,
+    },
+  });
+  const validated = summarySchema.array().parse(raw);
+  return res.json({
+    summaries: validated,
+  } satisfies GetSummariesOutput);
 });
 
 export { authenticatedApiRoutes };

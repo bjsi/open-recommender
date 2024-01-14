@@ -4,7 +4,7 @@ import { AuthInfo } from "./types";
 export function useAuth(): AuthInfo | undefined {
   const [auth, setAuth] = React.useState<AuthInfo>();
   React.useEffect(() => {
-    fetch("http://localhost:3000/auth/login/success", {
+    fetch(`${import.meta.env.VITE_SERVER_URL}/auth/login/success`, {
       method: "GET",
       credentials: "include",
       headers: {

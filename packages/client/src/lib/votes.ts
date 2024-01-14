@@ -7,7 +7,7 @@ import { debounce } from "./debounce";
 export async function voteOnRecommendation(args: VoteOnRecommendationInput) {
   return await debounce(async () => {
     try {
-      const res = await fetch("http://localhost:3000/api/vote", {
+      const res = await fetch(`${import.meta.env.VITE_SERVER_URL}/api/vote`, {
         method: "POST",
         credentials: "include",
         headers: {

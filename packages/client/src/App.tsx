@@ -5,16 +5,21 @@ import { Layout } from "./components/Layout";
 import { VideosPage } from "./components/VideosPage";
 import { Homepage } from "./components/Homepage";
 import { NoPage } from "./components/NoPage";
-import { Privacy } from "./components/Privacy";
+import { ProfilePage } from "./components/ProfilePage";
+import { useAuth } from "./lib/useAuth";
 
 function App() {
+  const auth = useAuth();
   return (
     <HashRouter>
       <Routes>
         <Route path="/" element={<Layout />}>
-          <Route path="privacy" element={<Privacy />} />
-          <Route index element={<Homepage />} />
-          <Route path="user/:user" element={<VideosPage />} />
+          <Route index element={<Homepage auth={auth} />} />
+          <Route path="user/:user/feed" element={<VideosPage auth={auth} />} />
+          <Route
+            path="user/:user/profile"
+            element={<ProfilePage auth={auth} />}
+          />
           <Route path="*" element={<NoPage />} />
         </Route>
       </Routes>

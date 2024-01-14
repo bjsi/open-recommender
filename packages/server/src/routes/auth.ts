@@ -9,9 +9,14 @@ authRoutes.get(
   "/twitter/callback",
   passport.authenticate("twitter", {
     failureRedirect: "/login",
-    successRedirect: "http://localhost:5173/",
+    successRedirect: process.env.CLIENT_URL!,
   })
 );
+
+authRoutes.get("/logout", (req, res) => {
+  req.logout(() => {});
+  res.redirect(process.env.CLIENT_URL!);
+});
 
 // when login is successful, retrieve user info
 authRoutes.get("/login/success", (req, res) => {

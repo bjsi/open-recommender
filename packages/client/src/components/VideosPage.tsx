@@ -6,15 +6,19 @@ import {
   GetRecommendationsOutput,
 } from "shared/schemas/getRecommendations";
 import { RecommendationWithVotes } from "shared/schemas/recommendation";
-import { useAuth } from "../lib/useAuth";
+import { AuthInfo } from "../lib/types";
 
-export function VideosPage() {
+interface VideosPageProps {
+  auth: AuthInfo | undefined;
+}
+
+export function VideosPage(props: VideosPageProps) {
   const videosForUser = useParams().user as string;
-  const auth = useAuth();
   const [clips, setClips] = React.useState<RecommendationWithVotes[]>();
   const loading = !clips;
   React.useEffect(() => {
-    fetch(`http://localhost:3000/api/get-recommendations`, {
+    if (!props.auth?.authenticated) return;
+    fetch(`${import.meta.env.VITE_SERVER_URL}/api/get-recommendations`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -27,7 +31,7 @@ export function VideosPage() {
       .then((data: GetRecommendationsOutput) => {
         setClips(data.recommendations);
       });
-  }, [videosForUser]);
+  }, [videosForUser, props.auth]);
 
   const videoRefs = React.useRef<HTMLDivElement[]>([]);
   const [inViewIndex, setInViewIndex] = React.useState<number>(0);
@@ -75,7 +79,9 @@ export function VideosPage() {
     videoRefs.current[index] = ref;
   };
 
-  if (!clips || clips.length === 0) {
+  if (!props.auth?.authenticated) {
+    return <div>Not logged in</div>;
+  } else if (!clips || clips.length === 0) {
     return <div>No clips found for user {videosForUser}</div>;
   }
 
@@ -84,7 +90,7 @@ export function VideosPage() {
       <div ref={appVideosRef} className="app__videos xl:max-w-[1200px]">
         {clips.map((vid, i) => (
           <Video
-            auth={auth}
+            auth={props.auth}
             setVideoRef={handleVideoRef(i)}
             video={vid}
             key={i}

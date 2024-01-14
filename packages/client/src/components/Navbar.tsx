@@ -1,10 +1,13 @@
 import React from "react";
 import { useAuth } from "../lib/useAuth";
-import { Avatar } from "@mui/material";
 import { NAVBAR_HEIGHT } from "../lib/consts";
+import { login } from "../lib/login";
+import { AccountDropdown } from "./AccountDropdown";
+import { useNavigate } from "react-router-dom";
 
 export function Navbar() {
   const auth = useAuth();
+  const navigate = useNavigate();
   return (
     <nav
       style={{
@@ -15,33 +18,26 @@ export function Navbar() {
     >
       <h1
         onClick={() => {
-          window.open("http://localhost:5173/", "_self");
+          navigate("/");
         }}
         className="text-lg font-semibold cursor-pointer"
       >
         Open Recommender
       </h1>
-      <button
-        onClick={() => {
-          window.open("http://localhost:3000/auth/twitter", "_self");
-        }}
-        className="px-2 py-2 font-bold text-white bg-blue-500 rounded hover:bg-blue-700"
-      >
-        {!auth?.authenticated ? (
-          "Login"
-        ) : (
-          <div className="flex items-center gap-2">
-            <Avatar
-              sx={{
-                width: 24,
-                height: 24,
-              }}
-              src={auth.user.profile_image_url!}
-            ></Avatar>
-            <div>Logout</div>
-          </div>
-        )}
-      </button>
+      {!auth?.authenticated ? (
+        <button
+          onClick={() => {
+            if (!auth?.authenticated) {
+              login();
+            }
+          }}
+          className="px-2 py-2 font-bold text-white bg-blue-500 rounded hover:bg-blue-700"
+        >
+          Login
+        </button>
+      ) : (
+        <AccountDropdown user={auth.user} />
+      )}
     </nav>
   );
 }

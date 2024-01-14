@@ -1,15 +1,19 @@
-import { useAuth } from "../lib/useAuth";
 import React from "react";
+import { Summary } from "shared/types/summary";
+import { GetSummariesOutput } from "shared/schemas/getSummaries";
+import { AuthInfo } from "../lib/types";
 
-interface ProfilePageProps {}
+interface ProfilePageProps {
+  auth: AuthInfo | undefined;
+}
 
-export function ProfilePage() {
-  const auth = useAuth();
+export function ProfilePage(props: ProfilePageProps) {
   const [summaries, setSummaries] = React.useState<Summary[]>();
   const loading = !summaries;
 
   React.useEffect(() => {
-    fetch("http://localhost:3000/api/get-summaries", {
+    if (!props.auth?.authenticated) return;
+    fetch(`${import.meta.env.VITE_SERVER_URL}/api/get-summaries`, {
       method: "POST",
       credentials: "include",
       headers: {
@@ -23,32 +27,50 @@ export function ProfilePage() {
         throw new Error("failed to authenticate user");
       })
       .then((responseJson: GetSummariesOutput) => {
-        setSummaries({
-          authenticated: true,
-          user: responseJson.user,
-        });
-      })
-      .catch((error) => {
-        setAuth({
-          authenticated: false,
-          error: "Failed to authenticate user",
-        });
+        setSummaries(responseJson.summaries);
       });
-  }, []);
+  }, [props.auth]);
 
-  if (!auth.authenticated) {
+  //   React.useEffect(() => {
+  //     if (!auth?.authenticated) return;
+  //     fetch("import.meta.env.VITE_SERVER_URL/api/get-likes", {
+  //       method: "POST",
+  //       credentials: "include",
+  //       headers: {
+  //         Accept: "application/json",
+  //         "Content-Type": "application/json",
+  //         "Access-Control-Allow-Credentials": "true",
+  //       },
+  //     })
+  //       .then((response) => {
+  //         if (response.status === 200) return response.json();
+  //         throw new Error("failed to authenticate user");
+  //       })
+  //       .then((responseJson: GetSummariesOutput) => {
+  //         setSummaries(responseJson.summaries);
+  //       });
+  //   }, [auth]);
+
+  if (!props.auth?.authenticated) {
     return <div>Not logged in</div>;
   }
   return (
-    <div>
-      <div>Open Recommender uses your profile to recommend things to you.</div>
+    <div className="p-4">
+      <div>Currently, Open Recommender takes Tweets as input.</div>
       <br></br>
-      <div>Currently, Open Recommender only takes Tweets as input.</div>
       <div>
-        Soon, you will be able to upload any kind of data to drive
-        recommendations.
+        Soon, you will be able to upload any kind of data, either here or via
+        the API, to drive recommendations.
       </div>
-      <div>You will also be able to effortlessly </div>
+      <br></br>
+      <div>Data</div>
+      <ul>
+        {summaries?.map((summary, idx) => (
+          <li key={idx}>
+            <div>{summary.data.summary}</div>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
