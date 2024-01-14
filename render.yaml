@@ -12,7 +12,7 @@ services:
     plan: free
     name: open-recommender-api
     env: node
-    buildCommand: cd packages/server && yarn && yarn build
+    buildCommand: cd packages/server && yarn
     startCommand: cd packages/server && yarn start
     branch: main
     envVars:
