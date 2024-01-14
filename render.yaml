@@ -24,5 +24,4 @@ services:
           property: connectionString
 databases:
   - name: open-recommender-db
-    type: postgres
-    env: production # Environment (production or staging)
+    plan: free
