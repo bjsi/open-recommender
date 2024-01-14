@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const recommendClipsOutputSchema = z.object({
-  clips: z
+  bestClips: z
     .object({
       title: z.string(),
       reason: z

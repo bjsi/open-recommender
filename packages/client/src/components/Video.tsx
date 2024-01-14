@@ -4,24 +4,66 @@ import { Avatar } from "@mui/material";
 import ThumbUpIcon from "@mui/icons-material/ThumbUp";
 import ThumbDownIcon from "@mui/icons-material/ThumbDown";
 import ReactPlayer from "react-player";
-import { IVideo } from "./testData";
 import { ShareClipButton } from "./ShareClipButton";
+import { RecommendationWithVotes } from "shared/schemas/recommendation";
+import { AuthInfo, Authenticated } from "../lib/types";
+import { voteOnRecommendation } from "../lib/votes";
+import { LoginOnboardingModal } from "./LoginOnboardingModal";
+import { updateNote } from "../lib/note";
 
 interface VideoProps {
   setVideoRef: (ref: HTMLDivElement) => void;
-  video: IVideo;
+  video: RecommendationWithVotes;
   inView: boolean;
+  auth: AuthInfo | undefined;
 }
 
 export function Video(props: VideoProps) {
   const playerRef = useRef<ReactPlayer>(null);
   const [playing, setPlaying] = useState(false);
-  const [liked, setLiked] = useState<-1 | 0 | 1>(0);
+  const [liked, setLiked] = useState<-1 | 0 | 1>(
+    props.auth?.authenticated
+      ? props.video.votes.find(
+          (x) => x.userId === (props.auth as Authenticated).user.id
+        )?.vote ?? 0
+      : 0
+  );
+
+  async function handleVote(vote: -1 | 1 | 0) {
+    if (props.auth?.authenticated) {
+      const prevVote = liked;
+      setLiked(vote);
+      const serverRes = await voteOnRecommendation({
+        recommendationId: props.video.id,
+        vote: vote,
+      });
+      console.log(serverRes);
+      if (serverRes === undefined) {
+        setLiked(prevVote);
+      } else {
+        setLiked(serverRes);
+      }
+    }
+  }
+
+  async function handleUpdateNotes(content: string) {
+    if (props.auth?.authenticated) {
+      setNotes(content);
+      const serverRes = await updateNote({
+        recommendationId: props.video.id,
+        content: content,
+      });
+      if (!serverRes) {
+        console.log("failed to update note");
+      }
+    }
+  }
+
   const [notes, setNotes] = useState<string>("");
   const [isReady, setIsReady] = React.useState(false);
 
   const seekToStart = () => {
-    const startSeconds = props.video.url.match(/t=(\d+)/)?.[1];
+    const startSeconds = props.video.data.url.match(/t=(\d+)/)?.[1];
     if (startSeconds) {
       console.log("seeking to", startSeconds);
       playerRef.current?.seekTo(parseInt(startSeconds) - 2);
@@ -50,7 +92,7 @@ export function Video(props: VideoProps) {
             controls
             playing={playing}
             ref={playerRef}
-            url={props.video.url}
+            url={props.video.data.url}
             onReady={onReady}
             onPlay={() => {
               // hack to get around YouTube's last play position memory
@@ -95,21 +137,31 @@ export function Video(props: VideoProps) {
           <div>
             <div className="flex flex-row items-center gap-2 px-2 shortsDesc">
               <p className="text-xs sm:text-base description">
-                {props.video.summary}
+                {props.video.data.summary}
               </p>
               <div className="flex flex-col items-center gap-4">
-                <ThumbUpIcon
-                  onClick={() => setLiked(liked === 1 ? 0 : 1)}
-                  fontSize="small"
-                  color={liked === 1 ? "primary" : undefined}
-                />
-                <ThumbDownIcon
-                  onClick={() => {
-                    setLiked(liked === -1 ? 0 : -1);
-                  }}
-                  fontSize="small"
-                  color={liked === -1 ? "primary" : undefined}
-                />
+                <LoginOnboardingModal shouldOpen={!props.auth?.authenticated}>
+                  <ThumbUpIcon
+                    onClick={() => {
+                      if (props.auth?.authenticated) {
+                        handleVote(liked === 1 ? 0 : 1);
+                      }
+                    }}
+                    fontSize="small"
+                    color={liked === 1 ? "primary" : undefined}
+                  />
+                </LoginOnboardingModal>
+                <LoginOnboardingModal shouldOpen={!props.auth?.authenticated}>
+                  <ThumbDownIcon
+                    onClick={() => {
+                      if (props.auth?.authenticated) {
+                        handleVote(liked === -1 ? 0 : -1);
+                      }
+                    }}
+                    fontSize="small"
+                    color={liked === -1 ? "primary" : undefined}
+                  />
+                </LoginOnboardingModal>
                 <ShareClipButton clip={props.video} notes={notes} />
               </div>
             </div>
@@ -119,7 +171,7 @@ export function Video(props: VideoProps) {
                   "https://lh3.googleusercontent.com/ogw/ADGmqu8BCzU8GejYorGqXeu98A1kfEFYKFT85I3_9KJBzfw=s32-c-mo"
                 }
               />
-              <p>{props.video.title}</p>
+              <p>{props.video.data.title}</p>
             </div>
           </div>
         </div>

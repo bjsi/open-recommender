@@ -1,13 +1,47 @@
 import React from "react";
-import { userClipsMap } from "./testData";
 import { Link } from "react-router-dom";
 import { ShareClipOnboardingModal } from "./ShareClipOnboardingModal";
+import { User } from "shared/types/user";
+import { GetUsersOutput } from "shared/schemas/getUsers";
+import { useAuth } from "../lib/useAuth";
 
 export function Homepage() {
+  const auth = useAuth();
+  const [users, setUsers] = React.useState<User[]>();
+
+  React.useEffect(() => {
+    fetch("http://localhost:3000/api/top-users", {
+      method: "GET",
+      credentials: "include",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Credentials": "true",
+      },
+    })
+      .then((response) => {
+        if (response.status === 200) return response.json();
+        throw new Error("failed to get users");
+      })
+      .then((responseJson: GetUsersOutput) => {
+        console.log(responseJson);
+        setUsers(responseJson.users);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }, []);
+
   return (
     <div className="p-4">
-      <h1>Open Recommender Alpha</h1>
-      <br></br>
+      {auth?.authenticated ? (
+        <>
+          <div>Welcome back, {auth.user.name}</div>
+          <br></br>
+        </>
+      ) : (
+        "Not logged in"
+      )}
       <p>
         I want to build a system that borrows the best elements from YouTube
         shorts, TikTok, <a href="">spaced repetition</a> and{" "}
@@ -39,6 +73,12 @@ export function Homepage() {
       <p></p>
       <p>Changelog</p>
       <ul className="list-disc list-inside">
+        <li>2024-01-14: Add API.</li>
+        <li>2024-01-13: Add auth and server.</li>
+        <li>
+          2024-01-08: Integrate <a href="https://metaphor.systems/">metaphor</a>
+          .
+        </li>
         <li>2024-01-04: Fix clip seeking bug.</li>
         <li>
           2024-01-03: Add{" "}
@@ -52,12 +92,13 @@ export function Homepage() {
         <li>2024-01-02: Create UI v1</li>
       </ul>
       <br></br>
-      <p>Users:</p>
+      <p>Top Users:</p>
       <ul className="list-disc list-inside">
-        {Object.entries(userClipsMap).map(([user, clips]) => (
-          <li key={user}>
-            <Link to={`/user/${user}`}>
-              {user} - {clips.length} clips
+        {(users || []).map((user) => (
+          <li key={user?.id}>
+            <Link to={`/user/${user.username}`}>
+              {user.name} (@{user.username}) - {user.recommendations.length}{" "}
+              clips
             </Link>
           </li>
         ))}

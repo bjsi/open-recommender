@@ -91,7 +91,7 @@ ${cue.text}
           : undefined,
         enableOpenPipeLogging: args.enableOpenPipeLogging,
       });
-      for (const clip of res?.clips || []) {
+      for (const clip of res?.bestClips || []) {
         const cues = args.transcript.slice(clip.startId, clip.endId + 1);
         chunks.push({
           title: clip.title,

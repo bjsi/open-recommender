@@ -14,10 +14,15 @@ interface OnboardingModalProps {
   cancelText?: string;
   title: string;
   content: React.ReactNode;
+  open?: boolean;
+  onOkay?: () => void;
 }
 
 export function OnboardingModal(props: OnboardingModalProps) {
-  const [isOpen, setOpen] = React.useState(false);
+  const [isOpen, setOpen] = React.useState(!!props.open);
+  React.useEffect(() => {
+    setOpen(!!props.open);
+  }, [props.open]);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
   return (
@@ -26,6 +31,7 @@ export function OnboardingModal(props: OnboardingModalProps) {
         onClick={(e) => {
           if (props.shouldOpen) {
             e.stopPropagation();
+            e.preventDefault();
             handleOpen();
           }
         }}
@@ -39,7 +45,14 @@ export function OnboardingModal(props: OnboardingModalProps) {
           {props.cancelText && (
             <Button onClick={handleClose}>{props.cancelText}</Button>
           )}
-          <Button onClick={handleClose} autoFocus color="primary">
+          <Button
+            onClick={() => {
+              props.onOkay?.();
+              handleClose();
+            }}
+            autoFocus
+            color="primary"
+          >
             {props.okayText}
           </Button>
         </DialogActions>

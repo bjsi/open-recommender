@@ -1,17 +1,17 @@
 import React from "react";
 import { faTwitterSquare } from "@fortawesome/free-brands-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { IVideo } from "./testData";
 import clsx from "clsx";
 import { ShareClipOnboardingModal } from "./ShareClipOnboardingModal";
+import { Recommendation } from "shared/schemas/recommendation";
 
 interface ShareClipButtonProps {
-  clip: IVideo;
+  clip: Recommendation;
   notes: string;
 }
 
 function formatTweet(props: ShareClipButtonProps) {
-  return encodeURIComponent(`${props.clip.title}\n\n${props.notes}\n\n`);
+  return encodeURIComponent(`${props.clip.data.title}\n\n${props.notes}\n\n`);
 }
 
 export function ShareClipButton(props: ShareClipButtonProps) {
@@ -21,13 +21,14 @@ export function ShareClipButton(props: ShareClipButtonProps) {
 
   return (
     <div
-      onClick={() =>
+      onClick={(e) => {
+        if (e.defaultPrevented) return;
         sharePage(
           `http://twitter.com/share?text=${formatTweet(props)}&url=${
-            props.clip.url
+            props.clip.data.url
           }`
-        )
-      }
+        );
+      }}
       className={clsx(`social-btn twitter cursor-pointer`)}
     >
       <ShareClipOnboardingModal shouldOpen>

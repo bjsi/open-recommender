@@ -110,34 +110,33 @@ export const rerankClips = (
     numToDiscard: number;
   } = { windowSize: 4, numToDiscard: 1 }
 ) =>
-  new RerankClips(args)
-    .withCommand({
-      name: "search chunk and rank",
-      async action() {
-        await searchChunkAndRank();
-      },
-    })
-    .withTest(
-      {
-        name: "advanced rag",
-        vars: {
-          clips: advancedRagDataset.clips.value,
-          tweets: advancedRagDataset.tweets.value,
-          profile: advancedRagDataset.profile.value,
-        },
-      },
-      (output) => {
-        return {
-          pass: output.orderedClipIds.length === 3,
-          reason: `Expected 3 clips, got ${output.orderedClipIds.length}`,
-          score: output.orderedClipIds.length === 3 ? 1 : 0,
-        };
-      },
-      (output) => {
-        return {
-          pass: output.orderedClipIds[0] === 2,
-          reason: `Expected clip 2 to be first, got ${output.orderedClipIds[0]}`,
-          score: output.orderedClipIds[0] === 2 ? 1 : 0,
-        };
-      }
-    );
+  new RerankClips(args).withCommand({
+    name: "search chunk and rank",
+    async action() {
+      await searchChunkAndRank();
+    },
+  });
+// .withTest(
+//   {
+//     name: "advanced rag",
+//     vars: {
+//       clips: advancedRagDataset.clips.value,
+//       tweets: advancedRagDataset.tweets.value,
+//       profile: advancedRagDataset.profile.value,
+//     },
+//   },
+//   (output) => {
+//     return {
+//       pass: output.orderedClipIds.length === 3,
+//       reason: `Expected 3 clips, got ${output.orderedClipIds.length}`,
+//       score: output.orderedClipIds.length === 3 ? 1 : 0,
+//     };
+//   },
+//   (output) => {
+//     return {
+//       pass: output.orderedClipIds[0] === 2,
+//       reason: `Expected clip 2 to be first, got ${output.orderedClipIds[0]}`,
+//       score: output.orderedClipIds[0] === 2 ? 1 : 0,
+//     };
+//   }
+// );

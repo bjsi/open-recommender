@@ -4,7 +4,7 @@ import { CreateQueriesFromProfileInput } from "../schemas/createQueriesFromProfi
 
 export const createQueriesFromProfileZeroShotFreeFormPrompt =
   new CandidatePrompt<CreateQueriesFromProfileInput>({
-    name: "zero shot free form",
+    name: "zero shot free form-2",
     compile() {
       return [
         ChatMessage.system(sharedCreateQueriesInstructions({ short: false })),

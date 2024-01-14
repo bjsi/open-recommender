@@ -1,11 +1,34 @@
 import React from "react";
-import { userClipsMap } from "./testData";
 import { Video } from "./Video";
 import { useParams } from "react-router-dom";
+import {
+  GetRecommendationsInput,
+  GetRecommendationsOutput,
+} from "shared/schemas/getRecommendations";
+import { RecommendationWithVotes } from "shared/schemas/recommendation";
+import { useAuth } from "../lib/useAuth";
 
 export function VideosPage() {
-  const user = useParams().user as string;
-  const clips = userClipsMap[user];
+  const videosForUser = useParams().user as string;
+  const auth = useAuth();
+  const [clips, setClips] = React.useState<RecommendationWithVotes[]>();
+  const loading = !clips;
+  React.useEffect(() => {
+    fetch(`http://localhost:3000/api/get-recommendations`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        username: videosForUser,
+      } satisfies GetRecommendationsInput),
+    })
+      .then((res) => res.json())
+      .then((data: GetRecommendationsOutput) => {
+        setClips(data.recommendations);
+      });
+  }, [videosForUser]);
+
   const videoRefs = React.useRef<HTMLDivElement[]>([]);
   const [inViewIndex, setInViewIndex] = React.useState<number>(0);
   const appVideosRef = React.useRef<HTMLDivElement>(null);
@@ -53,7 +76,7 @@ export function VideosPage() {
   };
 
   if (!clips || clips.length === 0) {
-    return <div>No clips found for user {user}</div>;
+    return <div>No clips found for user {videosForUser}</div>;
   }
 
   return (
@@ -61,6 +84,7 @@ export function VideosPage() {
       <div ref={appVideosRef} className="app__videos xl:max-w-[1200px]">
         {clips.map((vid, i) => (
           <Video
+            auth={auth}
             setVideoRef={handleVideoRef(i)}
             video={vid}
             key={i}

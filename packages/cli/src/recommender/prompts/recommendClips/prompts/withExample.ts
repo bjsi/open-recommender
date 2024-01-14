@@ -47,7 +47,7 @@ ${eaccDataset.transcript.value}
       ChatMessage.assistant<RecommendClipsOutput>(null, {
         name: toCamelCase(RECOMMEND_CLIPS),
         arguments: {
-          clips: [
+          bestClips: [
             {
               title:
                 "Balancing Forces: Effective Accelerationism in AI and Society",

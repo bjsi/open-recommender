@@ -130,6 +130,9 @@ export const createQueriesMetaphor = {
       console.log(chalk.red(msg));
       return failure(msg);
     } else {
+      console.log(chalk.green(queries.length + " queries generated"));
+      console.log(chalk.blue("Queries:"));
+      console.log(queries);
       return success({ ...args, queries });
     }
   },

@@ -31,8 +31,7 @@ export class RecursiveTwitterSummarizer extends Prompt<
   constructor() {
     super({
       name: SUMMARIZE_TWEETS,
-      description:
-        "Extract a list of tweets that reveal the user's hobbyist and professional interests.",
+      description: "Summarize the user's tweets to understand their interests.",
       prompts: [zeroShot],
       model: "gpt-4",
       input: recursiveTwitterSummarizerInputSchema,
@@ -55,7 +54,7 @@ export class RecursiveTwitterSummarizer extends Prompt<
     const maxTokens =
       8192 -
       // for output
-      1000 -
+      1500 -
       (
         await this.calculateCost({
           tweets: "",
@@ -138,7 +137,7 @@ export class RecursiveTwitterSummarizer extends Prompt<
         .map((x) => x.replace(/\r?\n/g, " "));
       if (
         summaries.length <= 1 ||
-        (await tokenize(summaries.reduce((a, b) => a + " " + b))).length <= 1200
+        (await tokenize(summaries.reduce((a, b) => a + " " + b))).length <= 2200
       ) {
         return summaries.join(" ");
       }
