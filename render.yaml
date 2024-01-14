@@ -6,8 +6,11 @@ services:
     staticPublishPath: ./packages/client/dist
     branch: main
     buildFilter:
-      - packages/client/**/*
-      - packages/shared/**/*
+    buildFilter:
+      paths:
+        - packages/client/**/*.ts
+        - packages/client/**/*.tsx
+        - packages/shared/**/*.ts
     envVars:
       - key: SKIP_INSTALL_DEPS
         value: true
@@ -19,8 +22,9 @@ services:
     startCommand: cd packages/server && yarn start
     branch: main
     buildFilter:
-      - packages/server/**/*
-      - packages/shared/**/*
+      paths:
+        - packages/server/**/*.ts
+        - packages/shared/**/*.ts
     envVars:
       - key: SKIP_INSTALL_DEPS
         value: true
