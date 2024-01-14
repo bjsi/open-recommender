@@ -15,7 +15,7 @@ services:
     plan: free
     name: open-recommender-api
     env: node
-    buildCommand: cd packages/shared && yarn && cd ../server && yarn && yarn build
+    buildCommand: cd packages/server && yarn build
     startCommand: cd packages/server && yarn start
     branch: main
     buildFilter:
