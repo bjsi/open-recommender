@@ -28,6 +28,6 @@
   },
   "scripts": {
     "start": "yarn && npx prisma generate && ts-node src/main.ts",
-    "build": "yarn && npx prisma generate && prisma migrate deploy"
+    "build": "yarn && npx prisma generate && npx prisma migrate deploy"
   }
 }
