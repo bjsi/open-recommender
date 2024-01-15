@@ -1,6 +1,4 @@
-import { Recommendation } from "shared/types/recommendation";
-
-export const userClipsMap: Record<string, Recommendation[]> = {
+export const userClipsMap = {
   tnewbold: [
     {
       type: "youtube",
