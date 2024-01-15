@@ -27,7 +27,7 @@
     "typescript": "^5.3.3"
   },
   "scripts": {
-    "start": "ts-node src/main.ts",
-    "build": "yarn && npx prisma generate"
+    "start": "yarn && npx prisma generate && ts-node src/main.ts",
+    "build": "yarn && npx prisma generate && prisma migrate deploy"
   }
 }
