@@ -20,7 +20,9 @@ authRoutes.get("/logout", (req, res) => {
 
 // when login is successful, retrieve user info
 authRoutes.get("/login/success", (req, res) => {
+  console.log("login success route");
   if (req.user) {
+    console.log("login success route, user exists", req.user);
     res.json({
       success: true,
       message: "user has successfully authenticated",

@@ -8,6 +8,7 @@ import session from "express-session";
 import { authRoutes } from "./routes/auth";
 import { publicApiRoutes } from "./routes/publicApi";
 import { authenticatedApiRoutes } from "./routes/authenticatedApi";
+import { PrismaSessionStore } from "@quixo3/prisma-session-store";
 
 dotenv.config();
 const prisma = new PrismaClient();
@@ -53,6 +54,7 @@ passport.use(
 );
 
 passport.serializeUser(function (user, done) {
+  console.log("serializeUser", user);
   done(null, (user as any).id);
 });
 
@@ -72,8 +74,13 @@ app.use(express.json());
 app.use(
   session({
     secret: process.env.COOKIE_KEY!, // Change to a random, secure string for production
-    resave: false,
+    resave: true,
     saveUninitialized: true,
+    store: new PrismaSessionStore(new PrismaClient(), {
+      checkPeriod: 2 * 60 * 1000, //ms
+      dbRecordIdIsSessionId: true,
+      dbRecordIdFunction: undefined,
+    }),
   })
 );
 app.use(passport.initialize());
