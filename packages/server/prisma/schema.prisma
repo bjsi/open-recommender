@@ -21,9 +21,10 @@ model User {
   tweets            Tweet[]
   summaries         Summary[]
   recommendations   Recommendation[]
-  votes              Vote[]
-  notes              Note[]
-  follows            Follow[]
+  votes             Vote[]
+  notes             Note[]
+  followers         Follow[]         @relation("Followed")
+  following         Follow[]         @relation("Follower")
 }
 
 model Tweet {
@@ -36,14 +37,14 @@ model Tweet {
 }
 
 model Summary {
-  id        Int      @id @default(autoincrement())
-  userId    Int
-  user      User     @relation(fields: [userId], references: [id])
-  data      Json
-  content  String
-  useForRecommendations Boolean @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id                    Int      @id @default(autoincrement())
+  userId                Int
+  user                  User     @relation(fields: [userId], references: [id])
+  data                  Json
+  content               String
+  useForRecommendations Boolean  @default(true)
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
 }
 
 enum RecommendationType {
@@ -57,7 +58,7 @@ model Recommendation {
   createdAt DateTime           @default(now())
   updatedAt DateTime           @updatedAt
   type      RecommendationType
-  viewed   Boolean            @default(false)
+  viewed    Boolean            @default(false)
   data      Json
   votes     Vote[]
   notes     Note[]
@@ -89,7 +90,7 @@ model Session {
   id        String   @id
   sid       String   @unique
   data      String
-  expiresAt   DateTime
+  expiresAt DateTime
 }
 
 enum FollowType {
@@ -99,12 +100,12 @@ enum FollowType {
 }
 
 model Follow {
-  id        Int      @id @default(autoincrement())
-  userId    Int
-  user      User     @relation(fields: [userId], references: [id])
-  followId  Int
-  follow    User     @relation(fields: [followId], references: [id])
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id         Int        @id @default(autoincrement())
+  userId     Int
+  user       User       @relation(name: "Follower", fields: [userId], references: [id])
+  followId   Int
+  follow     User       @relation(name: "Followed", fields: [followId], references: [id])
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
   followType FollowType
 }

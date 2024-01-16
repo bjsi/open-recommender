@@ -13,6 +13,8 @@ export function ProfilePage(props: ProfilePageProps) {
   const username = useParams().user;
   const [summaries, setSummaries] = React.useState<Summary[]>();
   const loading = !summaries;
+  const viewingOwnProfile =
+    props.auth?.authenticated && props.auth.user.username === username;
 
   React.useEffect(() => {
     if (!props.auth?.authenticated) return;

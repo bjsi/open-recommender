@@ -8213,7 +8213,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"nodemon@npm:^3.0.1":
+"nodemon@npm:^3.0.1, nodemon@npm:^3.0.2":
   version: 3.0.2
   resolution: "nodemon@npm:3.0.2"
   dependencies:
@@ -9920,6 +9920,7 @@ __metadata:
     dotenv: "npm:^16.3.1"
     express: "npm:^4.18.2"
     express-session: "npm:^1.17.3"
+    nodemon: "npm:^3.0.2"
     passport: "npm:^0.7.0"
     passport-twitter: "npm:^1.0.4"
     prisma: "npm:5.8.0"

@@ -1,0 +1,6 @@
+{
+  "watch": ["src", "../shared"],
+  "ext": "js,json,ts,tsx",
+  "ignore": ["src/tests/*"],
+  "delay": "2500"
+}
