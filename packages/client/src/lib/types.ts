@@ -1,8 +1,9 @@
-import { User } from "shared/types/user";
+import { z } from "zod";
+import { UserModel } from "shared/src/schemas/user";
 
 export interface Authenticated {
   authenticated: true;
-  user: User;
+  user: z.infer<typeof UserModel>;
 }
 
 export type AuthInfo =

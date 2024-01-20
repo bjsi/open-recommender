@@ -23,7 +23,7 @@ export function useAuth(): AuthInfo | undefined {
           user: responseJson.user,
         });
       })
-      .catch((error) => {
+      .catch(() => {
         setAuth({
           authenticated: false,
           error: "Failed to authenticate user",

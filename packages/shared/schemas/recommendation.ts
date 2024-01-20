@@ -1,26 +1,39 @@
-import { z } from "zod";
+import * as z from "zod"
+import { RecommendationType } from "@prisma/client"
+import { CompleteRecommendationSource, RelatedRecommendationSourceModel, CompleteVote, RelatedVoteModel, CompleteNote, RelatedNoteModel, CompleteUserRecommendation, RelatedUserRecommendationModel } from "./index"
 
-export const recommendationSchema = z.object({
-  type: z.literal("youtube"),
-  id: z.number(),
-  data: z.object({
-    title: z.string(),
-    summary: z.string(),
-    url: z.string(),
-  }),
-});
+// Helper schema for JSON fields
+type Literal = boolean | number | string
+type Json = Literal | { [key: string]: Json } | Json[]
+const literalSchema = z.union([z.string(), z.number(), z.boolean()])
+const jsonSchema: z.ZodSchema<Json> = z.lazy(() => z.union([literalSchema, z.array(jsonSchema), z.record(jsonSchema)]))
 
-export type Recommendation = z.infer<typeof recommendationSchema>;
+export const RecommendationModel = z.object({
+  id: z.number().int(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+  type: z.nativeEnum(RecommendationType),
+  data: jsonSchema,
+  sourceId: z.number().int(),
+  recommendationSourceId: z.number().int(),
+  public: z.boolean(),
+})
 
-export const recommendationWithVotesSchema = recommendationSchema.extend({
-  votes: z
-    .object({
-      vote: z.union([z.literal(1), z.literal(-1), z.literal(0)]),
-      userId: z.number(),
-    })
-    .array(),
-});
+export interface CompleteRecommendation extends z.infer<typeof RecommendationModel> {
+  source: CompleteRecommendationSource
+  votes: CompleteVote[]
+  notes: CompleteNote[]
+  userRecommendations: CompleteUserRecommendation[]
+}
 
-export type RecommendationWithVotes = z.infer<
-  typeof recommendationWithVotesSchema
->;
+/**
+ * RelatedRecommendationModel contains all relations on your model in addition to the scalars
+ *
+ * NOTE: Lazy required in case of potential circular dependencies within schema
+ */
+export const RelatedRecommendationModel: z.ZodSchema<CompleteRecommendation> = z.lazy(() => RecommendationModel.extend({
+  source: RelatedRecommendationSourceModel,
+  votes: RelatedVoteModel.array(),
+  notes: RelatedNoteModel.array(),
+  userRecommendations: RelatedUserRecommendationModel.array(),
+}))

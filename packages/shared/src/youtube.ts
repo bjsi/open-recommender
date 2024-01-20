@@ -12,3 +12,7 @@ export function youtubeUrlToTimestampSeconds(url: string) {
     return 0;
   }
 }
+
+export function youtubeUrlWithoutTimestamp(url: string) {
+  return url.replace(/&t=\d+/, "");
+}

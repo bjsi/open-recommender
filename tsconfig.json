@@ -1,24 +1,31 @@
 {
   "compilerOptions": {
     "strict": true,
-    "forceConsistentCasingInFileNames": true
+    "strictNullChecks": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+    "types": ["jest", "node", "@types/jest"]
   },
-  "exclude": ["packages/**/tests/**", "packages/**/dist/**"],
+  "exclude": [
+    "packages/**/tests/**",
+    "packages/**/dist/**",
+    "packages/**/node_modules/**",
+    "node_modules/**/*",
+    "node_modules/pybridge/src/bridge.ts"
+  ],
+  "include": ["packages/**/*"],
   "references": [
     {
       "path": "./packages/cli"
     },
     {
-      "path": "./packages/client"
+      "path": "./packages/client/tsconfig.json"
     },
     {
       "path": "./packages/server"
     },
     {
       "path": "./packages/shared"
-    },
-    {
-      "path": "./packages/recommender"
     }
   ]
 }

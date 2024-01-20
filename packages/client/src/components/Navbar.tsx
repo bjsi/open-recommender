@@ -1,4 +1,3 @@
-import React from "react";
 import { useAuth } from "../lib/useAuth";
 import { NAVBAR_HEIGHT } from "../lib/consts";
 import { login } from "../lib/login";

@@ -6,9 +6,12 @@ import { PrismaClient } from "@prisma/client";
 import cors from "cors";
 import session from "express-session";
 import { authRoutes } from "./routes/auth";
-import { publicApiRoutes } from "./routes/publicApi";
-import { authenticatedApiRoutes } from "./routes/authenticatedApi";
 import { PrismaSessionStore } from "@quixo3/prisma-session-store";
+import * as trpcExpress from "@trpc/server/adapters/express";
+import { authenticatedRouter } from "./routers/authenticatedRouter";
+import { createContext, mergeRouters } from "./trpc";
+import { adminRouter } from "./routers/adminRouter";
+import { publicRouter } from "./routers/publicRouter";
 
 dotenv.config();
 const prisma = new PrismaClient();
@@ -18,6 +21,7 @@ passport.use(
     {
       consumerKey: process.env.TWITTER_CONSUMER_KEY!,
       consumerSecret: process.env.TWITTER_CONSUMER_SECRET!,
+      includeEmail: true,
       callbackURL: `${process.env.SERVER_URL}/auth/twitter/callback`,
     },
     async function (_, __, profile, done) {
@@ -33,11 +37,12 @@ passport.use(
         if (!user) {
           console.log(
             "user does not exist, creating new user with profile",
-            profile
+            JSON.stringify(profile, null, 2)
           );
           user = await prisma.user.create({
             data: {
               twitterId: profile.id,
+              email: profile.emails![0].value,
               name: profile.displayName,
               username: profile.username,
               profile_image_url: profile._json.profile_image_url,
@@ -107,8 +112,41 @@ const authCheck = (req: any, res: any, next: any) => {
 
 // set up routes
 app.use("/auth", authRoutes);
-app.use("/api", publicApiRoutes);
-app.use("/api", authCheck, authenticatedApiRoutes);
+app.use(
+  "/api",
+  trpcExpress.createExpressMiddleware({
+    router: mergeRouters(publicRouter, authenticatedRouter),
+    createContext,
+  })
+);
+
+// function apiKeyValidationMiddleware(req, res, next) {
+//   const apiKey = req.headers["x-api-key"];
+//   if (!apiKey) {
+//     return res.status(401).send("API key is required");
+//   }
+
+//   prisma.user
+//     .findUnique({ where: { apiKey } })
+//     .then((user) => {
+//       if (!user) {
+//         return res.status(401).send("Invalid API key");
+//       }
+//       req.user = user; // Attach user to the request object
+//       next();
+//     })
+//     .catch((error) => {
+//       return res.status(500).send("Internal Server Error");
+//     });
+// }
+
+// app.use("/api-key", apiKeyValidationMiddleware, (req, res) => {
+//   res.send("Accessed protected route");
+// });
+
+const appRouter = mergeRouters(publicRouter, adminRouter, authenticatedRouter);
+
+export type AppRouter = typeof appRouter;
 
 // if it's already login, send the profile response,
 // otherwise, send a 401 response that the user is not authenticated

@@ -1,37 +1,19 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { User } from "shared/types/user";
-import { GetUsersOutput } from "shared/schemas/getUsers";
 import { AuthInfo } from "../lib/types";
+import { RouterOutput, trpc } from "../lib/trpc";
 
 interface HomepageProps {
   auth: AuthInfo | undefined;
 }
 
 export function Homepage(props: HomepageProps) {
-  const [users, setUsers] = React.useState<User[]>();
+  const [users, setUsers] = React.useState<RouterOutput["topUsers"]>();
 
   React.useEffect(() => {
-    fetch(`${import.meta.env.VITE_SERVER_URL}/api/top-users`, {
-      method: "GET",
-      credentials: "include",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-        "Access-Control-Allow-Credentials": "true",
-      },
-    })
-      .then((response) => {
-        if (response.status === 200) return response.json();
-        throw new Error("failed to get users");
-      })
-      .then((responseJson: GetUsersOutput) => {
-        console.log(responseJson);
-        setUsers(responseJson.users);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+    trpc.topUsers.query().then((response) => {
+      setUsers(response);
+    });
   }, []);
 
   return (
@@ -63,7 +45,7 @@ export function Homepage(props: HomepageProps) {
       <br></br>
       <p>
         Interested?{" "}
-        <a href="https://buy.stripe.com/bIY7tbco90f23sY9AC">Subscribe here</a>{" "}
+        <a href="https://buy.stripe.com/8wMfZb9Ng6Oq6fC7ss">Subscribe here</a>{" "}
         and I'll add you to the beta. Got ideas?{" "}
         <a href="https://twitter.com/experilearning">DM me on Twitter</a>.
       </p>
@@ -84,8 +66,7 @@ export function Homepage(props: HomepageProps) {
         {(users || []).map((user) => (
           <li key={user?.id}>
             <Link to={`/user/${user.username}/feed`}>
-              {user.name} (@{user.username}) - {user.recommendations.length}{" "}
-              clips
+              {user.name} (@{user.username}) - {user.recommendations} clips
             </Link>
           </li>
         ))}

@@ -1,28 +1,18 @@
-import {
-  VoteOnRecommendationInput,
-  VoteOnRecommendationOutput,
-} from "shared/schemas/voteOnRecommendation";
 import { debounce } from "./debounce";
+import { RouterInput, trpc } from "./trpc";
 
-export async function voteOnRecommendation(args: VoteOnRecommendationInput) {
-  return await debounce(async () => {
+export const voteOnRecommendation = async (
+  args: RouterInput["voteOnRecommendation"]
+) =>
+  await debounce(async () => {
     try {
-      const res = await fetch(`${import.meta.env.VITE_SERVER_URL}/api/vote`, {
-        method: "POST",
-        credentials: "include",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-          "Access-Control-Allow-Credentials": "true",
-        },
-        body: JSON.stringify(args),
+      const res = await trpc.voteOnRecommendation.mutate({
+        recommendationId: args.recommendationId,
+        vote: args.vote,
       });
-      const json: VoteOnRecommendationOutput = await res.json();
-      console.log(json);
-      return json.vote;
+      return res;
     } catch (error) {
       console.error(error);
       return undefined;
     }
   }, 1000)();
-}

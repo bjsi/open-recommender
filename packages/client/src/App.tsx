@@ -1,4 +1,3 @@
-import React from "react";
 import "./App.css";
 import { Routes, Route, HashRouter } from "react-router-dom";
 import { Layout } from "./components/Layout";
@@ -7,6 +6,8 @@ import { Homepage } from "./components/Homepage";
 import { NoPage } from "./components/NoPage";
 import { ProfilePage } from "./components/ProfilePage";
 import { useAuth } from "./lib/useAuth";
+import { TermsOfService } from "./components/TermsOfService";
+import { Privacy } from "./components/Privacy";
 
 function App() {
   const auth = useAuth();
@@ -20,6 +21,8 @@ function App() {
             path="user/:user/profile"
             element={<ProfilePage auth={auth} />}
           />
+          <Route path="terms" element={<TermsOfService />} />
+          <Route path="privacy" element={<Privacy />} />
           <Route path="*" element={<NoPage />} />
         </Route>
       </Routes>

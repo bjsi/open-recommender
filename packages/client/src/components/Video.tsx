@@ -5,15 +5,15 @@ import ThumbUpIcon from "@mui/icons-material/ThumbUp";
 import ThumbDownIcon from "@mui/icons-material/ThumbDown";
 import ReactPlayer from "react-player";
 import { ShareClipButton } from "./ShareClipButton";
-import { RecommendationWithVotes } from "shared/schemas/recommendation";
-import { AuthInfo, Authenticated } from "../lib/types";
-import { voteOnRecommendation } from "../lib/votes";
 import { LoginOnboardingModal } from "./LoginOnboardingModal";
 import { updateNote } from "../lib/note";
+import { voteOnRecommendation } from "../lib/votes";
+import { AuthInfo, Authenticated } from "../lib/types";
+import { RouterOutput } from "../lib/trpc";
 
 interface VideoProps {
   setVideoRef: (ref: HTMLDivElement) => void;
-  video: RecommendationWithVotes;
+  video: RouterOutput["getRecommendations"][number];
   inView: boolean;
   auth: AuthInfo | undefined;
 }
@@ -22,11 +22,11 @@ export function Video(props: VideoProps) {
   const playerRef = useRef<ReactPlayer>(null);
   const [playing, setPlaying] = useState(false);
   const [liked, setLiked] = useState<-1 | 0 | 1>(
-    props.auth?.authenticated
-      ? props.video.votes.find(
+    (props.auth?.authenticated
+      ? props.video.recommendation.votes.find(
           (x) => x.userId === (props.auth as Authenticated).user.id
         )?.vote ?? 0
-      : 0
+      : 0) as 0 | 1 | -1
   );
 
   async function handleVote(vote: -1 | 1 | 0) {
@@ -34,14 +34,14 @@ export function Video(props: VideoProps) {
       const prevVote = liked;
       setLiked(vote);
       const serverRes = await voteOnRecommendation({
-        recommendationId: props.video.id,
+        recommendationId: props.video.recommendationId,
         vote: vote,
       });
       console.log(serverRes);
       if (serverRes === undefined) {
         setLiked(prevVote);
       } else {
-        setLiked(serverRes);
+        setLiked(serverRes === 1 ? 1 : serverRes === -1 ? -1 : 0);
       }
     }
   }
@@ -50,7 +50,7 @@ export function Video(props: VideoProps) {
     if (props.auth?.authenticated) {
       setNotes(content);
       const serverRes = await updateNote({
-        recommendationId: props.video.id,
+        recommendationId: props.video.recommendationId,
         content: content,
       });
       if (!serverRes) {
@@ -63,7 +63,8 @@ export function Video(props: VideoProps) {
   const [isReady, setIsReady] = React.useState(false);
 
   const seekToStart = () => {
-    const startSeconds = props.video.data.url.match(/t=(\d+)/)?.[1];
+    const startSeconds =
+      props.video.recommendation.data.url.match(/t=(\d+)/)?.[1];
     if (startSeconds) {
       console.log("seeking to", startSeconds);
       playerRef.current?.seekTo(parseInt(startSeconds) - 2);
@@ -92,7 +93,7 @@ export function Video(props: VideoProps) {
             controls
             playing={playing}
             ref={playerRef}
-            url={props.video.data.url}
+            url={props.video.recommendation.data.url}
             onReady={onReady}
             onPlay={() => {
               // hack to get around YouTube's last play position memory
@@ -125,7 +126,7 @@ export function Video(props: VideoProps) {
           placeholder="notes..."
           value={notes}
           onChange={(e) => {
-            setNotes(e.target.value);
+            handleUpdateNotes(e.target.value);
           }}
         />
       </div>
@@ -137,7 +138,7 @@ export function Video(props: VideoProps) {
           <div>
             <div className="flex flex-row items-center gap-2 px-2 shortsDesc">
               <p className="text-xs sm:text-base description">
-                {props.video.data.summary}
+                {props.video.recommendation.data.summary}
               </p>
               <div className="flex flex-col items-center gap-4">
                 <LoginOnboardingModal shouldOpen={!props.auth?.authenticated}>
@@ -171,7 +172,7 @@ export function Video(props: VideoProps) {
                   "https://lh3.googleusercontent.com/ogw/ADGmqu8BCzU8GejYorGqXeu98A1kfEFYKFT85I3_9KJBzfw=s32-c-mo"
                 }
               />
-              <p>{props.video.data.title}</p>
+              <p>{props.video.recommendation.data.title}</p>
             </div>
           </div>
         </div>

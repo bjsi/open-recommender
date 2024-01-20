@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { hhmmssToSeconds } from "./timeUtils";
 import { recommendClipsOutputSchema } from "../schemas/recommendClipsOutputSchema";
 
 export interface TranscriptClip {
@@ -15,4 +14,4 @@ export interface TranscriptClip {
 
 export type TranscriptChunk = Required<
   z.infer<typeof recommendClipsOutputSchema>
->["clips"][number];
+>["bestClips"][number];

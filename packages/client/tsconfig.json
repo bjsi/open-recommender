@@ -1,5 +1,8 @@
 {
+  "references": [{ "path": "../server" }, { "path": "../shared" }],
   "compilerOptions": {
+    "outDir": "./dist",
+    "composite": true,
     "target": "ES2020",
     "useDefineForClassFields": true,
     "lib": ["ES2020", "DOM", "DOM.Iterable", "dom.iterable"],
@@ -8,18 +11,15 @@
 
     /* Bundler mode */
     "moduleResolution": "bundler",
-    "allowImportingTsExtensions": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "noEmit": true,
     "jsx": "react-jsx",
 
     /* Linting */
     "strict": true,
+    "strictNullChecks": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true
-  },
-  "include": ["client/src"],
-  "references": [{ "path": "./tsconfig.node.json" }]
+  }
 }

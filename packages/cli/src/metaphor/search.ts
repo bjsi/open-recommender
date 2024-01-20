@@ -1,6 +1,6 @@
 import Metaphor from "metaphor-node";
 import dotenv from "dotenv";
-import { youtubeUrlToId } from "../youtube/utils";
+import { youtubeUrlToId } from "shared/src/youtube";
 
 dotenv.config();
 

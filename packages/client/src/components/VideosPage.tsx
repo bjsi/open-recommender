@@ -1,12 +1,8 @@
 import React from "react";
 import { Video } from "./Video";
 import { useParams } from "react-router-dom";
-import {
-  GetRecommendationsInput,
-  GetRecommendationsOutput,
-} from "shared/schemas/getRecommendations";
-import { RecommendationWithVotes } from "shared/schemas/recommendation";
 import { AuthInfo } from "../lib/types";
+import { RouterOutput, trpc } from "../lib/trpc";
 
 interface VideosPageProps {
   auth: AuthInfo | undefined;
@@ -14,23 +10,13 @@ interface VideosPageProps {
 
 export function VideosPage(props: VideosPageProps) {
   const videosForUser = useParams().user as string;
-  const [clips, setClips] = React.useState<RecommendationWithVotes[]>();
-  const loading = !clips;
+  const [clips, setClips] =
+    React.useState<RouterOutput["getRecommendations"]>();
   React.useEffect(() => {
     if (!props.auth?.authenticated) return;
-    fetch(`${import.meta.env.VITE_SERVER_URL}/api/get-recommendations`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        username: videosForUser,
-      } satisfies GetRecommendationsInput),
-    })
-      .then((res) => res.json())
-      .then((data: GetRecommendationsOutput) => {
-        setClips(data.recommendations);
-      });
+    trpc.getRecommendations.query({ username: videosForUser }).then((res) => {
+      setClips(res);
+    });
   }, [videosForUser, props.auth]);
 
   const videoRefs = React.useRef<HTMLDivElement[]>([]);
@@ -87,7 +73,7 @@ export function VideosPage(props: VideosPageProps) {
 
   return (
     <div className="app">
-      <div ref={appVideosRef} className="app__videos xl:max-w-[1200px]">
+      <div ref={appVideosRef} className="app__videos xl:max-w-[850px]">
         {clips.map((vid, i) => (
           <Video
             auth={props.auth}

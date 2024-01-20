@@ -2,10 +2,11 @@ import React, { useState } from "react";
 import { Avatar, Menu, MenuItem } from "@mui/material";
 import { logout } from "../lib/login";
 import { useNavigate } from "react-router-dom";
-import { User } from "shared/types/user";
+import { z } from "zod";
+import { UserModel } from "shared/schemas/user";
 
 interface AccountDropdownProps {
-  user: User;
+  user: z.infer<typeof UserModel>;
 }
 
 export const AccountDropdown = (props: AccountDropdownProps) => {

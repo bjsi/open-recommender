@@ -1,57 +1,19 @@
-import {
-  GetNoteForRecommendationInput,
-  GetNoteForRecommendationOutput,
-  UpdateNoteForRecommendationInput,
-  UpdateNoteForRecommendationOutput,
-} from "shared/schemas/getNotes";
 import { debounce } from "./debounce";
+import { RouterInput, trpc } from "./trpc";
 
-export async function getNote(args: GetNoteForRecommendationInput) {
-  try {
-    const res = await fetch(
-      `${import.meta.env.VITE_SERVER_URL}/api/get-note-for-recommendation`,
-      {
-        method: "POST",
-        credentials: "include",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-          "Access-Control-Allow-Credentials": "true",
-        },
-        body: JSON.stringify(args),
-      }
-    );
-    const json: GetNoteForRecommendationOutput = await res.json();
-    console.log(json);
-    return json.note;
-  } catch (error) {
-    console.error(error);
-    return undefined;
-  }
-}
-
-export async function updateNote(args: UpdateNoteForRecommendationInput) {
-  return await debounce(async () => {
+export const updateNote = async (
+  args: RouterInput["updateNoteForRecommendation"]
+) => {
+  return debounce(async () => {
     try {
-      const res = await fetch(
-        `${import.meta.env.VITE_SERVER_URL}/api/update-note-for-recommendation`,
-        {
-          method: "POST",
-          credentials: "include",
-          headers: {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-            "Access-Control-Allow-Credentials": "true",
-          },
-          body: JSON.stringify(args),
-        }
-      );
-      const json: UpdateNoteForRecommendationOutput = await res.json();
-      console.log(json);
-      return json.success;
+      const res = await trpc.updateNoteForRecommendation.mutate({
+        recommendationId: args.recommendationId,
+        content: args.content,
+      });
+      return res;
     } catch (error) {
       console.error(error);
       return undefined;
     }
   }, 1000)();
-}
+};

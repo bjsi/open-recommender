@@ -28,17 +28,3 @@ import {
   CREATE_SEARCH_QUERIES_FROM_PROFILE,
   createQueriesFromProfile,
 } from "./createQueriesFromProfile/createQueriesFromProfile";
-
-/**
- * Container for all the prompts in the recommender.
- */
-export const promptController = new PromptController({
-  [APPRAISE_TRANSCRIPT]: appraiseTranscript,
-  [RECOMMEND_CLIPS]: recommendClips,
-  [CREATE_YOUTUBE_SEARCH_QUERIES]: createYouTubeSearchQueries,
-  [RECOMMEND_VIDEOS]: recommendVideos,
-  [RERANK_CLIPS]: rerankClips,
-  [EXTRACT_RELEVANT_TWEETS]: extractRelevantTweets,
-  [SUMMARIZE_TWEETS]: recursivelySummarizeTweets,
-  [CREATE_SEARCH_QUERIES_FROM_PROFILE]: createQueriesFromProfile,
-});
