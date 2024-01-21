@@ -12,6 +12,11 @@ import { authenticatedRouter } from "./routers/authenticatedRouter";
 import { createContext, mergeRouters } from "./trpc";
 import { adminRouter } from "./routers/adminRouter";
 import { publicRouter } from "./routers/publicRouter";
+import { Request, Response, NextFunction } from "express";
+import { z } from "zod";
+import { hashApiKey } from "./generateAPIKey";
+import { UserModel } from "shared/src/schemas/User";
+import { apiKeyRouter } from "./routers/apiKeyRouter";
 
 dotenv.config();
 const prisma = new PrismaClient();
@@ -120,33 +125,70 @@ app.use(
   })
 );
 
-// function apiKeyValidationMiddleware(req, res, next) {
-//   const apiKey = req.headers["x-api-key"];
-//   if (!apiKey) {
-//     return res.status(401).send("API key is required");
-//   }
+async function apiKeyValidationMiddleware(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  try {
+    const apiKey = z.string().parse(req.headers["x-api-key"]);
+    console.log("apiKey", apiKey);
+    if (!apiKey) {
+      return res.status(401).send("API key is required");
+    }
+    const hash = hashApiKey(apiKey);
+    console.log("hash", hash);
+    const user = await prisma.user.findUnique({
+      where: { apiKey: hash },
+    });
+    if (!user) {
+      return res.status(401).send("Invalid API key");
+    }
+    req.user = user; // Attach user to the request object
+    next();
+  } catch (e) {
+    return res.status(401).send("Invalid API key");
+  }
+}
 
-//   prisma.user
-//     .findUnique({ where: { apiKey } })
-//     .then((user) => {
-//       if (!user) {
-//         return res.status(401).send("Invalid API key");
-//       }
-//       req.user = user; // Attach user to the request object
-//       next();
-//     })
-//     .catch((error) => {
-//       return res.status(500).send("Internal Server Error");
-//     });
-// }
+function isAdminValidationMiddleware(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  if (
+    (req.user as z.infer<typeof UserModel> | undefined)?.username !==
+    process.env.ADMIN
+  ) {
+    return res.status(401).send("Unauthorized");
+  }
+  next();
+}
 
-// app.use("/api-key", apiKeyValidationMiddleware, (req, res) => {
-//   res.send("Accessed protected route");
-// });
+app.use(
+  "/api-key",
+  apiKeyValidationMiddleware,
+  trpcExpress.createExpressMiddleware({
+    router: apiKeyRouter,
+    createContext,
+  })
+);
+
+app.use(
+  "/admin",
+  apiKeyValidationMiddleware,
+  isAdminValidationMiddleware,
+  trpcExpress.createExpressMiddleware({
+    router: adminRouter,
+    createContext,
+  })
+);
 
 const appRouter = mergeRouters(publicRouter, adminRouter, authenticatedRouter);
 
 export type AppRouter = typeof appRouter;
+
+export type AdminRouter = typeof adminRouter;
 
 // if it's already login, send the profile response,
 // otherwise, send a 401 response that the user is not authenticated

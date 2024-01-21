@@ -1,6 +1,6 @@
 import { ExampleDataSet } from "prompt-iteration-assistant/dist/lib/prompt";
 import { RecommendClipsCustomInput } from "../schemas/recommendClipsInputSchema";
-import { Tweet } from "../../../../twitter/schemas";
+import { Tweet } from "shared/src/manual/Tweet";
 import { TranscriptCue } from "../../../../youtube/transcript";
 
 const tweets: Tweet[] = [

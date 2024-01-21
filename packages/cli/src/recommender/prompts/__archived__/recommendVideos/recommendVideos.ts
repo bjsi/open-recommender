@@ -7,7 +7,7 @@ import { recommendVideosOutputSchema } from "./schemas/recommendVideosOutputSche
 import { mainPrompt } from "./prompts/withExample";
 import _ from "lodash";
 import { tweetsToString } from "../../../../twitter/getUserContext";
-import { Tweet } from "../../../../twitter/schemas";
+import { Tweet } from "shared/src/manual/Tweet";
 import { searchResultsToString } from "../../../../youtube/formatting";
 import { SearchResult } from "../../../../youtube/search";
 import { openpipe } from "../../../../openpipe/openpipe";

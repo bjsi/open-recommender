@@ -4,7 +4,7 @@ import {
   RequestTagsWithoutName,
   formatPromptName,
 } from "../../../openpipe/requestTags";
-import { Tweet } from "../../../twitter/schemas";
+import { Tweet } from "shared/src/manual/Tweet";
 import { tweetsToString } from "../../../twitter/getUserContext";
 import { openpipe } from "../../../openpipe/openpipe";
 import {

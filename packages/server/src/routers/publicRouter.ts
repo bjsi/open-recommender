@@ -1,7 +1,8 @@
 import { prisma } from "../db";
 import { router, publicProcedure } from "../trpc";
 import { z } from "zod";
-import { YouTubeRecommendation } from "shared/src/schemas/YouTubeRecommendation";
+import { PublicUserModel } from "shared/src/manual/PublicUser";
+import { YouTubeRecommendation } from "shared/src/manual/YouTubeRecommendation";
 
 export const publicRouter = router({
   getRecommendations: publicProcedure
@@ -53,7 +54,7 @@ export const publicRouter = router({
       },
     });
     const validated = raw.map((user) => ({
-      ...user,
+      ...PublicUserModel.parse(user),
       recommendations: user.recommendations.length,
     }));
     return validated;

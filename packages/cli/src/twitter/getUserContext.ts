@@ -5,7 +5,7 @@
  */
 
 import { readFileSync, writeFileSync } from "fs";
-import { TweetSchema, Tweet, UserSchema } from "./schemas";
+import { TweetSchema, Tweet, UserSchema } from "shared/src/manual/Tweet";
 import path from "path";
 import { TwitterAPI, initTwitterAPI } from "./twitterAPI";
 
@@ -56,6 +56,7 @@ export const tweetsToString = (args: { tweets: Tweet[]; user: string }) => {
 };
 
 import { z } from "zod";
+import { single } from "rxjs";
 
 const TweetBaseSchema = z.object({
   id: z.number(),
@@ -198,9 +199,12 @@ export const getUserProfile = async (api: TwitterAPI, user_login: string) => {
 export const getUserTweetHistory = async (
   api: TwitterAPI,
   user_login: string,
-  n_tweets?: number
+  n_tweets?: number,
+  since_id?: number
 ) => {
-  const tweetsStr = await api.get_tweets(user_login, n_tweets || 50);
+  const tweetsStr = since_id
+    ? await api.get_tweets_since(user_login, since_id, n_tweets || 50)
+    : await api.get_tweets(user_login, n_tweets || 50);
   const tweets = parseTweets(tweetsStr);
   // for (const tweet of tweets) {
   //   if (tweet.inReplyToTweetId != null) {

@@ -16,6 +16,7 @@ export const RecommendationModel = z.object({
   data: jsonSchema,
   sourceId: z.number().int(),
   recommendationSourceId: z.number().int(),
+  public: z.boolean(),
 })
 
 export interface CompleteRecommendation extends z.infer<typeof RecommendationModel> {

@@ -1,6 +1,11 @@
 import { PyBridge, RemoteController } from "pybridge";
 
 export interface TwitterAPI {
+  get_tweets_since(
+    user_login: string,
+    since_id: number,
+    n_tweets: number
+  ): Promise<string>; // Tweet[];
   get_tweets(user_login: string, n_tweets: number): Promise<string>; // Tweet[];
   get_user(user_login: string): Promise<string>; // User;
   get_tweet(tweet_id: number): Promise<string>; // Tweet;

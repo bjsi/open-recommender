@@ -53,6 +53,7 @@ export function Homepage(props: HomepageProps) {
       <p></p>
       <p>Changelog</p>
       <ul className="list-disc list-inside">
+        <li>2024-01-21: Implement user profile and follower system.</li>
         <li>2024-01-14: Add API.</li>
         <li>2024-01-13: Add auth and server.</li>
         <li>
@@ -64,9 +65,10 @@ export function Homepage(props: HomepageProps) {
       <p>Top Users:</p>
       <ul className="list-disc list-inside">
         {(users || []).map((user) => (
-          <li key={user?.id}>
+          <li key={user.username}>
+            <Link to={`/user/${user.username}/profile`}>{user.name}</Link> -{" "}
             <Link to={`/user/${user.username}/feed`}>
-              {user.name} (@{user.username}) - {user.recommendations} clips
+              {user.recommendations} clips
             </Link>
           </li>
         ))}

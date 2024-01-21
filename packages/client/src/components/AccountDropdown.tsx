@@ -3,7 +3,7 @@ import { Avatar, Menu, MenuItem } from "@mui/material";
 import { logout } from "../lib/login";
 import { useNavigate } from "react-router-dom";
 import { z } from "zod";
-import { UserModel } from "shared/schemas/user";
+import { UserModel } from "shared/src/schemas/user";
 
 interface AccountDropdownProps {
   user: z.infer<typeof UserModel>;

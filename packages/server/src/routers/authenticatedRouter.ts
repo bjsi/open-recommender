@@ -1,7 +1,8 @@
 import { prisma } from "../db";
 import { router, publicProcedure } from "../trpc";
 import { z } from "zod";
-import { PublicUserModel } from "shared/src/schemas/PublicUser";
+import { PublicUserModel } from "shared/src/manual/PublicUser";
+import { generateAPIKey } from "../generateAPIKey";
 
 export const authenticatedRouter = router({
   voteOnRecommendation: publicProcedure
@@ -229,4 +230,100 @@ export const authenticatedRouter = router({
         })),
       };
     }),
+  isFollowing: publicProcedure
+    .input(
+      z.object({
+        username: z.string(),
+      })
+    )
+    .query(async ({ ctx, input }) => {
+      const authenticatedUser = await prisma.user.findUnique({
+        where: {
+          id: ctx.user?.id,
+        },
+      });
+      if (!authenticatedUser || authenticatedUser.username === input.username) {
+        return;
+      }
+      const user = await prisma.user.findUnique({
+        where: {
+          username: input.username,
+        },
+        include: {
+          followers: true,
+        },
+      });
+      if (!user) {
+        throw new Error("user not found");
+      }
+      return user.followers.some((f) => f.userId === authenticatedUser.id);
+    }),
+  toggleFollowing: publicProcedure
+    .input(
+      z.object({
+        username: z.string(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const authenticatedUser = await prisma.user.findUnique({
+        where: {
+          id: ctx.user?.id,
+        },
+      });
+      if (!authenticatedUser || authenticatedUser.username === input.username) {
+        return false;
+      }
+      const user = await prisma.user.findUnique({
+        where: {
+          username: input.username,
+        },
+      });
+      if (!user) {
+        throw new Error("user not found");
+      }
+      const follow = await prisma.follow.findFirst({
+        where: {
+          userId: authenticatedUser.id,
+          followId: user.id,
+        },
+      });
+      if (follow) {
+        await prisma.follow.delete({
+          where: {
+            id: follow.id,
+          },
+        });
+        return false;
+      } else {
+        const f = await prisma.follow.create({
+          data: {
+            userId: authenticatedUser.id,
+            followType: "likes",
+            followId: user.id,
+          },
+        });
+        return !!f;
+      }
+    }),
+
+  getAPIKey: publicProcedure.mutation(async ({ ctx }) => {
+    const authenticatedUser = await prisma.user.findUnique({
+      where: {
+        id: ctx.user?.id,
+      },
+    });
+    if (!authenticatedUser) {
+      return;
+    }
+    const { apiKey, hashedApiKey } = generateAPIKey();
+    await prisma.user.update({
+      where: {
+        id: authenticatedUser.id,
+      },
+      data: {
+        apiKey: hashedApiKey,
+      },
+    });
+    return apiKey;
+  }),
 });

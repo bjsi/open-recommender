@@ -1,6 +1,6 @@
 import chalk from "chalk";
 import { twitter } from "../twitter";
-import { Tweet } from "../twitter/schemas";
+import { Tweet } from "shared/src/manual/Tweet";
 import { tweetsToString } from "../twitter/getUserContext";
 import { yt } from "../youtube";
 import { Failure, Success, failure, success } from "./run";
@@ -17,6 +17,7 @@ import { createRequestTags } from "../openpipe/requestTags";
 import { recursivelySummarizeTweets } from "../recommender/prompts/recursiveTwitterSummarizer/recursiveTwitterSummarizer";
 import { createQueriesFromProfile } from "../recommender/prompts/createQueriesFromProfile/createQueriesFromProfile";
 import { MetaphorYouTubeResult, searchYouTubeVideos } from "../metaphor/search";
+import { trpc } from "../trpc";
 
 export const STAGES = [
   "validate-args",
@@ -54,6 +55,18 @@ export const getTweets = {
     args: GetTweetsStageArgs
   ): Promise<Success<SummarizeTweetsArgs> | Failure> {
     const { user } = args;
+    const dbUser = await trpc.getUser.query({ username: user });
+    if (!dbUser) {
+      const msg = "User not found in Open Recommender DB";
+      console.log(chalk.red(msg));
+      return failure(msg);
+    }
+    const lastSavedTweet = (
+      await trpc.getTweets.query({
+        username: user,
+        limit: 1,
+      })
+    )[0];
     console.log(
       chalk.blue(`Creating recommendations for Twitter user @${user}`)
     );
@@ -65,8 +78,19 @@ export const getTweets = {
       await twitter.tweets.fetch({
         user,
         n_tweets: 200,
+        since_id: lastSavedTweet?.tweetId,
       })
     ).slice(0, 300);
+
+    if (tweets.length < 300) {
+      const moreTweets = await trpc.getTweets.query({
+        username: user,
+        before: lastSavedTweet?.tweetedAt,
+        limit: 300 - tweets.length,
+      });
+      tweets.push(...moreTweets.map((x) => x.data));
+    }
+
     if (!tweets.length) {
       console.log(chalk.red("No tweets found"));
     } else {
@@ -116,7 +140,7 @@ export const createQueriesMetaphor = {
   run: async function (
     args: CreateQueriesStageArgs
   ): Promise<Success<SearchForVideosStageArgs> | Failure> {
-    const { tweets, profile, bio, user } = args;
+    const { profile, bio, user } = args;
     console.log(chalk.blue("Creating search queries..."));
     const { queries } = await createQueriesFromProfile().execute({
       enableOpenPipeLogging: args.enableLogging,

@@ -1,7 +1,7 @@
 import { ExampleDataSet } from "prompt-iteration-assistant";
 import { FilterIrrelevantTweetsInput } from "../schemas/filterIrrelevantTweetsInputSchema";
 import { tweetsToString } from "../../../../../twitter/getUserContext";
-import { Tweet } from "../../../../../twitter/schemas";
+import { Tweet } from "shared/src/manual/Tweet";
 
 export const experilearningTweets: Tweet[] = [
   {

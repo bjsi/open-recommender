@@ -1,5 +1,5 @@
 import { ExampleDataSet } from "prompt-iteration-assistant/dist/lib/prompt";
-import { Tweet } from "../../../../twitter/schemas";
+import { Tweet } from "shared/src/manual/Tweet";
 import { TranscriptCue } from "../../../../youtube/transcript";
 import { RecommendClipsCustomInput } from "../schemas/recommendClipsInputSchema";
 

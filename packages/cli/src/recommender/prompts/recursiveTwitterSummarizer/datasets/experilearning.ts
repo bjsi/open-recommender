@@ -1,6 +1,6 @@
 import { ExampleDataSet } from "prompt-iteration-assistant";
 import { tweetsToString } from "../../../../twitter/getUserContext";
-import { Tweet } from "../../../../twitter/schemas";
+import { Tweet } from "shared/src/manual/Tweet";
 import { RecursiveTwitterSummarizerInput } from "../schemas/recursiveTwitterSummarizerInputSchema";
 
 export const experilearningTweets: Tweet[] = [

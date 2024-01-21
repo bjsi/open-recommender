@@ -1,10 +1,15 @@
 import { z } from "zod";
 
-export const YouTubeRecommendation = z.object({
-  type: z.literal("youtube"),
+// a clip from a video
+
+export const YouTubeRecommendationModel = z.object({
+  id: z.number().int(),
   title: z.string(),
-  summary: z.string(),
+  description: z.string(),
+  thumbnail: z.string(),
   url: z.string(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
 });
 
-export type YouTubeRecommendation = z.infer<typeof YouTubeRecommendation>;
+export type YouTubeRecommendation = z.infer<typeof YouTubeRecommendationModel>;

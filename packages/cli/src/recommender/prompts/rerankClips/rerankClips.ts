@@ -5,7 +5,7 @@ import {
 } from "./schemas/rerankClipsInputSchema";
 import { rerankClipsOutputSchema } from "./schemas/rerankClipsOutputSchema";
 import { zeroShotPrompt } from "./prompts/withExample";
-import { Tweet } from "../../../twitter/schemas";
+import { Tweet } from "shared/src/manual/Tweet";
 import { tweetsToString } from "../../../twitter/getUserContext";
 import { openpipe } from "../../../openpipe/openpipe";
 import _, { uniq } from "remeda";

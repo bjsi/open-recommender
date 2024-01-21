@@ -4,13 +4,12 @@ import { confirm } from "./confirm";
 const prisma = new PrismaClient();
 
 async function main() {
-  const c = await confirm("Delete all recommendations");
+  const c = await confirm("Delete all DB data");
   if (!c) {
     console.log("Aborting");
     return;
   }
-
-  await prisma.recommendation.deleteMany({});
+  await prisma.user.deleteMany({});
 }
 main()
   .catch((e) => {

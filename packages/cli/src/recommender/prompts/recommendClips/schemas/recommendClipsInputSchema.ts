@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { Tweet } from "../../../../twitter/schemas";
+import { Tweet } from "shared/src/manual/Tweet";
 import { TranscriptCue } from "../../../../youtube/transcript";
 
 export const recommendClipsInputSchema = z.object({

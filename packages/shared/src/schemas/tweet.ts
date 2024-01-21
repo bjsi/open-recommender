@@ -1,5 +1,5 @@
 import * as z from "zod"
-import { CompleteUser, RelatedUserModel } from "./index"
+import { CompleteUser, RelatedUserModel, CompleteSummary, RelatedSummaryModel } from "./index"
 
 // Helper schema for JSON fields
 type Literal = boolean | number | string
@@ -9,14 +9,18 @@ const jsonSchema: z.ZodSchema<Json> = z.lazy(() => z.union([literalSchema, z.arr
 
 export const TweetModel = z.object({
   id: z.number().int(),
+  tweetId: z.number().int(),
+  tweetedAt: z.date(),
   userId: z.number().int(),
   data: jsonSchema,
+  summaryId: z.number().int().nullish(),
   createdAt: z.date(),
   updatedAt: z.date(),
 })
 
 export interface CompleteTweet extends z.infer<typeof TweetModel> {
   user: CompleteUser
+  summary?: CompleteSummary | null
 }
 
 /**
@@ -26,4 +30,5 @@ export interface CompleteTweet extends z.infer<typeof TweetModel> {
  */
 export const RelatedTweetModel: z.ZodSchema<CompleteTweet> = z.lazy(() => TweetModel.extend({
   user: RelatedUserModel,
+  summary: RelatedSummaryModel.nullish(),
 }))

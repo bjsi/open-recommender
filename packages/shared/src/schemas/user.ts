@@ -10,6 +10,7 @@ export const UserModel = z.object({
   profile_image_url: z.string(),
   createdAt: z.date(),
   updatedAt: z.date(),
+  apiKey: z.string().nullish(),
 })
 
 export interface CompleteUser extends z.infer<typeof UserModel> {

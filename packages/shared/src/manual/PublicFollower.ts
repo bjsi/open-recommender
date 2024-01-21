@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { FollowModel } from "../../schemas";
+import { FollowModel } from "../schemas";
 
 export const PublicFollowerModel = FollowModel.omit({
   id: true,

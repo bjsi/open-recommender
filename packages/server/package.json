@@ -25,8 +25,10 @@
     "@types/passport-twitter": "^1.0.40"
   },
   "scripts": {
-    "dev": "nodemon -x 'ts-node src/main.ts'",
+    "dev": "nodemon -x 'tsc -b && ts-node src/main.ts'",
     "start": "ts-node --transpile-only src/main.ts",
-    "build": "yarn && npx prisma generate && npx prisma migrate deploy"
+    "build": "yarn && npx prisma generate && npx prisma migrate deploy",
+    "seed": "ts-node --transpile-only src/seed.ts",
+    "delete": "ts-node --transpile-only src/clearDB.ts"
   }
 }

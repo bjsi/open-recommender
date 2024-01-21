@@ -1,6 +1,6 @@
 import * as z from "zod"
 import { RecommendationType } from "@prisma/client"
-import { CompleteRecommendation, RelatedRecommendationModel } from "./index"
+import { CompleteRecommendation, RelatedRecommendationModel, CompleteQueryToRecommendationSource, RelatedQueryToRecommendationSourceModel } from "./index"
 
 // Helper schema for JSON fields
 type Literal = boolean | number | string
@@ -10,6 +10,7 @@ const jsonSchema: z.ZodSchema<Json> = z.lazy(() => z.union([literalSchema, z.arr
 
 export const RecommendationSourceModel = z.object({
   id: z.number().int(),
+  externalId: z.string(),
   createdAt: z.date(),
   updatedAt: z.date(),
   type: z.nativeEnum(RecommendationType),
@@ -18,6 +19,7 @@ export const RecommendationSourceModel = z.object({
 
 export interface CompleteRecommendationSource extends z.infer<typeof RecommendationSourceModel> {
   recommendations: CompleteRecommendation[]
+  queries: CompleteQueryToRecommendationSource[]
 }
 
 /**
@@ -27,4 +29,5 @@ export interface CompleteRecommendationSource extends z.infer<typeof Recommendat
  */
 export const RelatedRecommendationSourceModel: z.ZodSchema<CompleteRecommendationSource> = z.lazy(() => RecommendationSourceModel.extend({
   recommendations: RelatedRecommendationModel.array(),
+  queries: RelatedQueryToRecommendationSourceModel.array(),
 }))

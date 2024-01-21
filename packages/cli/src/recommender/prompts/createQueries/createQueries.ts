@@ -7,7 +7,7 @@ import {
   createQueriesInputSchema,
 } from "./schemas/createQueriesInputSchema";
 import { tweetsToString } from "../../../twitter/getUserContext";
-import { Tweet } from "../../../twitter/schemas";
+import { Tweet } from "shared/src/manual/Tweet";
 import { openpipe } from "../../../openpipe/openpipe";
 import { experilearningTweetsDataset } from "./datasets/experilearningTweetsDataset";
 import { corbttTweetsDataset } from "./datasets/corbttTweetsDataset";

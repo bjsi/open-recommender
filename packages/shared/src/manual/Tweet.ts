@@ -66,14 +66,10 @@ const MediaPhotoSchema = z.object({
   url: z.string(),
 });
 
-type MediaPhoto = z.infer<typeof MediaPhotoSchema>;
-
 const MediaAnimatedSchema = z.object({
   thumbnailUrl: z.string(),
   videoUrl: z.string(),
 });
-
-type MediaAnimated = z.infer<typeof MediaAnimatedSchema>;
 
 const MediaVideoVariantSchema = z.object({
   contentType: z.string(),

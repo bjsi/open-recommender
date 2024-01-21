@@ -1,5 +1,5 @@
 import * as z from "zod"
-import { CompleteSummary, RelatedSummaryModel } from "./index"
+import { CompleteSummary, RelatedSummaryModel, CompleteQueryToRecommendationSource, RelatedQueryToRecommendationSourceModel } from "./index"
 
 // Helper schema for JSON fields
 type Literal = boolean | number | string
@@ -13,10 +13,12 @@ export const QueryModel = z.object({
   data: jsonSchema,
   createdAt: z.date(),
   updatedAt: z.date(),
+  public: z.boolean(),
 })
 
 export interface CompleteQuery extends z.infer<typeof QueryModel> {
   summary: CompleteSummary
+  recommendationSources: CompleteQueryToRecommendationSource[]
 }
 
 /**
@@ -26,4 +28,5 @@ export interface CompleteQuery extends z.infer<typeof QueryModel> {
  */
 export const RelatedQueryModel: z.ZodSchema<CompleteQuery> = z.lazy(() => QueryModel.extend({
   summary: RelatedSummaryModel,
+  recommendationSources: RelatedQueryToRecommendationSourceModel.array(),
 }))

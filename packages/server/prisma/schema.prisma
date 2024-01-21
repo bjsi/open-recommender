@@ -3,7 +3,7 @@
 
 generator zod {
   provider                 = "zod-prisma"
-  output                   = "../../shared/schemas" // (default) the directory where generated zod schemas will be saved
+  output                   = "../../shared/src/schemas" // (default) the directory where generated zod schemas will be saved
   relationModel            = true // (default) Create and export both plain and related models.
   modelCase                = "PascalCase" // (default) Output models using pascal case (ex. UserModel, PostModel)
   modelSuffix              = "Model" // (default) Suffix to apply to your prisma models when naming Zod schemas
@@ -42,9 +42,13 @@ model User {
 
 model Tweet {
   id        Int      @id @default(autoincrement())
+  tweetId   Int      @unique
+  tweetedAt DateTime
   userId    Int
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   data      Json
+  summaryId Int?
+  summary   Summary? @relation(fields: [summaryId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -59,12 +63,13 @@ model Summary {
   createdAt             DateTime @default(now())
   updatedAt             DateTime @updatedAt
   queries               Query[]
+  tweets                Tweet[]
 }
 
 model Query {
   id        Int      @id @default(autoincrement())
   summaryId Int
-  summary   Summary  @relation(fields: [summaryId], references: [id])
+  summary   Summary  @relation(fields: [summaryId], references: [id], onDelete: Cascade)
   data      Json
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -83,7 +88,7 @@ model Recommendation {
   type                RecommendationType
   data                Json
   sourceId            Int
-  source              RecommendationSource @relation(fields: [recommendationSourceId], references: [id])
+  source              RecommendationSource @relation(fields: [recommendationSourceId], references: [id], onDelete: Cascade)
   votes               Vote[]
   notes               Note[]
   userRecommendations UserRecommendation[] @relation("UserRecommendation")
@@ -105,9 +110,9 @@ model RecommendationSource {
 model QueryToRecommendationSource {
   id                      Int                  @id @default(autoincrement())
   queryId                 Int
-  query                   Query                @relation(fields: [queryId], references: [id])
+  query                   Query                @relation(fields: [queryId], references: [id], onDelete: Cascade)
   recommendationSourceId  Int
-  recommendationSource    RecommendationSource @relation(fields: [recommendationSourceId], references: [id])
+  recommendationSource    RecommendationSource @relation(fields: [recommendationSourceId], references: [id], onDelete: Cascade)
   createdAt               DateTime             @default(now())
   updatedAt               DateTime             @updatedAt
 }
@@ -116,7 +121,7 @@ model UserRecommendation {
   userId           Int
   recommendationId Int
   user             User           @relation(fields: [userId], references: [id], onDelete: Cascade)
-  recommendation   Recommendation @relation("UserRecommendation", fields: [recommendationId], references: [id])
+  recommendation   Recommendation @relation("UserRecommendation", fields: [recommendationId], references: [id], onDelete: Cascade)
 
   viewed Boolean @default(false)
 
@@ -128,7 +133,7 @@ model Vote {
   userId           Int
   user             User           @relation(fields: [userId], references: [id], onDelete: Cascade)
   recommendationId Int
-  recommendation   Recommendation @relation(fields: [recommendationId], references: [id])
+  recommendation   Recommendation @relation(fields: [recommendationId], references: [id], onDelete: Cascade)
   vote             Int
   createdAt        DateTime       @default(now())
   updatedAt        DateTime       @updatedAt
@@ -139,7 +144,7 @@ model Note {
   userId           Int
   user             User           @relation(fields: [userId], references: [id], onDelete: Cascade)
   recommendationId Int
-  recommendation   Recommendation @relation(fields: [recommendationId], references: [id])
+  recommendation   Recommendation @relation(fields: [recommendationId], references: [id], onDelete: Cascade)
   content          String
   createdAt        DateTime       @default(now())
   updatedAt        DateTime       @updatedAt
