@@ -28,7 +28,7 @@
     "dev": "nodemon -x 'tsc -b && ts-node src/main.ts'",
     "start": "ts-node --transpile-only src/main.ts",
     "build": "yarn && npx prisma generate && npx prisma migrate deploy",
-    "seed": "ts-node --transpile-only src/seed.ts",
-    "delete": "ts-node --transpile-only src/clearDB.ts"
+    "seed": "ts-node --transpile-only scripts/seed.ts",
+    "delete": "ts-node --transpile-only scripts/clearDB.ts"
   }
 }

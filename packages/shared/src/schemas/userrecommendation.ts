@@ -4,6 +4,7 @@ import { CompleteUser, RelatedUserModel, CompleteRecommendation, RelatedRecommen
 export const UserRecommendationModel = z.object({
   userId: z.number().int(),
   recommendationId: z.number().int(),
+  priority: z.number().int(),
   viewed: z.boolean(),
 })
 

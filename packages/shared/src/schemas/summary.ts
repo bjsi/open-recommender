@@ -1,17 +1,11 @@
 import * as z from "zod"
 import { CompleteUser, RelatedUserModel, CompleteQuery, RelatedQueryModel, CompleteTweet, RelatedTweetModel } from "./index"
 
-// Helper schema for JSON fields
-type Literal = boolean | number | string
-type Json = Literal | { [key: string]: Json } | Json[]
-const literalSchema = z.union([z.string(), z.number(), z.boolean()])
-const jsonSchema: z.ZodSchema<Json> = z.lazy(() => z.union([literalSchema, z.array(jsonSchema), z.record(jsonSchema)]))
-
 export const SummaryModel = z.object({
   id: z.number().int(),
   userId: z.number().int(),
-  data: jsonSchema,
   public: z.boolean(),
+  content: z.string(),
   useForRecommendations: z.boolean(),
   createdAt: z.date(),
   updatedAt: z.date(),

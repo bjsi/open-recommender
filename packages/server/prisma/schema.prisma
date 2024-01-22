@@ -57,8 +57,8 @@ model Summary {
   id                    Int      @id @default(autoincrement())
   userId                Int
   user                  User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  data                  Json
   public                Boolean
+  content               String
   useForRecommendations Boolean  @default(true)
   createdAt             DateTime @default(now())
   updatedAt             DateTime @updatedAt
@@ -70,7 +70,7 @@ model Query {
   id        Int      @id @default(autoincrement())
   summaryId Int
   summary   Summary  @relation(fields: [summaryId], references: [id], onDelete: Cascade)
-  data      Json
+  text      String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   public                Boolean
@@ -122,6 +122,7 @@ model UserRecommendation {
   recommendationId Int
   user             User           @relation(fields: [userId], references: [id], onDelete: Cascade)
   recommendation   Recommendation @relation("UserRecommendation", fields: [recommendationId], references: [id], onDelete: Cascade)
+  priority         Int
 
   viewed Boolean @default(false)
 

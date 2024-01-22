@@ -1,3 +1,4 @@
+import { trpc } from "../trpc";
 import { Pipeline, PipelineArgs, pipelineArgsSchema } from "./pipeline";
 import { getRunById } from "./run";
 import {
@@ -81,6 +82,14 @@ import { Command } from "commander";
           url: c.videoUrl,
         }))
       );
+
+      const finalData = {
+        tweets: maybeRecommendations.result.tweets,
+        summary: maybeRecommendations.result.profile,
+        clips: maybeRecommendations.result.orderedClips,
+      };
+
+      await trpc.addRecommendations;
     } else {
       console.log(maybeRecommendations.result);
     }

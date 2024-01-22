@@ -44,15 +44,15 @@ export class RerankClips extends Prompt<
     this.numToDiscard = args.numToDiscard;
   }
 
-  async execute(args: {
+  async execute<T extends TranscriptClip>(args: {
     user: string;
     tweets: Tweet[];
-    clips: TranscriptClip[];
+    clips: T[];
     profile: string;
     enableOpenPipeLogging?: boolean;
     openPipeRequestTags?: RequestTagsWithoutName;
   }) {
-    const callApi = async (windowClips: TranscriptClip[]) => {
+    const callApi = async (windowClips: T[]) => {
       const promptVariables: RerankClipsInput = {
         tweets: tweetsToString({ tweets: args.tweets, user: args.user }),
         clips: transcriptClipsToString(windowClips),
@@ -86,7 +86,7 @@ export class RerankClips extends Prompt<
     } else if (args.clips.length === 1) {
       return args.clips;
     } else {
-      let topClips: TranscriptClip[] = [];
+      let topClips: T[] = [];
       const initialWindow = args.clips.slice(0, this.windowSize);
       // initial rank
       const orderedClips = await callApi(initialWindow);
