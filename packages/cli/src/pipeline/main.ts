@@ -8,6 +8,7 @@ import {
   downloadTranscripts,
   getTweets,
   rankClips,
+  saveResultsToDB,
   searchForVideos,
   summarizeTweets,
   validateArgs,
@@ -51,7 +52,8 @@ import { Command } from "commander";
     .addStage(downloadTranscripts)
     .addStage(appraiseTranscripts)
     .addStage(chunkTranscripts)
-    .addStage(rankClips);
+    .addStage(rankClips)
+    .addStage(saveResultsToDB);
 
   const print = opts.print;
   if (print) {
@@ -75,21 +77,7 @@ import { Command } from "commander";
   } else {
     const maybeRecommendations = await pipeline.execute();
     if (maybeRecommendations.success) {
-      console.log(
-        maybeRecommendations.result.orderedClips.map((c) => ({
-          title: c.title,
-          summary: c.summary,
-          url: c.videoUrl,
-        }))
-      );
-
-      const finalData = {
-        tweets: maybeRecommendations.result.tweets,
-        summary: maybeRecommendations.result.profile,
-        clips: maybeRecommendations.result.orderedClips,
-      };
-
-      await trpc.addRecommendations;
+      console.log(maybeRecommendations.result.orderedClips);
     } else {
       console.log(maybeRecommendations.result);
     }

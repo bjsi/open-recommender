@@ -31,6 +31,7 @@ export const STAGES = [
   "appraise-transcripts",
   "chunk-transcripts",
   "order-clips",
+  "save-results",
 ] as const;
 
 export const validateArgs = {
@@ -391,25 +392,9 @@ interface RankClipsStageArgs extends ChunkTranscriptsStageArgs {
 export const rankClips = {
   name: "order-clips",
   description: "Order Clips",
-  run: async function (args: RankClipsStageArgs): Promise<
-    | Success<
-        RankClipsStageArgs & {
-          orderedClips: {
-            query: string;
-            searchResult: MetaphorYouTubeResult;
-            title: string;
-            summary: string;
-            start: number;
-            end: number;
-            videoTitle: string;
-            videoUrl: string;
-            videoId: string;
-            text: string;
-          }[];
-        }
-      >
-    | Failure
-  > {
+  run: async function (
+    args: RankClipsStageArgs
+  ): Promise<Success<SaveResultsToDBStageArgs> | Failure> {
     // order globally over all transcripts and all clips
 
     // clip objects with their respective transcript and query info
@@ -484,5 +469,38 @@ export const rankClips = {
     }
 
     return success({ ...args, orderedClips: remainingClips });
+  },
+};
+
+interface SaveResultsToDBStageArgs extends RankClipsStageArgs {
+  orderedClips: {
+    query: string;
+    searchResult: MetaphorYouTubeResult;
+    title: string;
+    summary: string;
+    start: number;
+    end: number;
+    videoTitle: string;
+    videoUrl: string;
+    videoId: string;
+    text: string;
+  }[];
+}
+
+export const saveResultsToDB = {
+  name: "save-results",
+  description: "Save results to DB",
+  run: async function (
+    args: SaveResultsToDBStageArgs
+  ): Promise<Success<SaveResultsToDBStageArgs> | Failure> {
+    const finalData = {
+      tweets: args.tweets,
+      summary: args.profile,
+      clips: args.orderedClips,
+      username: args.user,
+    };
+
+    await trpc.addRecommendations.mutate(finalData);
+    return success(args);
   },
 };

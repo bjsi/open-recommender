@@ -32,6 +32,9 @@ export const publicRouter = router({
             },
           },
         },
+        orderBy: {
+          priority: "asc",
+        },
       });
       const validated = raw.map((rec) => ({
         ...rec,

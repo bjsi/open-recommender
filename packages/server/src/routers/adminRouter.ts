@@ -2,7 +2,8 @@ import { z } from "zod";
 import { router, publicProcedure } from "../trpc";
 import { prisma } from "../db";
 import { TweetSchema } from "shared/src/manual/Tweet";
-import { QueryModel } from "shared/src/schemas/Query";
+import { YouTubeRecommendationSource } from "shared/src/manual/YouTubeRecommendationSource";
+import { YouTubeRecommendation } from "shared/src/manual/YouTubeRecommendation";
 
 export const adminRouter = router({
   addRecommendations: publicProcedure
@@ -65,27 +66,77 @@ export const adminRouter = router({
       // add clips and queries
       const queryStringToObjectId: Record<string, number> = {};
 
-      for (let i = 0; i < input.clips.length; i++) {
-        const clip = input.clips[i];
+      for (let idx = 0; idx < input.clips.length; idx++) {
+        const clip = input.clips[idx];
         const query = clip.query;
         const queryObjId = queryStringToObjectId[query];
         let queryObject;
         if (queryObjId) {
-
-          queryObjId 
-          (await prisma.query.findUnique({
+          queryObject = await prisma.query.findUnique({
             where: {
               id: queryObjId,
             },
-          })) ??
-          (await prisma.query.create({
+          });
+        }
+        if (!queryObject) {
+          queryObject = await prisma.query.create({
             data: {
               text: query,
               summaryId: summary.id,
               public: true,
             },
-          }));
+          });
+        }
         queryStringToObjectId[query] = queryObject.id;
+
+        let recommendationSource = await prisma.recommendationSource.findUnique(
+          {
+            where: {
+              externalId: clip.videoId,
+            },
+          }
+        );
+
+        if (!recommendationSource) {
+          recommendationSource = await prisma.recommendationSource.create({
+            data: {
+              type: "youtube",
+              externalId: clip.videoId,
+              data: {
+                type: "youtube",
+                id: clip.videoId,
+                title: clip.videoTitle,
+              } satisfies YouTubeRecommendationSource,
+            },
+          });
+        }
+
+        const recommendation = await prisma.recommendation.create({
+          data: {
+            sourceId: recommendationSource.id,
+            type: "youtube",
+            public: true,
+            source: {
+              connect: {
+                id: recommendationSource.id,
+              },
+            },
+            data: {
+              type: "youtube",
+              title: clip.title,
+              summary: clip.summary,
+              url: clip.videoUrl,
+            } satisfies YouTubeRecommendation,
+          },
+        });
+
+        await prisma.userRecommendation.create({
+          data: {
+            recommendationId: recommendation.id,
+            userId: user.id,
+            priority: idx,
+          },
+        });
       }
     }),
   getTweets: publicProcedure
