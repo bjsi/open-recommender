@@ -8,7 +8,7 @@
     "packages/*"
   ],
   "scripts": {
-    "build": "cd packages/shared && tsc && cd ../cli && tsc && cd ../server && tsc && cd ../client && tsc",
+    "build": "cd packages/shared && tsc -b && cd ../cli && tsc -b && cd ../server && tsc -b && cd ../client && tsc -b",
     "chat": "yarn workspace cli chat",
     "search": "yarn workspace cli search",
     "server": "yarn workspace ui server",

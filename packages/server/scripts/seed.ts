@@ -16,7 +16,9 @@ async function seed() {
   if (!user) {
     return;
   }
-  for (const clip of userClipsMap["experilearning"]) {
+  const clips = userClipsMap["experilearning"];
+  for (let i = 0; i < clips.length; i++) {
+    const clip = clips[i];
     let source = await prisma.recommendationSource.findUnique({
       where: {
         externalId: youtubeUrlToId(clip.url)!,
@@ -62,6 +64,7 @@ async function seed() {
       data: {
         userId: user.id,
         recommendationId: recommendation.id,
+        priority: i,
       },
     });
   }
