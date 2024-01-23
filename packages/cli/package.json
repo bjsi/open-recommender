@@ -3,14 +3,6 @@
   "license": "MIT",
   "private": true,
   "dependencies": {
-    "@deepkit/app": "^1.0.1-alpha.96",
-    "@deepkit/core": "^1.0.1-alpha.108",
-    "@deepkit/event": "^1.0.1-alpha.108",
-    "@deepkit/injector": "^1.0.1-alpha.108",
-    "@deepkit/logger": "^1.0.1-alpha.94",
-    "@deepkit/stopwatch": "^1.0.1-alpha.108",
-    "@deepkit/type": "^1.0.1-alpha.96",
-    "@deepkit/workflow": "^1.0.1-alpha.108",
     "better-sqlite3": "^9.1.1",
     "chalk": "^4.1.2",
     "commander": "^11.1.0",
@@ -24,12 +16,12 @@
     "openpipe": "^0.8.0",
     "prompt-iteration-assistant": "^0.0.34",
     "promptfoo": "^0.28.1",
-    "pybridge": "^1.1.0",
+    "pybridge-zod": "^1.1.0",
     "remeda": "^1.29.0",
     "run-parallel-limit": "^1.1.0",
-    "rxjs": "^7.8.1",
     "sqlite-vss": "^0.1.2",
-    "subtitle": "^4.2.1"
+    "subtitle": "^4.2.1",
+    "ts-node": "^10.9.2"
   },
   "scripts": {
     "prompts": "npx tsx ./src/recommender/prompts/main.ts",
@@ -53,6 +45,7 @@
     "@types/inquirer": "^9.0.7",
     "@types/jest": "^29.5.11",
     "@types/node": "^20.9.4",
-    "@types/run-parallel-limit": "^1.0.3"
+    "@types/run-parallel-limit": "^1.0.3",
+    "typescript": "^5.3.3"
   }
 }

@@ -26,5 +26,6 @@
     {
       "path": "./packages/shared"
     }
-  ]
+  ],
+  "reflection": true
 }

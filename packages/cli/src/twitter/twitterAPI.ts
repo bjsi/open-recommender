@@ -1,22 +1,24 @@
-import { PyBridge, RemoteController } from "pybridge";
+import { PyBridge, RemoteController } from "pybridge-zod";
+import { z } from "zod";
 
-export interface TwitterAPI {
-  get_tweets_since(
-    user_login: string,
-    since_id: number,
-    n_tweets: number
-  ): Promise<string>; // Tweet[];
-  get_tweets(user_login: string, n_tweets: number): Promise<string>; // Tweet[];
-  get_user(user_login: string): Promise<string>; // User;
-  get_tweet(tweet_id: number): Promise<string>; // Tweet;
-}
+export const TwitterAPISchema = z.object({
+  get_tweets_since: z.function(
+    z.tuple([z.string(), z.number(), z.number()]),
+    z.string()
+  ),
+  get_tweets: z.function(z.tuple([z.string(), z.number()]), z.string()),
+  get_user: z.function(z.tuple([z.string()]), z.string()),
+  get_tweet: z.function(z.tuple([z.number()]), z.string()),
+});
+
+export type TwitterAPI = RemoteController<z.infer<typeof TwitterAPISchema>>;
 
 class PythonController {
-  api: RemoteController<TwitterAPI>;
+  api: TwitterAPI;
 
   constructor(protected python: PyBridge) {
     this.python = python;
-    this.api = this.python.controller<TwitterAPI>("twitterAPI.py");
+    this.api = this.python.controller("twitterAPI.py", TwitterAPISchema);
   }
 }
 

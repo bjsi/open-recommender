@@ -158,8 +158,9 @@ export const createQueriesMetaphor = {
     } else {
       console.log(chalk.green(queries.length + " queries generated"));
       console.log(chalk.blue("Queries:"));
-      console.log(queries);
-      return success({ ...args, queries });
+      console.log(chalk.blue("Limiting to 5 queries:"));
+      console.log(queries.slice(0, 5));
+      return success({ ...args, queries: queries.slice(0, 5) });
     }
   },
 };

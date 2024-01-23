@@ -57,6 +57,7 @@ export const tweetsToString = (args: { tweets: Tweet[]; user: string }) => {
 
 import { z } from "zod";
 import { single } from "rxjs";
+import { RemoteController } from "pybridge-zod";
 
 const TweetBaseSchema = z.object({
   id: z.number(),
@@ -202,9 +203,11 @@ export const getUserTweetHistory = async (
   n_tweets?: number,
   since_id?: number
 ) => {
-  const tweetsStr = since_id
-    ? await api.get_tweets_since(user_login, since_id, n_tweets || 50)
-    : await api.get_tweets(user_login, n_tweets || 50);
+  const tweetsStr =
+    //since_id
+    //? await api.get_tweets_since(user_login, since_id, n_tweets || 50)
+    //:
+    await api.get_tweets(user_login, n_tweets || 50);
   const tweets = parseTweets(tweetsStr);
   // for (const tweet of tweets) {
   //   if (tweet.inReplyToTweetId != null) {

@@ -22,7 +22,6 @@
     "zod-to-json-schema": "^3.21.4"
   },
   "devDependencies": {
-    "@deepkit/type-compiler": "^1.0.1-alpha.95",
     "@trpc/client": "^11.0.0-next-beta.193",
     "@trpc/server": "^11.0.0-next-beta.193",
     "@types/node": "^20.8.3",

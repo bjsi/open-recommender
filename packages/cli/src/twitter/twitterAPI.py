@@ -2,7 +2,7 @@ import asyncio
 from distutils.file_util import write_file
 import json
 from typing import Awaitable, Dict, List, Optional
-from twscrape import API, gather, AccountsPool, Tweet
+from twscrape import API, gather, AccountsPool
 from contextlib import aclosing
 
 api: Optional[API] = None
@@ -38,7 +38,7 @@ async def _get_tweets(user_login: str, n_tweets: int) -> Awaitable[str]:
     user = await api.user_by_login(user_login)
     tweets_and_replies = await gather(
         api.user_tweets_and_replies(
-            user.id, limit=n_tweets, includePromotedContent=False
+            user.id, limit=n_tweets, kv={"includePromotedContent": False}
         )
     )  # list[Tweet]
     return "[" + ", ".join([tweet.json() for tweet in tweets_and_replies]) + "]"
