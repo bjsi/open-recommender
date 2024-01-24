@@ -10,6 +10,8 @@ import { updateNote } from "../lib/note";
 import { voteOnRecommendation } from "../lib/votes";
 import { AuthInfo, Authenticated } from "../lib/types";
 import { RouterOutput } from "../lib/trpc";
+import { TextareaAutosize } from "@mui/base/TextareaAutosize";
+import { WhyRecommendedModal } from "./WhyRecommendedModal";
 
 interface VideoProps {
   setVideoRef: (ref: HTMLDivElement) => void;
@@ -80,7 +82,6 @@ export function Video(props: VideoProps) {
   }, [isReady, props.inView]);
 
   const isInitialPlay = React.useRef(true);
-
   return (
     <div className="video h-[100%]">
       {props.inView ? (
@@ -120,7 +121,7 @@ export function Video(props: VideoProps) {
         </div>
       )}
       <div className="w-[100%] p-4">
-        <textarea
+        <TextareaAutosize
           title="notes"
           className="w-[100%] box-border p-2"
           placeholder="notes..."
@@ -137,8 +138,9 @@ export function Video(props: VideoProps) {
         >
           <div>
             <div className="flex flex-row items-center gap-2 px-2 shortsDesc">
-              <p className="text-xs sm:text-base description">
-                {props.video.recommendation.data.summary}
+              <p className="flex items-center gap-1 text-xs sm:text-base description">
+                <div>{props.video.recommendation.data.summary}</div>
+                <WhyRecommendedModal video={props.video} />
               </p>
               <div className="flex flex-col items-center gap-4">
                 <LoginOnboardingModal shouldOpen={!props.auth?.authenticated}>

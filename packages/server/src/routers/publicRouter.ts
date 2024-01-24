@@ -28,7 +28,30 @@ export const publicRouter = router({
         include: {
           recommendation: {
             include: {
-              votes: true,
+              source: {
+                include: {
+                  queries: {
+                    include: {
+                      query: {
+                        include: {
+                          summary: true,
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+              votes: {
+                include: {
+                  user: {
+                    select: {
+                      profile_image_url: true,
+                      name: true,
+                      username: true,
+                    },
+                  },
+                },
+              },
             },
           },
         },
@@ -36,12 +59,16 @@ export const publicRouter = router({
           priority: "asc",
         },
       });
+      const queriesAndSummaries = raw
+        .flatMap((rec) => rec.recommendation.source.queries.map((q) => q.query))
+        .filter((q) => q.summary.userId === user.id);
       const validated = raw.map((rec) => ({
         ...rec,
         recommendation: {
           ...rec.recommendation,
           data: YouTubeRecommendation.parse(rec.recommendation.data),
         },
+        queries: queriesAndSummaries,
       }));
       return validated;
     }),

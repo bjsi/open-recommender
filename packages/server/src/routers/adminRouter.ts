@@ -10,7 +10,6 @@ export const adminRouter = router({
     .input(
       z.object({
         username: z.string(),
-        tweets: z.array(TweetSchema),
         summary: z.string(),
         clips: z.array(
           z.object({
@@ -50,17 +49,6 @@ export const adminRouter = router({
           public: true,
           userId: user.id,
         },
-      });
-
-      // add tweets
-      await prisma.tweet.createMany({
-        data: input.tweets.map((t) => ({
-          tweetId: t.id,
-          tweetedAt: t.date,
-          userId: user.id,
-          summaryId: summary.id,
-          data: t as Record<string, any>,
-        })),
       });
 
       // add clips and queries
@@ -137,6 +125,10 @@ export const adminRouter = router({
             priority: idx,
           },
         });
+
+        return {
+          summaryId: summary.id,
+        };
       }
     }),
   getTweets: publicProcedure
@@ -178,6 +170,7 @@ export const adminRouter = router({
       z.object({
         username: z.string(),
         tweets: TweetSchema.array(),
+        summaryId: z.number().optional(),
       })
     )
     .mutation(async ({ input }) => {
@@ -195,6 +188,7 @@ export const adminRouter = router({
           tweetedAt: t.date,
           userId: user.id,
           data: t as Record<string, any>,
+          summaryId: input.summaryId,
         })),
       });
     }),

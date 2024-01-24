@@ -495,12 +495,10 @@ export const saveResultsToDB = {
     args: SaveResultsToDBStageArgs
   ): Promise<Success<SaveResultsToDBStageArgs> | Failure> {
     const finalData = {
-      tweets: args.tweets,
       summary: args.profile,
       clips: args.orderedClips,
       username: args.user,
     };
-
     await trpc.addRecommendations.mutate(finalData);
     return success(args);
   },
