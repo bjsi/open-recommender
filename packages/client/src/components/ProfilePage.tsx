@@ -13,6 +13,7 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  Tooltip,
 } from "@mui/material";
 import * as _ from "remeda";
 import { OnboardingModal } from "./OnboardingModal";
@@ -100,7 +101,7 @@ export function ProfilePage(props: ProfilePageProps) {
     rows.push({
       createdAt: summary.createdAt,
       type: "Summary of User",
-      content: summary.data.content,
+      content: summary.content,
       useForRecommendations: summary.useForRecommendations,
     });
   });
@@ -131,19 +132,21 @@ export function ProfilePage(props: ProfilePageProps) {
         <div>Followers: {profileForUser.followers}</div>
         <br></br>
         {!viewingOwnProfile ? (
-          <Button
-            variant="contained"
-            onClick={() => {
-              setIsFollowing(!isFollowing);
-              trpc.toggleFollowing
-                .mutate({ username: usernameForProfile })
-                .then((response) => {
-                  setIsFollowing(!!response);
-                });
-            }}
-          >
-            {isFollowing ? "Follow" : "Unfollow"}
-          </Button>
+          <Tooltip title="Follow users to get recommended clips they liked.">
+            <Button
+              variant="contained"
+              onClick={() => {
+                setIsFollowing(!isFollowing);
+                trpc.toggleFollowing
+                  .mutate({ username: usernameForProfile })
+                  .then((response) => {
+                    setIsFollowing(!!response);
+                  });
+              }}
+            >
+              {isFollowing ? "Unfollow" : "Follow"}
+            </Button>
+          </Tooltip>
         ) : (
           <>
             {!apiKey ? (
