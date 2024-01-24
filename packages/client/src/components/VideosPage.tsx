@@ -3,6 +3,7 @@ import { Video } from "./Video";
 import { useParams } from "react-router-dom";
 import { AuthInfo } from "../lib/types";
 import { RouterOutput, trpc } from "../lib/trpc";
+import { login } from "../lib/login";
 
 interface VideosPageProps {
   auth: AuthInfo | undefined;
@@ -14,6 +15,7 @@ export function VideosPage(props: VideosPageProps) {
     React.useState<RouterOutput["getRecommendations"]>();
   React.useEffect(() => {
     if (!props.auth?.authenticated) return;
+    // @ts-ignore
     trpc.getRecommendations.query({ username: videosForUser }).then((res) => {
       setClips(res);
     });
@@ -66,7 +68,12 @@ export function VideosPage(props: VideosPageProps) {
   };
 
   if (!props.auth?.authenticated) {
-    return <div>Not logged in</div>;
+    return (
+      <div className="p-4">
+        Not logged in. Please <a onClick={() => login()}>log in</a> to view your
+        own or others' clips.
+      </div>
+    );
   } else if (!clips || clips.length === 0) {
     return <div>No clips found for user {videosForUser}</div>;
   }

@@ -16,13 +16,16 @@ export function WhyRecommendedModal(props: WhyRecommendedModalProps) {
       shouldOpen
       title="Why was this recommended?"
       content={
-        <div>
+        <div className="flex flex-col gap-2">
           <div>
             Open Recommender created this summary of your interests based on
             your recent Tweets and any custom data you uploaded to your profile.
           </div>
-          <Card className={clsx()} onClick={() => setExpanded(!expanded)}>
-            <Collapse collapsedSize={200} in={expanded}>
+          <Card
+            className={clsx("border border-solid")}
+            onClick={() => setExpanded(!expanded)}
+          >
+            <Collapse collapsedSize={100} in={expanded}>
               <Typography>{props.video.queries[0].summary.content}</Typography>
             </Collapse>
           </Card>

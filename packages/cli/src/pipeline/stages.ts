@@ -19,6 +19,7 @@ import { createQueriesFromProfile } from "../recommender/prompts/createQueriesFr
 import { MetaphorYouTubeResult, searchYouTubeVideos } from "../metaphor/search";
 import { trpc } from "../trpc";
 import { compact } from "remeda";
+import { writeFileSync } from "fs";
 
 export const STAGES = [
   "validate-args",
@@ -499,6 +500,7 @@ export const saveResultsToDB = {
       clips: args.orderedClips,
       username: args.user,
     };
+    writeFileSync("finalData.json", JSON.stringify(finalData, null, 2));
     await trpc.addRecommendations.mutate(finalData);
     return success(args);
   },

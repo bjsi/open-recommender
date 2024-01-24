@@ -79,7 +79,7 @@ export const publicRouter = router({
       },
       where: {
         username: {
-          in: ["experilearning"],
+          in: ["experilearning", "bazinga"],
         },
       },
     });

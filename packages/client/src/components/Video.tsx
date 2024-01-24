@@ -140,7 +140,6 @@ export function Video(props: VideoProps) {
             <div className="flex flex-row items-center gap-2 px-2 shortsDesc">
               <p className="flex items-center gap-1 text-xs sm:text-base description">
                 <div>{props.video.recommendation.data.summary}</div>
-                <WhyRecommendedModal video={props.video} />
               </p>
               <div className="flex flex-col items-center gap-4">
                 <LoginOnboardingModal shouldOpen={!props.auth?.authenticated}>
@@ -166,6 +165,7 @@ export function Video(props: VideoProps) {
                   />
                 </LoginOnboardingModal>
                 <ShareClipButton clip={props.video} notes={notes} />
+                <WhyRecommendedModal video={props.video} />
               </div>
             </div>
             <div className="shortDetails">
