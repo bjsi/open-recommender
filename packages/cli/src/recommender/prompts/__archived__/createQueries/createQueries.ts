@@ -6,15 +6,14 @@ import {
   CreateQueriesInput,
   createQueriesInputSchema,
 } from "./schemas/createQueriesInputSchema";
-import { tweetsToString } from "../../../twitter/getUserContext";
-import { Tweet } from "shared/src/manual/Tweet";
-import { openpipe } from "../../../openpipe/openpipe";
+import { tweetsToString } from "../../../../twitter/getUserContext";
+import { Tweet, TwitterUser } from "shared/src/manual/Tweet";
+import { openpipe } from "../../../../openpipe/openpipe";
 import { experilearningTweetsDataset } from "./datasets/experilearningTweetsDataset";
-import { corbttTweetsDataset } from "./datasets/corbttTweetsDataset";
 import {
   RequestTagsWithoutName,
   formatPromptName,
-} from "../../../openpipe/requestTags";
+} from "../../../../openpipe/requestTags";
 
 export const CREATE_YOUTUBE_SEARCH_QUERIES = "Create Queries";
 
@@ -40,14 +39,14 @@ export class CreateYouTubeSearchQueries extends Prompt<
   }
 
   async execute(args: {
-    user: string;
+    user: TwitterUser;
     tweets: Tweet[];
     openPipeRequestTags?: RequestTagsWithoutName;
     enableOpenPipeLogging?: boolean;
   }) {
     const promptVariables: CreateQueriesInput = {
-      user: args.user,
-      tweets: tweetsToString({ tweets: args.tweets, user: args.user }),
+      user: args.user.displayname,
+      tweets: tweetsToString({ tweets: args.tweets, inFeedOfUser: args.user }),
     };
     const candidatePrompt = this.chooseCandidatePrompt(promptVariables);
     const res = await openpipe.functionCall({
@@ -78,20 +77,11 @@ export class CreateYouTubeSearchQueries extends Prompt<
 }
 
 export const createYouTubeSearchQueries = () =>
-  new CreateYouTubeSearchQueries()
-    .withTest({
-      name: "experilearning",
-      onlyTestMainPrompt: true,
-      vars: {
-        user: "experilearning",
-        tweets: experilearningTweetsDataset.tweets.value,
-      },
-    })
-    .withTest({
-      name: "corbtt",
-      onlyTestMainPrompt: true,
-      vars: {
-        user: "corbtt",
-        tweets: corbttTweetsDataset.tweets.value,
-      },
-    });
+  new CreateYouTubeSearchQueries().withTest({
+    name: "experilearning",
+    onlyTestMainPrompt: true,
+    vars: {
+      user: "experilearning",
+      tweets: experilearningTweetsDataset.tweets.value,
+    },
+  });

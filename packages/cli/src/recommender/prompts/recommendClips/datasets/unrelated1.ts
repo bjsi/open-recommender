@@ -2,6 +2,7 @@ import { ExampleDataSet } from "prompt-iteration-assistant/dist/lib/prompt";
 import { Tweet } from "shared/src/manual/Tweet";
 import { TranscriptCue } from "../../../../youtube/transcript";
 import { RecommendClipsCustomInput } from "../schemas/recommendClipsInputSchema";
+import { experilearningTwitterUser } from "../../recursiveTwitterSummarizer/datasets/experilearning";
 
 const tweets: Tweet[] = [
   {
@@ -2524,7 +2525,7 @@ export const unrelatedDataset1: ExampleDataSet<RecommendClipsCustomInput> = {
   },
   user: {
     name: "experilearning",
-    value: "experilearning",
+    value: experilearningTwitterUser,
   },
   url: {
     name: "lex-bezos",

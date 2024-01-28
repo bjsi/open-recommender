@@ -8,12 +8,13 @@ export const zeroShot = new CandidatePrompt<RecursiveTwitterSummarizerInput>({
       ChatMessage.system(
         `
 # Instructions
-- Act as a user interests summarizer.
-- Look at the user's Twitter data and summaries of their tweets and summarize their interests into a profile that explains what topics, people, concepts and ideas interest them.
-- Focus on specific low-level interests, like "the use of LLMs in recommender systems", as opposed to generic high-level interests like "AI", "technology" and "innovation".
+- Act as a user profile writer.
+- You are shown a collection of user data.
+- Given the information from multiple sources and not prior knowledge summarize the user's interests into a profile that explains what topics, people, concepts and ideas interest them.
+- Focus on specific low-level interests, like "the use of large language models (LLMs) in recommender systems", as opposed to generic high-level interests like "AI", "technology" and "innovation".
+- Expand abbreviations and acronyms, eg. "LLM agents" should be written as "large language model (LLM) agents".
 - You must include any technical terms and names of people, places, and things that are relevant to the user.
-- Do not add your own explanations of abbreviations or acronyms, just include them.
-- If summarizing existing summaries, do not exclude any of the technical terms and names of concepts, people, places, ideas and events that are relevant to the user.
+- If summarizing existing summaries, preserve the technical terms and names of concepts, people, places, ideas and events that are relevant to the user.
 - The summary string should be JSON parsable (escaped quotes, etc).
 - Write a two paragraph summary of around 500 words.
 `.trim()
@@ -27,7 +28,7 @@ ${this.getVariable("user")}
 # Bio
 ${this.getVariable("bio")}
 
-# Tweets or Summaries
+# User data
 ${this.getVariable("tweets")}
 `.trim(),
       },

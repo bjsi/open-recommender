@@ -1,11 +1,15 @@
 import chalk from "chalk";
 import { execSync } from "child_process";
-import { existsSync, readFileSync, readdirSync, writeFileSync } from "fs";
+import {
+  existsSync,
+  readFileSync,
+  readdirSync,
+  writeFile,
+  writeFileSync,
+} from "fs";
 import path from "path";
 import { dataFolder } from "../filesystem";
 import { parseSync, stringifySync } from "subtitle";
-import { tokenize } from "../tokenize";
-import { readBuilderProgram } from "typescript";
 
 export interface Transcript {
   cues: TranscriptCue[];
@@ -96,15 +100,18 @@ export async function fetchTranscript(
   }
 }
 
-export function transcriptToMarkdownCues(cues: TranscriptCue[]) {
+export function transcriptToMarkdownCues(
+  cues: TranscriptCue[],
+  delimiter = "\n---\n"
+) {
   return cues
-    .map(
-      (cue, id) => `
+    .map((cue, id) =>
+      `
 ID: ${id}
 ${cue.text}
-`
+`.trim()
     )
-    .join(`\n---\n`);
+    .join(delimiter);
 }
 
 export function transcriptToString(cues: TranscriptCue[]) {
@@ -186,14 +193,7 @@ if (require.main === module) {
     videoId,
     "The 10 AI Innovations Expected to Revolutionize 2024 - 2025"
   ).then((result) => {
-    const formatted = result?.cues
-      ?.map((x, i) => ({
-        id: i,
-        text: x.text,
-        start: x.start,
-      }))
-      .map((x) => `ID: ${x.id}\nstart:${x.start}\n${x.text}`)
-      .join("\n---\n");
-    console.log(formatted);
+    console.log(result?.cues || []);
+    writeFileSync("transcript.json", JSON.stringify(result, null, 2));
   });
 }

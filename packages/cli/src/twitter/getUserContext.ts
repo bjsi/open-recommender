@@ -5,49 +5,138 @@
  */
 
 import { readFileSync, writeFileSync } from "fs";
-import { TweetSchema, Tweet, UserSchema } from "shared/src/manual/Tweet";
+import {
+  TweetSchema,
+  Tweet,
+  TwitterUserSchema,
+  TwitterUser,
+} from "shared/src/manual/Tweet";
 import path from "path";
 import { TwitterAPI, initTwitterAPI } from "./twitterAPI";
+
+const likeToString = (args: {
+  like: z.infer<typeof LikeSchema>;
+  inFeedOfUser: TwitterUser;
+  id?: number;
+}) => {
+  const { like, inFeedOfUser, id } = args;
+  const formattedTweet = compact([
+    id != null && `ID: ${id}`,
+    `Type: Like`,
+    `Liked by ${inFeedOfUser.displayname}`,
+    `${formatDisplayNameWithBio(like.tweetedBy)} (${like.date})`,
+    like.content,
+  ]).join("\n");
+  return formattedTweet;
+};
+
+const replyToString = (args: {
+  reply: z.infer<typeof ReplySchema>;
+  inFeedOfUser: TwitterUser;
+  id?: number;
+}) => {
+  const { reply, inFeedOfUser, id } = args;
+  const formattedTweet = compact([
+    id != null && `ID: ${id}`,
+    `Type: Reply`,
+    `${formatDisplayNameWithBio(reply.contextUser)} (${reply.contextDate})`,
+    reply.contextContent,
+    `${formatDisplayName(reply.replyUser.username)} (${reply.replyDate})`,
+    reply.replyContent,
+  ]).join("\n");
+  return formattedTweet;
+};
+
+const quoteToString = (args: {
+  quote: z.infer<typeof QuoteSchema>;
+  inFeedOfUser: TwitterUser;
+  id?: number;
+}) => {
+  const { quote, id } = args;
+  const formattedTweet = compact([
+    id != null && `ID: ${id}`,
+    `Type: Quote`,
+    `Tweeted by ${formatDisplayNameWithBio(quote.contextUser)} (${
+      quote.contextDate
+    })`,
+    quote.contextContent,
+    `Quoted by ${formatDisplayName(quote.replyUser.displayname)} (${
+      quote.replyDate
+    })`,
+    quote.replyContent,
+  ]).join("\n");
+  return formattedTweet;
+};
+
+const retweetToString = (args: {
+  retweet: z.infer<typeof RetweetSchema>;
+  inFeedOfUser: TwitterUser;
+  id?: number;
+}) => {
+  const { retweet, inFeedOfUser, id } = args;
+  const formattedTweet = compact([
+    id != null && `ID: ${id}`,
+    `Type: Reweet`,
+    `Retweeted by ${formatDisplayName(inFeedOfUser.displayname)}`,
+    `${formatDisplayNameWithBio(retweet.tweetedBy)} (${retweet.date})`,
+    retweet.content,
+  ]).join("\n");
+  return formattedTweet;
+};
+
+const normalTweetToString = (args: {
+  tweet: z.infer<typeof NormalTweetSchema>;
+  inFeedOfUser: TwitterUser;
+  id?: number;
+}) => {
+  const { tweet, inFeedOfUser, id } = args;
+  const formattedTweet = compact([
+    id != null && `ID: ${id}`,
+    `Type: Tweet`,
+    `Tweeted by ${formatDisplayName(tweet.tweetedBy.displayname)} (${
+      tweet.date
+    })`,
+    tweet.content,
+  ]).join("\n");
+  return formattedTweet;
+};
 
 // TODO: what if I quote a tweet and reply to it?
 // TODO: dedupe retweet + like
 export const tweetToString = (args: {
   data: Tweet;
-  user: string;
+  inFeedOfUser: TwitterUser;
   id?: number;
 }) => {
-  const { data, user, id } = args;
-  const tweet = formatTweet(data, user);
-  const type = tweet.type;
-  const hasContext = type === "quote" || type === "reply";
-  const date = hasContext ? tweet.replyDate : tweet.date;
-  let content = hasContext ? tweet.replyContent : tweet.content;
-  for (const link of data.links) {
-    if (link.tcourl) {
-      content = content.replace(link.tcourl, link.url);
-    }
+  const { data, inFeedOfUser, id } = args;
+  const tweet = formatTweet(data, inFeedOfUser);
+  if (tweet.type === "like") {
+    return likeToString({ like: tweet, inFeedOfUser, id });
   }
-  const formattedTweet = [
-    id != null && `ID: ${id}`,
-    tweet.type === "like" && `Liked by @${user}`,
-    hasContext && `tweet: @${tweet.contextUser} (${tweet.contextDate})`,
-    hasContext && tweet.contextContent,
-    `${hasContext ? "reply: " : ""}@${
-      type === "like" ? tweet.user : user
-    } (${date})`,
-    content,
-  ]
-    .filter(Boolean)
-    .join("\n");
-  return formattedTweet;
+  if (tweet.type === "reply") {
+    return replyToString({ reply: tweet, inFeedOfUser, id });
+  }
+  if (tweet.type === "quote") {
+    return quoteToString({ quote: tweet, inFeedOfUser, id });
+  }
+  if (tweet.type === "retweet") {
+    return retweetToString({ retweet: tweet, inFeedOfUser, id });
+  }
+  if (tweet.type === "tweet") {
+    return normalTweetToString({ tweet, inFeedOfUser, id });
+  }
+  return null;
 };
 
-export const tweetsToString = (args: { tweets: Tweet[]; user: string }) => {
+export const tweetsToString = (args: {
+  tweets: Tweet[];
+  inFeedOfUser: TwitterUser;
+}) => {
   return args.tweets
     .map((tweet, idx) =>
       tweetToString({
         data: tweet,
-        user: args.user,
+        inFeedOfUser: args.inFeedOfUser,
         id: idx,
       })
     )
@@ -56,8 +145,7 @@ export const tweetsToString = (args: { tweets: Tweet[]; user: string }) => {
 };
 
 import { z } from "zod";
-import { single } from "rxjs";
-import { RemoteController } from "pybridge-zod";
+import { compact } from "lodash";
 
 const TweetBaseSchema = z.object({
   id: z.number(),
@@ -67,10 +155,10 @@ const TweetBaseSchema = z.object({
 const ReplyBaseSchema = TweetBaseSchema.extend({
   replyContent: z.string(),
   replyDate: z.string(),
-  replyUser: z.string(),
+  replyUser: TwitterUserSchema,
   contextContent: z.string(),
   contextDate: z.string(),
-  contextUser: z.string(),
+  contextUser: TwitterUserSchema,
 });
 
 const ReplySchema = ReplyBaseSchema.extend({
@@ -85,15 +173,23 @@ const NormalTweetSchema = TweetBaseSchema.extend({
   type: z.literal("tweet"),
   content: z.string(),
   date: z.string(),
-  user: z.string(),
+  tweetedBy: TwitterUserSchema,
 });
 
 const LikeSchema = TweetBaseSchema.extend({
   type: z.literal("like"),
   content: z.string(),
   date: z.string(),
-  user: z.string(),
-  likedBy: z.string(),
+  tweetedBy: TwitterUserSchema,
+  likedBy: TwitterUserSchema,
+});
+
+const RetweetSchema = TweetBaseSchema.extend({
+  type: z.literal("retweet"),
+  content: z.string(),
+  date: z.string(),
+  tweetedBy: TwitterUserSchema,
+  retweetedBy: TwitterUserSchema,
 });
 
 export const TweetTypeSchema = z.union([
@@ -101,31 +197,85 @@ export const TweetTypeSchema = z.union([
   QuoteSchema,
   NormalTweetSchema,
   LikeSchema,
+  RetweetSchema,
 ]);
 export type TweetType = z.infer<typeof TweetTypeSchema>;
 
-const formatTweetContent = (content: string) => {
-  return content
+const formatDisplayName = (displayname: string) => {
+  return "@" + displayname.replace(/\s/g, "_");
+};
+
+const truncate = (str: string, n: number) => {
+  return str.length > n ? str.substr(0, n - 1) + "..." : str;
+};
+
+const formatDisplayNameWithBio = (user: TwitterUser) => {
+  return `${formatDisplayName(user.displayname)} (bio: ${truncate(
+    user.rawDescription.replace(/\n/g, " "),
+    50
+  )})`;
+};
+
+const replaceTcoUrls = (content: string, data: Tweet) => {
+  for (const link of data.links) {
+    if (link.tcourl) {
+      content = content.replace(link.tcourl, link.url);
+    }
+  }
+  return content;
+};
+
+const replaceUsernamesWithNames = (content: string, tweet: Tweet) => {
+  let newContent = content;
+  for (const mention of tweet.mentionedUsers) {
+    newContent = newContent.replace(
+      `@${mention.username}`,
+      formatDisplayName(mention.displayname)
+    );
+  }
+  return newContent;
+};
+
+const formatTweetContent = (content: string, tweet: Tweet) => {
+  const cleaned = content
     .split("\n")
     .map((x) => x.trim())
     .filter(Boolean)
     .join("\n");
+  const cleaned2 = replaceUsernamesWithNames(cleaned, tweet);
+  const cleaned3 = replaceTcoUrls(cleaned2, tweet);
+  return truncate(cleaned3, 2000);
 };
 
-export const formatTweet = (tweet: Tweet, user: string): TweetType => {
+export const formatTweet = (
+  tweet: Tweet,
+  inFeedOfUser: TwitterUser
+): TweetType => {
   const contextTweet =
     tweet.retweetedTweet || tweet.quotedTweet || tweet.replyToTweet;
-  const tweetContent = formatTweetContent(tweet.rawContent);
-  const contextContent = formatTweetContent(contextTweet?.rawContent || "");
-  if (tweet.user.username !== user) {
+  const tweetContent = formatTweetContent(tweet.rawContent, tweet);
+  const contextContent = contextTweet
+    ? formatTweetContent(contextTweet.rawContent, contextTweet)
+    : "";
+  if (tweet.user.username !== inFeedOfUser.username) {
     return {
       id: tweet.id,
       url: tweet.url,
       type: "like",
       content: tweetContent,
       date: tweet.date.slice(0, 10),
-      user: tweet.user.username,
-      likedBy: user,
+      tweetedBy: tweet.user,
+      likedBy: inFeedOfUser,
+    };
+  } else if (tweet.retweetedTweet) {
+    return {
+      id: tweet.id,
+      url: tweet.url,
+      type: "retweet",
+      content: tweetContent,
+      date: tweet.date.slice(0, 10),
+      tweetedBy: tweet.retweetedTweet.user,
+      retweetedBy: inFeedOfUser,
     };
   } else if (tweet.quotedTweet) {
     return {
@@ -134,10 +284,10 @@ export const formatTweet = (tweet: Tweet, user: string): TweetType => {
       type: "quote",
       replyContent: tweetContent,
       replyDate: tweet.date.slice(0, 10),
-      replyUser: tweet.user.username,
+      replyUser: tweet.user,
       contextContent: contextContent,
       contextDate: contextTweet!.date.slice(0, 10),
-      contextUser: contextTweet!.user.username,
+      contextUser: contextTweet!.user,
     };
   } else if (tweet.inReplyToTweetId && tweet.replyToTweet) {
     return {
@@ -146,10 +296,10 @@ export const formatTweet = (tweet: Tweet, user: string): TweetType => {
       type: "reply",
       replyContent: tweetContent,
       replyDate: tweet.date.slice(0, 10),
-      replyUser: tweet.user.username,
+      replyUser: tweet.user,
       contextContent: contextContent,
       contextDate: contextTweet!.date.slice(0, 10),
-      contextUser: contextTweet!.user.username,
+      contextUser: contextTweet!.user,
     };
   } else {
     return {
@@ -158,23 +308,26 @@ export const formatTweet = (tweet: Tweet, user: string): TweetType => {
       type: "tweet",
       content: tweetContent,
       date: tweet.date.slice(0, 10),
-      user: tweet.user.username,
+      tweetedBy: tweet.user,
     };
   }
 };
 
-export const formatTweets = (tweets: Tweet[], user: string) => {
+export const formatTweets = (tweets: Tweet[], inFeedOfUser: TwitterUser) => {
   return tweets
-    .map((tweet) => formatTweet(tweet, user))
+    .map((tweet) => formatTweet(tweet, inFeedOfUser))
     .filter(Boolean) as TweetType[];
 };
 
 const isAdvert = (tweet: Tweet) => {
   const sources = [tweet.source, tweet.sourceUrl, tweet.sourceLabel];
-  return sources.some((source) =>
-    ["ads", "advert", "brand networks"].some((x) =>
-      source?.toLowerCase()?.includes(x)
-    )
+  return (
+    sources.some((source) =>
+      ["ads", "advert", "brand networks", "twitter media studio"].some((x) =>
+        source?.toLowerCase()?.includes(x)
+      )
+    ) ||
+    (tweet.sourceLabel && !tweet.sourceLabel?.toLowerCase().includes("twitter"))
   );
 };
 
@@ -193,7 +346,7 @@ const parseTweets = (tweetsStr: string) => {
 
 export const getUserProfile = async (api: TwitterAPI, user_login: string) => {
   const userStr = await api.get_user(user_login);
-  const user = UserSchema.parse(JSON.parse(userStr));
+  const user = TwitterUserSchema.parse(JSON.parse(userStr));
   return user;
 };
 
@@ -238,16 +391,20 @@ if (require.main === module) {
     const user = (process.argv[2] || "experilearning").replace("@", "");
     const n_tweets = parseInt(process.argv[3] || "20");
     console.log(`Getting ${n_tweets} tweets for user @${user}`);
-    const tweets =
+    const { tweets, userProfile } =
       //loadExampleTweetHistory(user) ||
       await (async () => {
         const { api, bridge } = initTwitterAPI();
+        const userProfile = await getUserProfile(api, user);
         const tweets = (await getUserTweetHistory(api, user, n_tweets)).filter(
           Boolean
         ) as Tweet[];
         // const profile = await getUserProfile(api, user);
         bridge.close();
-        return tweets; // profile,
+        return {
+          tweets,
+          userProfile,
+        };
       })();
     if (!tweets || tweets.length === 0) {
       console.log("No tweets found");
@@ -263,7 +420,7 @@ if (require.main === module) {
     );
 
     console.log(tweets);
-    const str = tweetsToString({ tweets, user });
+    const str = tweetsToString({ tweets, inFeedOfUser: userProfile });
     console.log(str);
   })();
 }

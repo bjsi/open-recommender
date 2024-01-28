@@ -49,7 +49,7 @@ class AppraiseTranscriptPrompt extends Prompt<
     openPipeRequestTags?: Omit<RequestTagsLatest, "promptName">;
     enableOpenPipeLogging?: boolean;
   }) {
-    // take a max of 2000 transcript tokens, depending on the length of the prompt + profile
+    // take a max of 1000 transcript tokens, depending on the length of the prompt + profile
     const maxTranscriptTokens =
       8192 -
       // for output
@@ -63,7 +63,7 @@ class AppraiseTranscriptPrompt extends Prompt<
       ).total;
     const transcript = firstNTokens(
       transcriptCuesToVtt(args.transcript),
-      Math.min(maxTranscriptTokens, 2000)
+      Math.min(maxTranscriptTokens, 1000)
     );
 
     const promptVariables: AppraiseTranscriptInput = {

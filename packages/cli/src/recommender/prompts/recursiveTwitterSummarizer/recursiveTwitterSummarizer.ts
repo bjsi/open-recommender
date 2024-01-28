@@ -4,12 +4,13 @@ import {
   RequestTagsWithoutName,
   formatPromptName,
 } from "../../../openpipe/requestTags";
-import { Tweet } from "shared/src/manual/Tweet";
+import { Tweet, TwitterUser } from "shared/src/manual/Tweet";
 import { tweetsToString } from "../../../twitter/getUserContext";
 import { openpipe } from "../../../openpipe/openpipe";
 import {
   experilearningDataset,
   experilearningTweets,
+  experilearningTwitterUser,
 } from "./datasets/experilearning";
 import { RecursiveCharacterTextSplitter } from "../../textSplitter";
 import {
@@ -19,7 +20,7 @@ import {
 import { recursiveTwitterSummarizerOutputSchema } from "./schemas/recursiveTwitterSummarizerOutputSchema";
 import { tokenize } from "../../../tokenize";
 
-export const SUMMARIZE_TWEETS = "Summarize Tweets";
+export const SUMMARIZE_TWEETS = "Summarize Data";
 
 /**
  * Recursively summarize a user's tweets into a kind of user profile.
@@ -31,7 +32,7 @@ export class RecursiveTwitterSummarizer extends Prompt<
   constructor() {
     super({
       name: SUMMARIZE_TWEETS,
-      description: "Summarize the user's tweets to understand their interests.",
+      description: "Summarize the user's data.",
       prompts: [zeroShot],
       model: "gpt-4",
       input: recursiveTwitterSummarizerInputSchema,
@@ -41,7 +42,7 @@ export class RecursiveTwitterSummarizer extends Prompt<
   }
 
   async execute(args: {
-    user: string;
+    user: TwitterUser;
     tweets: Tweet[];
     openPipeRequestTags?: RequestTagsWithoutName;
     enableOpenPipeLogging?: boolean;
@@ -59,7 +60,7 @@ export class RecursiveTwitterSummarizer extends Prompt<
         await this.calculateCost({
           tweets: "",
           bio,
-          user: args.user,
+          user: args.user.displayname,
         })
       ).total;
 
@@ -67,7 +68,7 @@ export class RecursiveTwitterSummarizer extends Prompt<
       const promptVariables: RecursiveTwitterSummarizerInput = {
         tweets: tweetsOrSummaries,
         bio,
-        user: args.user,
+        user: args.user.displayname,
       };
       const candidatePrompt = this.chooseCandidatePrompt(promptVariables);
       const res = await openpipe.functionCall({
@@ -99,7 +100,9 @@ export class RecursiveTwitterSummarizer extends Prompt<
     const parts = await new RecursiveCharacterTextSplitter({
       separators: ["---"],
       chunkSize: maxTokens,
-    }).splitText(tweetsToString({ tweets: args.tweets, user: args.user }));
+    }).splitText(
+      tweetsToString({ tweets: args.tweets, inFeedOfUser: args.user })
+    );
 
     // messy code to make sure each prompt gets filled with the
     // max number of tweets given the model's context limit.
@@ -125,7 +128,9 @@ export class RecursiveTwitterSummarizer extends Prompt<
 
     let summaries: string[] = [];
     for (const tweets of tweetChunks) {
-      const res = await callApi(tweetsToString({ tweets, user: args.user }));
+      const res = await callApi(
+        tweetsToString({ tweets, inFeedOfUser: args.user })
+      );
       summaries.push(res);
     }
 
@@ -170,7 +175,7 @@ export const recursivelySummarizeTweets = () =>
 if (require.main === module) {
   (async () => {
     const sum = await recursivelySummarizeTweets().execute({
-      user: "experilearning",
+      user: experilearningTwitterUser,
       tweets: experilearningTweets,
     });
     console.log("FINAL SUMMARY");

@@ -1,12 +1,8 @@
 import { PromptController } from "prompt-iteration-assistant";
 import {
-  EXTRACT_RELEVANT_TWEETS,
-  extractRelevantTweets,
-} from "./__archived__/filterIrrelevantTweets/filterIrrelevantTweets";
-import {
   RECOMMEND_VIDEOS,
   recommendVideos,
-} from "./__archived__/recommendVideos/recommendVideos";
+} from "./recommendVideos/recommendVideos";
 import {
   APPRAISE_TRANSCRIPT,
   appraiseTranscript,
@@ -14,7 +10,7 @@ import {
 import {
   CREATE_YOUTUBE_SEARCH_QUERIES,
   createYouTubeSearchQueries,
-} from "./createQueries/createQueries";
+} from "./__archived__/createQueries/createQueries";
 import {
   CREATE_SEARCH_QUERIES_FROM_PROFILE,
   createQueriesFromProfile,
@@ -27,7 +23,6 @@ import {
   SUMMARIZE_TWEETS,
   recursivelySummarizeTweets,
 } from "./recursiveTwitterSummarizer/recursiveTwitterSummarizer";
-import { RERANK_CLIPS, rerankClips } from "./rerankClips/rerankClips";
 
 /**
  * Container for all the prompts in the recommender.
@@ -37,8 +32,6 @@ const promptController = new PromptController({
   [RECOMMEND_CLIPS]: recommendClips,
   [CREATE_YOUTUBE_SEARCH_QUERIES]: createYouTubeSearchQueries,
   [RECOMMEND_VIDEOS]: recommendVideos,
-  [RERANK_CLIPS]: rerankClips,
-  [EXTRACT_RELEVANT_TWEETS]: extractRelevantTweets,
   [SUMMARIZE_TWEETS]: recursivelySummarizeTweets,
   [CREATE_SEARCH_QUERIES_FROM_PROFILE]: createQueriesFromProfile,
 });

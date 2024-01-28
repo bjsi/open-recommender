@@ -1,6 +1,6 @@
 import { ExampleDataSet } from "prompt-iteration-assistant";
 import { tweetsToString } from "../../../../twitter/getUserContext";
-import { Tweet } from "shared/src/manual/Tweet";
+import { Tweet, TwitterUser } from "shared/src/manual/Tweet";
 import { RecursiveTwitterSummarizerInput } from "../schemas/recursiveTwitterSummarizerInputSchema";
 
 export const experilearningTweets: Tweet[] = [
@@ -39669,6 +39669,39 @@ export const experilearningTweets: Tweet[] = [
   },
 ];
 
+export const experilearningTwitterUser: TwitterUser = {
+  id: 1318176552652243000,
+  id_str: "1318176552652242944",
+  url: "https://twitter.com/experilearning",
+  username: "experilearning",
+  displayname: "Jamesb",
+  rawDescription:
+    "fascinated by LLM agents | building the best SRS app in the multiverse @rem_note",
+  created: "2020-10-19 13:06:10+00:00",
+  followersCount: 888,
+  friendsCount: 368,
+  statusesCount: 847,
+  favouritesCount: 1118,
+  listedCount: 32,
+  mediaCount: 179,
+  location: "Oxford, UK",
+  profileImageUrl:
+    "https://pbs.twimg.com/profile_images/1318177040563044352/wc9oSp4b_normal.jpg",
+  profileBannerUrl: null,
+  protected: null,
+  verified: false,
+  blue: true,
+  blueType: null,
+  descriptionLinks: [
+    {
+      url: "https://bjsi.github.io/",
+      text: "bjsi.github.io",
+      tcourl: "https://t.co/pUoG8zy05Z",
+    },
+  ],
+  _type: "snscrape.modules.twitter.User",
+};
+
 export const experilearningDataset: ExampleDataSet<RecursiveTwitterSummarizerInput> =
   {
     user: {
@@ -39684,7 +39717,7 @@ export const experilearningDataset: ExampleDataSet<RecursiveTwitterSummarizerInp
       name: "experilearning tweets",
       value: tweetsToString({
         tweets: experilearningTweets,
-        user: "experilearning",
+        inFeedOfUser: experilearningTwitterUser,
       }),
     },
   };

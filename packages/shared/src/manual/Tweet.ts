@@ -35,7 +35,7 @@ const UserRefSchema = z.object({
 
 type UserRef = z.infer<typeof UserRefSchema>;
 
-export const UserSchema = z.object({
+export const TwitterUserSchema = z.object({
   id: z.number(),
   id_str: z.string(),
   url: z.string(),
@@ -60,7 +60,7 @@ export const UserSchema = z.object({
   _type: z.literal("snscrape.modules.twitter.User"),
 });
 
-type User = z.infer<typeof UserSchema>;
+export type TwitterUser = z.infer<typeof TwitterUserSchema>;
 
 const MediaPhotoSchema = z.object({
   url: z.string(),
@@ -98,7 +98,7 @@ export interface Tweet {
   id_str: string;
   url: string;
   date: string;
-  user: User;
+  user: TwitterUser;
   lang: string;
   rawContent: string;
   replyCount: number;
@@ -131,7 +131,7 @@ export const TweetSchema: z.ZodType<Tweet> = z.lazy(() =>
     id_str: z.string(),
     url: z.string(),
     date: z.string(),
-    user: UserSchema,
+    user: TwitterUserSchema,
     lang: z.string(),
     rawContent: z.string(),
     replyCount: z.number(),

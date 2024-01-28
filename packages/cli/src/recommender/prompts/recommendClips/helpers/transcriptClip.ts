@@ -12,6 +12,11 @@ export interface TranscriptClip {
   text: string;
 }
 
+export interface TranscriptClipWithScore extends TranscriptClip {
+  score: number;
+  rank: number;
+}
+
 export type TranscriptChunk = Required<
   z.infer<typeof recommendClipsOutputSchema>
 >["bestClips"][number];

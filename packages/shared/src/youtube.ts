@@ -16,3 +16,7 @@ export function youtubeUrlToTimestampSeconds(url: string) {
 export function youtubeUrlWithoutTimestamp(url: string) {
   return url.replace(/&t=\d+/, "");
 }
+
+export function youtubeUrlWithTimestamp(id: string, seconds: number) {
+  return `https://www.youtube.com/watch?v=${id}&t=${seconds}`;
+}

@@ -1,12 +1,14 @@
-import Metaphor from "metaphor-node";
+import Exa from "exa-js";
 import dotenv from "dotenv";
 import { youtubeUrlToId } from "shared/src/youtube";
+import { compact } from "remeda";
 
 dotenv.config();
 
-const metaphor = new Metaphor(process.env.METAPHOR_API_KEY!);
+const metaphor = new Exa(process.env.METAPHOR_API_KEY!);
 
 export interface MetaphorYouTubeResult {
+  metaphorId: string;
   type: "youtube";
   title: string;
   url: string;
@@ -14,55 +16,119 @@ export interface MetaphorYouTubeResult {
   id: string;
 }
 
-export async function searchYouTubeVideos(
-  query: string
-): Promise<MetaphorYouTubeResult[]> {
-  try {
-    const response = await metaphor.search(query, {
-      numResults: 5,
-      includeDomains: ["youtube.com"],
-      useAutoprompt: true,
-    });
-    return response.results
+interface MetaphorArticleResult {
+  metaphorId: string;
+  id: string;
+  type: "article";
+  title: string;
+  url: string;
+  highlights: {
+    text: string;
+    score: number;
+  }[];
+  text: string;
+}
+
+export type MetaphorResult = MetaphorYouTubeResult | MetaphorArticleResult;
+
+export async function searchYouTube(args: {
+  query: string;
+  numResults?: number;
+}): Promise<MetaphorYouTubeResult[]> {
+  const response = await metaphor.search(args.query, {
+    numResults: args.numResults || 5,
+    useAutoprompt: true,
+    includeDomains: ["youtube.com"],
+  });
+  console.log("metaphor response", response);
+  return compact(
+    response.results
       .filter((x) => !!x.title)
-      .map((x) => ({
-        type: "youtube" as const,
-        title: x.title,
-        url: x.url,
-        channelName: x.author,
-        id: youtubeUrlToId(x.url),
-      }))
-      .filter((x) => !!x.id) as MetaphorYouTubeResult[];
-  } catch (e) {
-    console.error(e);
-    return [];
-  }
+      .map((x) => {
+        const ytId = youtubeUrlToId(x.url);
+        return !ytId || !x.title
+          ? null
+          : {
+              metaphorId: x.id,
+              type: "youtube" as const,
+              title: x.title,
+              url: x.url,
+              channelName: x.author,
+              id: ytId,
+            };
+      })
+  );
+}
+
+export async function searchNonYouTube(args: {
+  query: string;
+  numResults?: number;
+}): Promise<MetaphorArticleResult[]> {
+  const response = await metaphor.searchAndContents(args.query, {
+    numResults: args.numResults || 5,
+    useAutoprompt: true,
+    highlights: {
+      numSentences: 10,
+      highlightsPerUrl: 3,
+    },
+    text: {
+      includeHtmlTags: false,
+    },
+  });
+
+  return compact(
+    response.results.map((res) => {
+      if (!res.title) {
+        return null;
+      }
+      return {
+        metaphorId: res.id,
+        id: res.id,
+        type: "article",
+        title: res.title,
+        url: res.url,
+        highlights: res.highlights.map((highlight, idx) => ({
+          text: highlight,
+          score: res.highlightScores[idx],
+        })),
+        text: res.text,
+      };
+    })
+  );
+}
+
+export async function getYouTubeTranscriptMetaphor(id: string) {
+  const response = await metaphor.getContents(id, { text: true });
+  return response;
 }
 
 export async function findSimilarYouTubeVideos(url: string) {
   const response = await metaphor.findSimilar(url, {
     numResults: 10,
   });
+  return response;
 }
 
 if (require.main === module) {
   const exampleQueries = [
-    "Exploring Language Learning Models and Spaced Repetition Systems",
-    "Artificial Intelligence advancements and implications in education",
-    "Optimization and evolution in AI: Perspectives of Yann LeCun and Kenneth Stanley",
-    "Regulation vs advancement of AI in the UK",
-    "How evolutionary algorithms shape AI",
-    "Engineering of AI prompts and hypothesis generation",
-    "Learning through exploration and problem-solving in programming",
-    "Deep dive into TypeScript and its utility in AI applications",
-    "Tech innovation in France: A focus on AI and social networks",
-    "Human potential and development through AI and technology",
+    "Integrating LLMs in Open Recommender Systems",
+    "Advanced methods in debugging LLM powered recommender systems",
+    "Optimizing pipeline abstraction in LLMs",
+    "Content filtering using LLMs for personalized learning experiences",
+    "The application of AI in digital education and lifelong learning",
+    "Understanding the role of LLMs in app development workflows",
+    "Exploring the contribution of LLMs in crafting personalized content feeds",
+    "Key advancements in Spaced Repetition Systems (SRS) and their integration with LLMs",
+    "Chain of Thought (CoT) and Tree of thought (ToT) prompt styles in effective learning models",
+    "Evolution and applications of AI in meal preparation and grocery shopping",
   ];
   const query =
-    exampleQueries[Math.floor(Math.random() * exampleQueries.length)];
+    "What are large language model agents and when were they created?";
+  // exampleQueries[Math.floor(Math.random() * exampleQueries.length)];
   console.log("query", query);
   (async () => {
-    const results = await searchYouTubeVideos(query);
-    console.log(results);
+    console.log(
+      JSON.stringify(await searchYouTube({ query, numResults: 10 }), null, 2)
+    );
   })();
 }

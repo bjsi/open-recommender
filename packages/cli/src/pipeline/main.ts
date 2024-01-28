@@ -2,13 +2,10 @@ import { trpc } from "../trpc";
 import { Pipeline, PipelineArgs, pipelineArgsSchema } from "./pipeline";
 import { getRunById } from "./run";
 import {
-  appraiseTranscripts,
-  chunkTranscripts,
+  RAGStage,
   createQueriesMetaphor,
   downloadTranscripts,
   getTweets,
-  rankClips,
-  saveResultsToDB,
   searchForVideos,
   summarizeTweets,
   validateArgs,
@@ -50,10 +47,7 @@ import { Command } from "commander";
     .addStage(createQueriesMetaphor)
     .addStage(searchForVideos)
     .addStage(downloadTranscripts)
-    .addStage(appraiseTranscripts)
-    .addStage(chunkTranscripts)
-    .addStage(rankClips)
-    .addStage(saveResultsToDB);
+    .addStage(RAGStage);
 
   const print = opts.print;
   if (print) {
@@ -77,7 +71,7 @@ import { Command } from "commander";
   } else {
     const maybeRecommendations = await pipeline.execute();
     if (maybeRecommendations.success) {
-      console.log(maybeRecommendations.result.orderedClips);
+      console.log(JSON.stringify(maybeRecommendations.result.chunks, null, 2));
     } else {
       console.log(maybeRecommendations.result);
     }

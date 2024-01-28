@@ -1,37 +1,32 @@
 import chalk from "chalk";
 import { twitter } from "../twitter";
 import { Tweet } from "shared/src/manual/Tweet";
-import { tweetsToString } from "../twitter/getUserContext";
 import { yt } from "../youtube";
 import { Failure, Success, failure, success } from "./run";
-import { TranscriptCue } from "../youtube/transcript";
+import { Transcript } from "../youtube/transcript";
 import { PipelineArgs, pipelineArgsSchema } from "./pipeline";
-import { TranscriptClip } from "../recommender/prompts/recommendClips/helpers/transcriptClip";
-import { appraiseTranscript } from "../recommender/prompts/appraiseTranscript/appraiseTranscript";
-import { recommendClips } from "../recommender/prompts/recommendClips/recommendClips";
-import { rerankClips } from "../recommender/prompts/rerankClips/rerankClips";
 import { pAll } from "./utils/pAll";
-import { shuffle } from "./utils/shuffle";
-import { chunkClipArray } from "./utils/chunkClipArray";
 import { createRequestTags } from "../openpipe/requestTags";
 import { recursivelySummarizeTweets } from "../recommender/prompts/recursiveTwitterSummarizer/recursiveTwitterSummarizer";
 import { createQueriesFromProfile } from "../recommender/prompts/createQueriesFromProfile/createQueriesFromProfile";
-import { MetaphorYouTubeResult, searchYouTubeVideos } from "../metaphor/search";
+import { MetaphorYouTubeResult, searchYouTube } from "../metaphor/search";
 import { trpc } from "../trpc";
+import { searchTranscripts } from "../rag/rag";
+import { brainstormQuestions } from "../recommender/prompts/brainstormSubQuestions/brainstormQuestions";
 import { compact } from "remeda";
-import { writeFileSync } from "fs";
+import { TranscriptClipWithScore } from "../recommender/prompts/recommendClips/helpers/transcriptClip";
+import { getUserProfile } from "../twitter/getUserContext";
+import { initTwitterAPI } from "../twitter/twitterAPI";
 
 export const STAGES = [
   "validate-args",
   "get-tweets",
   "summarize-tweets",
-  "create-queries",
+  "create-queries-metaphor",
   "search-for-videos",
-  "filter-search-results",
   "download-transcripts",
   "appraise-transcripts",
-  "chunk-transcripts",
-  "order-clips",
+  "rag",
   "save-results",
 ] as const;
 
@@ -115,8 +110,11 @@ export const summarizeTweets = {
   ): Promise<Success<CreateQueriesStageArgs> | Failure> {
     const { tweets, user } = args;
     console.log(chalk.blue("Summarizing tweets..."));
+    const { api, bridge } = initTwitterAPI();
+    const twitterUser = await getUserProfile(api, user);
+    bridge.close();
     const profile = await recursivelySummarizeTweets().execute({
-      user,
+      user: twitterUser,
       tweets,
     });
     if (!profile) {
@@ -152,27 +150,50 @@ export const createQueriesMetaphor = {
       bio,
       user,
     });
-    if (!queries.length) {
+    const queriesWithQuestions = await pAll(
+      queries.map((query) => async () => {
+        const questions = await brainstormQuestions().execute({
+          query,
+          enableOpenPipeLogging: args.enableLogging,
+          openPipeRequestTags: createRequestTags(args),
+        });
+        return {
+          query,
+          questions,
+        };
+      }),
+      { concurrency: 5 }
+    );
+    if (!queriesWithQuestions.length) {
       const msg = "No search queries generated";
       console.log(chalk.red(msg));
       return failure(msg);
     } else {
-      console.log(chalk.green(queries.length + " queries generated"));
+      console.log(
+        chalk.green(queriesWithQuestions.length + " queries generated")
+      );
       console.log(chalk.blue("Queries:"));
       console.log(chalk.blue("Limiting to 5 queries:"));
-      console.log(queries.slice(0, 5));
-      return success({ ...args, queries: queries.slice(0, 5) });
+      console.log(JSON.stringify(queriesWithQuestions.slice(0, 5), null, 2));
+      return success({
+        ...args,
+        queriesWithQuestions: queriesWithQuestions.slice(0, 5),
+      });
     }
   },
 };
 
 interface SearchForVideosStageArgs extends CreateQueriesStageArgs {
-  queries: string[];
+  queriesWithQuestions: {
+    query: string;
+    questions: string[];
+  }[];
 }
 
 type QueryWithSearchResult = {
   searchResults: MetaphorYouTubeResult[];
   query: string;
+  questions: string[];
 };
 
 export const searchForVideos = {
@@ -181,13 +202,13 @@ export const searchForVideos = {
   run: async function (
     args: SearchForVideosStageArgs
   ): Promise<Success<DownloadTranscriptsStageArgs> | Failure> {
-    const { queries } = args;
+    const { queriesWithQuestions } = args;
 
     console.log(chalk.blue("Searching YouTube..."));
 
     const queryWithResults: QueryWithSearchResult[] = await pAll(
-      queries.map((query) => async () => {
-        const rawSearchResultsForQuery = await searchYouTubeVideos(query);
+      queriesWithQuestions.map(({ query, questions }) => async () => {
+        const rawSearchResultsForQuery = await searchYouTube({ query });
         console.log(
           chalk.blue(
             rawSearchResultsForQuery
@@ -197,10 +218,11 @@ export const searchForVideos = {
         );
         return {
           query,
+          questions,
           searchResults: rawSearchResultsForQuery,
         };
       }),
-      { concurrency: 5 }
+      { concurrency: 10 }
     );
     console.log(
       chalk.blue("Found " + queryWithResults.length + " search results")
@@ -210,9 +232,9 @@ export const searchForVideos = {
 };
 
 type QueryWithSearchResultWithTranscript = {
-  searchResult: MetaphorYouTubeResult;
-  cues: TranscriptCue[];
+  searchResults: (MetaphorYouTubeResult & { transcript: Transcript })[];
   query: string;
+  questions: string[];
 };
 
 interface DownloadTranscriptsStageArgs extends SearchForVideosStageArgs {
@@ -224,27 +246,32 @@ export const downloadTranscripts = {
   description: "Download transcripts for videos",
   run: async function (
     args: DownloadTranscriptsStageArgs
-  ): Promise<Success<AppraiseTranscriptsStageArgs> | Failure> {
+  ): Promise<Success<RAGStageArgs> | Failure> {
     const { queryWithResults: searchResults } = args;
     console.log(chalk.blue(`Fetching ${searchResults.length} transcripts...`));
     const resultsWithTranscripts: QueryWithSearchResultWithTranscript[] = [];
     for (const results of searchResults) {
-      await pAll(
-        results.searchResults.map((result) => async () => {
-          const { id, title } = result;
-          const fetchResult = await yt.transcript.fetch({ id, title });
-          if (!fetchResult || !fetchResult.cues.length) {
-            console.log("Skipping video without transcript");
-            return;
-          }
-          resultsWithTranscripts.push({
-            searchResult: result,
-            cues: fetchResult.cues,
-            query: results.query,
-          });
-        }),
-        { concurrency: 3 }
+      const searchResultsWithTranscripts = compact(
+        await pAll(
+          results.searchResults.map((result) => async () => {
+            const { id, title } = result;
+            const fetchResult = await yt.transcript.fetch({ id, title });
+            if (!fetchResult || !fetchResult.cues.length) {
+              console.log("Skipping video without transcript");
+              return;
+            }
+            return {
+              ...result,
+              transcript: fetchResult,
+            };
+          }),
+          { concurrency: 3 }
+        )
       );
+      resultsWithTranscripts.push({
+        ...results,
+        searchResults: searchResultsWithTranscripts,
+      });
     }
     if (!resultsWithTranscripts.length) {
       const msg = "No transcripts fetched";
@@ -261,247 +288,134 @@ export const downloadTranscripts = {
   },
 };
 
-interface AppraiseTranscriptsStageArgs extends DownloadTranscriptsStageArgs {
+// interface AppraiseTranscriptsStageArgs extends DownloadTranscriptsStageArgs {
+//   resultsWithTranscripts: QueryWithSearchResultWithTranscript[];
+// }
+
+// export const appraiseTranscripts = {
+//   name: "appraise-transcripts",
+//   description: "Appraise transcripts",
+//   run: async function (args: AppraiseTranscriptsStageArgs) {
+//     const { resultsWithTranscripts } = args;
+//     console.log(
+//       chalk.blue(`Appraising ${resultsWithTranscripts.length} transcripts...`)
+//     );
+//     const appraisedResults: QueryWithSearchResultWithTranscript[] = (
+//       await pAll(
+//         resultsWithTranscripts.map((result) => async () => {
+//           const { recommend, reasoning } = await appraiseTranscript().execute({
+//             transcript: result.cues,
+//             title: result.searchResult.title,
+//             profile: args.profile,
+//             enableOpenPipeLogging: args.enableLogging,
+//             openPipeRequestTags: createRequestTags(args),
+//           });
+//           if (!recommend) {
+//             console.log(
+//               chalk.blue(
+//                 `Rejecting video ${result.searchResult.title}. ${reasoning}`
+//               )
+//             );
+//             return;
+//           } else {
+//             console.log(
+//               chalk.green(
+//                 `Accepting video ${result.searchResult.title}. ${reasoning}`
+//               )
+//             );
+//             return result;
+//           }
+//         }),
+//         { concurrency: 10 }
+//       )
+//     ).filter(Boolean) as QueryWithSearchResultWithTranscript[];
+//     if (!appraisedResults.length) {
+//       const msg = "No transcripts passed the appraisal filter";
+//       console.log(chalk.red(msg));
+//       return failure(msg);
+//     } else {
+//       console.log(
+//         chalk.green(
+//           appraisedResults.length + " transcripts passed the appraisal filter"
+//         )
+//       );
+//       return success({ ...args, appraisedResults });
+//     }
+//   },
+// };
+
+interface RAGStageArgs extends DownloadTranscriptsStageArgs {
   resultsWithTranscripts: QueryWithSearchResultWithTranscript[];
 }
 
-export const appraiseTranscripts = {
-  name: "appraise-transcripts",
-  description: "Appraise transcripts",
-  run: async function (args: AppraiseTranscriptsStageArgs) {
+export const RAGStage = {
+  name: "rag",
+  description: "RAG Chunk transcripts",
+  run: async function (
+    args: RAGStageArgs
+  ): Promise<
+    | Success<
+        RAGStageArgs & { chunks: Record<string, TranscriptClipWithScore[]> }
+      >
+    | Failure
+  > {
     const { resultsWithTranscripts } = args;
     console.log(
-      chalk.blue(`Appraising ${resultsWithTranscripts.length} transcripts...`)
+      chalk.blue(`Chunking ${resultsWithTranscripts.length} transcripts...`)
     );
-    const appraisedResults: QueryWithSearchResultWithTranscript[] = (
-      await pAll(
-        resultsWithTranscripts.map((result) => async () => {
-          const { recommend, reasoning } = await appraiseTranscript().execute({
-            transcript: result.cues,
-            title: result.searchResult.title,
-            profile: args.profile,
-            enableOpenPipeLogging: args.enableLogging,
-            openPipeRequestTags: createRequestTags(args),
-          });
-          if (!recommend) {
-            console.log(
-              chalk.blue(
-                `Rejecting video ${result.searchResult.title}. ${reasoning}`
-              )
-            );
-            return;
-          } else {
-            console.log(
-              chalk.green(
-                `Accepting video ${result.searchResult.title}. ${reasoning}`
-              )
-            );
-            return result;
-          }
-        }),
-        { concurrency: 10 }
-      )
-    ).filter(Boolean) as QueryWithSearchResultWithTranscript[];
-    if (!appraisedResults.length) {
-      const msg = "No transcripts passed the appraisal filter";
-      console.log(chalk.red(msg));
-      return failure(msg);
-    } else {
-      console.log(
-        chalk.green(
-          appraisedResults.length + " transcripts passed the appraisal filter"
-        )
-      );
-      return success({ ...args, appraisedResults });
+    const clips: Record<string, TranscriptClipWithScore[]> = {};
+    for (const result of resultsWithTranscripts) {
+      const chunks = await searchTranscripts({
+        queries: result.questions,
+        transcripts: result.searchResults.map((x) => x.transcript),
+        scoreCutOff: 19,
+      });
+      for (const question of Object.keys(chunks)) {
+        if (!clips[question]) {
+          clips[question] = [];
+        }
+        clips[question].push(...chunks[question]);
+      }
     }
-  },
-};
-
-interface ChunkTranscriptsStageArgs extends AppraiseTranscriptsStageArgs {
-  appraisedResults: QueryWithSearchResultWithTranscript[];
-}
-
-interface QuerySearchResultTranscriptChunks
-  extends QueryWithSearchResultWithTranscript {
-  chunks: TranscriptClip[];
-}
-
-export const chunkTranscripts = {
-  name: "chunk-transcripts",
-  description: "Chunk transcripts",
-  run: async function (
-    args: ChunkTranscriptsStageArgs
-  ): Promise<Success<RankClipsStageArgs> | Failure> {
-    const { appraisedResults, user } = args;
-    const querySearchResultTranscriptChunks = compact(
-      await pAll(
-        appraisedResults.map((result) => async () => {
-          const chunks = await recommendClips().execute({
-            tweets: [],
-            openPipeRequestTags: createRequestTags(args),
-            enableOpenPipeLogging: args.enableLogging,
-            user,
-            transcript: result.cues,
-            title: result.searchResult.title,
-            url: "https://www.youtube.com/watch?v=" + result.searchResult.id,
-            videoId: result.searchResult.id,
-            profile: args.profile,
-          });
-          if (!chunks.length) {
-            console.log(
-              chalk.red(
-                "No chapters generated for " + result.searchResult.title
-              )
-            );
-            return;
-          } else {
-            console.log(
-              chalk.green(
-                `${chunks.length} chapters generated for "${result.searchResult.title}"`
-              )
-            );
-            console.log(chunks);
-            return {
-              ...result,
-              chunks,
-            };
-          }
-        }),
-        { concurrency: 10 }
-      )
-    ).flat();
-
-    if (!querySearchResultTranscriptChunks.length) {
+    if (!Object.keys(clips).length) {
       const msg = "No transcripts chunked";
       console.log(chalk.red(msg));
       return failure(msg);
     } else {
-      console.log(
-        chalk.green(
-          querySearchResultTranscriptChunks.length +
-            " transcripts chunked successfully"
-        )
-      );
-      return success({ ...args, querySearchResultTranscriptChunks });
+      console.log(chalk.green(Object.keys(clips).length + " chunks created"));
+      return success({ ...args, chunks: clips });
     }
   },
 };
 
-interface RankClipsStageArgs extends ChunkTranscriptsStageArgs {
-  querySearchResultTranscriptChunks: QuerySearchResultTranscriptChunks[];
-}
+// interface SaveResultsToDBStageArgs extends RankClipsStageArgs {
+//   orderedClips: {
+//     query: string;
+//     searchResult: MetaphorYouTubeResult;
+//     title: string;
+//     summary: string;
+//     start: number;
+//     end: number;
+//     videoTitle: string;
+//     videoUrl: string;
+//     videoId: string;
+//     text: string;
+//   }[];
+// }
 
-export const rankClips = {
-  name: "order-clips",
-  description: "Order Clips",
-  run: async function (
-    args: RankClipsStageArgs
-  ): Promise<Success<SaveResultsToDBStageArgs> | Failure> {
-    // order globally over all transcripts and all clips
-
-    // clip objects with their respective transcript and query info
-
-    const allClips = shuffle(
-      args.querySearchResultTranscriptChunks.flatMap((x) =>
-        x.chunks.map((c) => ({
-          ...c,
-          query: x.query,
-          searchResult: x.searchResult,
-        }))
-      )
-    );
-
-    console.log(chalk.blue(`Ordering ${allClips.length} clips...`));
-
-    // each window contains 8 clips
-    // we order then discard the bottom 4 clips
-    // we do some special handling for clips from the
-    // same video to ensure we don't have too many clips from the same video
-    const maxDesiredNumClips = 30;
-    // TODO: don't hardcode
-    const maxTokens =
-      8192 -
-      // for output
-      500 -
-      (
-        await rerankClips().calculateCost({
-          clips: "",
-          profile: args.profile,
-          tweets: tweetsToString({ tweets: args.tweets, user: args.user }),
-        })
-      ).total;
-    const ratioToDiscard = 0.5;
-    const maxClipsPerVideo = 3;
-
-    let remainingClips = allClips;
-
-    // TODO: what if we start with less than maxDesired clips?
-    while (remainingClips.length > maxDesiredNumClips) {
-      let chunked = await chunkClipArray({
-        clips: remainingClips,
-        maxTokensPerChunk: maxTokens,
-        shuffle: true,
-      });
-      remainingClips = (
-        await pAll(
-          chunked.map((chunk) => async () => {
-            const orderedClips = await rerankClips({
-              windowSize: chunk.length,
-              numToDiscard:
-                chunk.every((clip) => clip.videoId === chunk[0]?.videoId) &&
-                chunk.length > maxClipsPerVideo
-                  ? chunk.length - maxClipsPerVideo
-                  : Math.floor(chunk.length * ratioToDiscard),
-            }).execute({
-              enableOpenPipeLogging: args.enableLogging,
-              openPipeRequestTags: createRequestTags(args),
-              user: args.user,
-              tweets: args.tweets,
-              profile: args.profile,
-              clips: chunk,
-            });
-            return orderedClips;
-          }),
-          {
-            concurrency: 10,
-          }
-        )
-      ).flat();
-      console.log(chalk.blue(`Remaining clips: ${remainingClips.length}`));
-    }
-
-    return success({ ...args, orderedClips: remainingClips });
-  },
-};
-
-interface SaveResultsToDBStageArgs extends RankClipsStageArgs {
-  orderedClips: {
-    query: string;
-    searchResult: MetaphorYouTubeResult;
-    title: string;
-    summary: string;
-    start: number;
-    end: number;
-    videoTitle: string;
-    videoUrl: string;
-    videoId: string;
-    text: string;
-  }[];
-}
-
-export const saveResultsToDB = {
-  name: "save-results",
-  description: "Save results to DB",
-  run: async function (
-    args: SaveResultsToDBStageArgs
-  ): Promise<Success<SaveResultsToDBStageArgs> | Failure> {
-    const finalData = {
-      summary: args.profile,
-      clips: args.orderedClips,
-      username: args.user,
-    };
-    writeFileSync("finalData.json", JSON.stringify(finalData, null, 2));
-    await trpc.addRecommendations.mutate(finalData);
-    return success(args);
-  },
-};
+// export const saveResultsToDB = {
+//   name: "save-results",
+//   description: "Save results to DB",
+//   run: async function (
+//     args: SaveResultsToDBStageArgs
+//   ): Promise<Success<SaveResultsToDBStageArgs> | Failure> {
+//     const finalData = {
+//       summary: args.profile,
+//       clips: args.orderedClips,
+//       username: args.user,
+//     };
+//     writeFileSync("finalData.json", JSON.stringify(finalData, null, 2));
+//     await trpc.addRecommendations.mutate(finalData);
+//     return success(args);
+//   },
+// };

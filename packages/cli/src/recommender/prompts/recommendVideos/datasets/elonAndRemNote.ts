@@ -2,10 +2,10 @@ import { ExampleDataSet } from "prompt-iteration-assistant";
 import {
   remnoteFlashcardsSearchResults,
   elonMuskSearchResults,
-} from "../../../shared/exampleData";
-import { interleaveArrays } from "../../../shared/interleaveArrays";
+} from "../../shared/exampleData";
+import { interleaveArrays } from "../../shared/interleaveArrays";
 import { RecommendVideosInput } from "../schemas/recommendVideosInputSchema";
-import { searchResultsToString } from "../../../../../youtube/formatting";
+import { searchResultsToString } from "../../../../youtube/formatting";
 
 export const elonAndRemNoteSearchResults = interleaveArrays(
   remnoteFlashcardsSearchResults,

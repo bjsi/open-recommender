@@ -13,7 +13,6 @@ import { splitTranscript } from "./helpers/splitTranscript";
 import { tweetsToString } from "../../../twitter/getUserContext";
 import { openpipe } from "../../../openpipe/openpipe";
 import { TranscriptClip } from "./helpers/transcriptClip";
-import { searchAndChunk } from "../../dialogs/searchAndChunk";
 import {
   RequestTagsWithoutName,
   formatPromptName,
@@ -62,7 +61,10 @@ ${cue.text}
     const chunks: TranscriptClip[] = [];
     for (const part of parts) {
       const promptVariables: RecommendClipsInput = {
-        tweets: tweetsToString({ tweets: args.tweets, user: args.user }),
+        tweets: tweetsToString({
+          tweets: args.tweets,
+          inFeedOfUser: args.user,
+        }),
         transcript: part,
         title: args.title,
         profile: args.profile,
@@ -167,12 +169,6 @@ export const recommendClips = () => {
         },
       },
       recClipsPrompt.execute.bind(recClipsPrompt)
-    )
-    .withCommand({
-      name: "search and chunk",
-      async action() {
-        await searchAndChunk();
-      },
-    });
+    );
   return recClipsPrompt;
 };

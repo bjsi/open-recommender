@@ -6,11 +6,11 @@ import { Prompt } from "prompt-iteration-assistant";
 import { recommendVideosOutputSchema } from "./schemas/recommendVideosOutputSchema";
 import { mainPrompt } from "./prompts/withExample";
 import _ from "lodash";
-import { tweetsToString } from "../../../../twitter/getUserContext";
-import { Tweet } from "shared/src/manual/Tweet";
-import { searchResultsToString } from "../../../../youtube/formatting";
-import { SearchResult } from "../../../../youtube/search";
-import { openpipe } from "../../../../openpipe/openpipe";
+import { tweetsToString } from "../../../twitter/getUserContext";
+import { Tweet, TwitterUser } from "shared/src/manual/Tweet";
+import { searchResultsToString } from "../../../youtube/formatting";
+import { SearchResult } from "../../../youtube/search";
+import { openpipe } from "../../../openpipe/openpipe";
 import {
   elonAndRemNote,
   elonAndRemNoteSearchResults,
@@ -18,7 +18,7 @@ import {
 import {
   RequestTagsWithoutName,
   formatPromptName,
-} from "../../../../openpipe/requestTags";
+} from "../../../openpipe/requestTags";
 import { sortBy } from "remeda";
 
 export const RECOMMEND_VIDEOS = "Recommend Videos";
@@ -41,7 +41,7 @@ export class RecommendVideos extends Prompt<
   }
 
   async execute(args: {
-    user: string;
+    user: TwitterUser;
     tweets: Tweet[];
     results: SearchResult[];
     query: string;
@@ -51,7 +51,7 @@ export class RecommendVideos extends Prompt<
     const promptVariables: RecommendVideosInput = {
       query: args.query,
       results: searchResultsToString(args.results),
-      tweets: tweetsToString({ tweets: args.tweets, user: args.user }),
+      tweets: tweetsToString({ tweets: args.tweets, inFeedOfUser: args.user }),
     };
     const candidatePrompt = this.prompts[0];
     const res = await openpipe.functionCall({

@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { Tweet } from "shared/src/manual/Tweet";
+import { Tweet, TwitterUser } from "shared/src/manual/Tweet";
 import { TranscriptCue } from "../../../../youtube/transcript";
 
 export const recommendClipsInputSchema = z.object({
@@ -12,7 +12,7 @@ export const recommendClipsInputSchema = z.object({
 export type RecommendClipsInput = z.infer<typeof recommendClipsInputSchema>;
 
 export interface RecommendClipsCustomInput {
-  user: string;
+  user: TwitterUser;
   tweets: Tweet[];
   transcript: TranscriptCue[];
   title: string;
