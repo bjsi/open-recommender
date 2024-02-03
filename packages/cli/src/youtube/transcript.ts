@@ -31,15 +31,15 @@ export async function fetchTranscript(
   videoTitle: string
 ): Promise<Transcript | undefined> {
   "yt-dlp --write-sub --sub-lang='en.*' --skip-download -o";
-  const bestQualityTranscriptCmd = [
-    "yt-dlp",
-    "--write-sub",
-    "--sub-lang='en.*'",
-    "--skip-download",
-    "-o",
-    `\"${dataFolder}/${videoId}\"`,
-    `https://www.youtube.com/watch?v=${videoId}`,
-  ].join(" ");
+  // const bestQualityTranscriptCmd = [
+  //   "yt-dlp",
+  //   "--write-sub",
+  //   "--sub-lang='en.*'",
+  //   "--skip-download",
+  //   "-o",
+  //   `\"${dataFolder}/${videoId}\"`,
+  //   `https://www.youtube.com/watch?v=${videoId}`,
+  // ].join(" ");
 
   const fallbackAutoSubsCmd = [
     "yt-dlp",
@@ -56,11 +56,11 @@ export async function fetchTranscript(
   const files = readdirSync(dataFolder);
   let transcriptFile = files.find((x) => x.startsWith(videoId));
   try {
-    if (!transcriptFile || !existsSync(transcriptFile)) {
-      execSync(bestQualityTranscriptCmd);
-    }
-    const files2 = readdirSync(dataFolder);
-    transcriptFile = files2.find((x) => x.startsWith(videoId));
+    // if (!transcriptFile || !existsSync(transcriptFile)) {
+    //   execSync(bestQualityTranscriptCmd);
+    // }
+    // const files2 = readdirSync(dataFolder);
+    // transcriptFile = files2.find((x) => x.startsWith(videoId));
     let transcriptText = transcriptFile
       ? tryReadFileSync(path.join(dataFolder, transcriptFile))
       : undefined;

@@ -6,15 +6,24 @@ import {
   transcriptToMarkdownCues,
   transcriptToString,
 } from "../youtube/transcript";
-import { TranscriptClipWithScore } from "../recommender/prompts/recommendClips/helpers/transcriptClip";
 import { last } from "remeda";
 import { youtubeUrlWithTimestamp } from "shared/src/youtube";
+import { TranscriptClip } from "../recommender/prompts/recommendClips/helpers/transcriptClip";
+import { getTopicFromQuestion } from "../recommender/prompts/getTopicFromQuestion/getTopicFromQuestion";
 
-const metadata = z.object({
-  videoId: z.string(),
-  minCueIdx: z.number(),
-  maxCueIdx: z.number(),
+const RAGChunkSchema = z.object({
+  content: z.string(),
+  score: z.number(),
+  rank: z.number(),
+  metadata: z.record(z.any()),
 });
+
+export interface RAGInput {
+  content: string;
+  metadata: Record<string, any>;
+}
+
+export type RAGChunk = z.infer<typeof RAGChunkSchema>;
 
 export const RAGAPISchema = z.object({
   rag: z
@@ -25,23 +34,13 @@ export const RAGAPISchema = z.object({
         docs: z.array(
           z.object({
             content: z.string(),
-            metadata,
+            metadata: z.record(z.any()),
           })
         ),
-        k: z.number(),
+        k: z.number().optional(),
       })
     )
-    .returns(
-      z
-        .object({
-          content: z.string(),
-          score: z.number(),
-          rank: z.number(),
-          metadata,
-        })
-        .array()
-        .array()
-    ),
+    .returns(RAGChunkSchema.array().array()),
 });
 
 export type RAGApi = RemoteController<z.infer<typeof RAGAPISchema>>;
@@ -66,7 +65,7 @@ export const initRAGApi = () => {
   };
 };
 
-const chunkTranscript = async (transcript: Transcript) => {
+export const chunkTranscript = async (transcript: Transcript) => {
   const chunks = (
     await new TokenTextSplitter({
       encodingName: "cl100k_base",
@@ -82,6 +81,7 @@ const chunkTranscript = async (transcript: Transcript) => {
     return {
       content: chunk.replace(/ID: \d+/g, "").replace(/\n+/g, " "),
       metadata: {
+        type: "youtube" as const,
         videoId: transcript.videoId,
         minCueIdx: min,
         maxCueIdx: max,
@@ -91,74 +91,85 @@ const chunkTranscript = async (transcript: Transcript) => {
   return chunks;
 };
 
-export const searchTranscripts = async (args: {
-  queries: string[];
-  transcripts: Transcript[];
+export interface SearchResultWithScore {
+  result: { content: string; metadata: { id: number } };
+  score: number;
+  rank: number;
+}
+
+export const rerankSearchResults = async (args: {
+  query: string;
+  results: { content: string; metadata: { id: number } }[];
   scoreCutOff: number;
-}): Promise<Record<string, TranscriptClipWithScore[]>> => {
+}) => {
   const { api, bridge } = initRAGApi();
-  const chunks = (
-    await Promise.all(
-      args.transcripts.flatMap((transcript) => chunkTranscript(transcript))
-    )
-  ).flat();
+  // This formulates the question into a better format for re-ranking
+  const topic = await getTopicFromQuestion().execute({
+    question: args.query,
+  });
+  console.log("Reranking using topic", topic, "for question", args.query);
+  if (!topic) {
+    throw new Error("Failed to get topic from question");
+  }
   const resultsList = await api.rag({
-    query: args.queries,
-    docs: chunks,
-    k: 5,
+    query: topic,
+    docs: args.results,
   });
   bridge.close();
-  const transcriptClips: Record<string, TranscriptClipWithScore[]> = {};
-  for (let i = 0; i < resultsList.length; i++) {
-    const question = args.queries[i];
-    const results = resultsList[i];
-    for (const result of results) {
-      if (result.score < args.scoreCutOff) {
-        continue;
-      }
-      const transcript = args.transcripts.find(
-        (x) => x.videoId === result.metadata.videoId
-      );
-      if (!transcript) {
-        continue;
-      }
-      const cues = transcript.cues.slice(
-        result.metadata.minCueIdx,
-        result.metadata.maxCueIdx
-      );
-      if (!transcriptClips[question]) {
-        transcriptClips[question] = [];
-      }
-      transcriptClips[question].push({
-        title: question,
-        summary: "",
-        start: cues[0].start,
-        end: last(cues)!.end,
-        videoTitle: transcript.videoTitle,
-        videoUrl: youtubeUrlWithTimestamp(transcript.videoId, cues[0].start),
-        videoId: transcript.videoId,
-        text: transcriptToString(cues),
-        score: result.score,
-        rank: result.rank,
-      });
-    }
-  }
-  return transcriptClips;
+  return resultsList.flat().filter((x) => x.score >= args.scoreCutOff);
 };
 
-// export const searchArticles = async (args: {
-//   queries: string[];
-//   articles: string[];
-// }) => {
-//   const { api, bridge } = initRAGApi();
-//   const results = await api.rag({
-//     query: "How does chain of thought prompting work?",
-//     docs: args.articles.map((article, idx) => ({
-//       content: article,
-//       id: idx,
-//     })),
-//     k: 5,
-//   });
-//   console.log(results);
-//   bridge.close();
-// };
+export interface TranscriptClipWithScore extends TranscriptClip {
+  score: number;
+  rank: number;
+}
+
+export interface ArticleSnippet {
+  type: "article";
+  title: string;
+  question: string;
+  text: string;
+  score: number;
+  rank: number;
+  articleTitle: string;
+  articleUrl: string;
+}
+
+export interface ArticleSnippetWithScore extends ArticleSnippet {
+  rank: number;
+  score: number;
+}
+
+export interface HighlightMetadata {
+  type: "highlight";
+  articleId: string;
+}
+
+export interface YTMetadata {
+  type: "youtube";
+  videoId: string;
+  minCueIdx: number;
+  maxCueIdx: number;
+}
+
+export const searchChunks = async <T extends { type: string }>(args: {
+  queries: string[];
+  chunks: {
+    content: string;
+    metadata: T;
+  }[];
+  scoreCutOff: number;
+}): Promise<Record<string, RAGChunk[]>> => {
+  const { api, bridge } = initRAGApi();
+  const resultsList = await api.rag({
+    query: args.queries,
+    docs: args.chunks,
+    k: 10,
+  });
+  bridge.close();
+  const questionToResults: Record<string, RAGChunk[]> = {};
+  for (let i = 0; i < resultsList.length; i++) {
+    questionToResults[args.queries[i]] = resultsList[i];
+  }
+  return questionToResults;
+};

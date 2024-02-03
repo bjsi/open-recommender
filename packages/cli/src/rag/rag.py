@@ -27,7 +27,7 @@ def rag(args: SearchArgs) -> List[List[SearchResult]]:
     RAG = RAGPretrainedModel.from_pretrained("colbert-ir/colbertv2.0", verbose=0)
     metadatas = [doc["metadata"] for doc in args["docs"] if "metadata" in doc]
     doc_contents = [doc["content"] for doc in args["docs"]]
-    k = args.get("k", 5)
+    k = args.get("k", len(doc_contents))
     search_results = RAG.rerank(query=args["query"], documents=doc_contents, k=k)
     if type(search_results[0]) is not list:
         if len(metadatas) > 0:

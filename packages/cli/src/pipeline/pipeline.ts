@@ -27,6 +27,8 @@ export const pipelineArgsSchema = z.object({
   stage: z.enum(STAGES).optional(),
   print: z.string().optional(),
   enableLogging: z.boolean().optional().default(true),
+  summaryFile: z.string().optional(),
+  customQuery: z.string().optional(),
 });
 
 export type PipelineArgs = z.infer<typeof pipelineArgsSchema>;

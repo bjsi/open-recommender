@@ -4,6 +4,7 @@ import dayjs from "dayjs";
 import { z } from "zod";
 import { writeFileSync } from "fs";
 import { tryParseJSON } from "../utils";
+import { rerankSearchResults } from "../rag/rag";
 
 dotenv.config();
 
@@ -42,7 +43,13 @@ const searchResultSchema = z.object({
 
 export type SearchResult = z.infer<typeof searchResultSchema>;
 
-export const formatSearchResult = (result: SearchResult) => {
+const formatChapters = (chapters: SearchResult["chapters"]) => {
+  return chapters?.map((c, idx) => idx + 1 + ". " + c.title).join("\n");
+};
+
+export const formatSearchResult = (
+  result: SearchResult & { score?: number; rank?: number }
+) => {
   return `
 Title: ${result.title}
 Channel: ${result.channel}
@@ -52,7 +59,9 @@ Duration: ${dayjs()
     .second(result.duration || 0)
     .format("H:mm:ss")}
 Chapters:
-${result.chapters?.map((c, idx) => idx + 1 + ". " + c.title).join("\n")}
+${formatChapters(result.chapters || [])}
+${result.score != null ? `Score: ${result.score}` : ""}
+${result.rank != null ? `Rank: ${result.rank}` : ""}
 `.trim();
 };
 
@@ -64,7 +73,21 @@ interface YouTubeSearchArgs {
 
 const pickRandom = <T>(arr: T[]) => arr[Math.floor(Math.random() * arr.length)];
 
-export async function search(args: YouTubeSearchArgs): Promise<SearchResult[]> {
+export interface YouTubeResult {
+  type: "youtube";
+  source: "youtube";
+  title: string;
+  url: string;
+  channelName: string;
+  id: string;
+
+  score: number;
+  rank: number;
+}
+
+export async function search(
+  args: YouTubeSearchArgs
+): Promise<YouTubeResult[]> {
   const searchCommand = `yt-dlp "ytsearch${args.n_results || 5}:${
     args.query +
     (args.randomlyAppendTerms ? " " + pickRandom(args.randomlyAppendTerms) : "")
@@ -79,7 +102,24 @@ export async function search(args: YouTubeSearchArgs): Promise<SearchResult[]> {
     .map((line) => searchResultSchema.safeParse(tryParseJSON(line)))
     .map((r) => (r.success ? r.data : undefined))
     .filter(Boolean) as SearchResult[];
-  return results;
+  const ranked = await rerankSearchResults({
+    query: args.query,
+    results: results.map((x, idx) => ({
+      content: `${x.title}\n${formatChapters(x.chapters || [])}`,
+      metadata: { id: idx },
+    })),
+    scoreCutOff: 19,
+  });
+  return ranked.map((x) => ({
+    title: results[x.metadata.id].title,
+    type: "youtube",
+    source: "youtube",
+    id: results[x.metadata.id].id,
+    channelName: results[x.metadata.id].channel,
+    url: `https://www.youtube.com/watch?v=${results[x.metadata.id].id}`,
+    score: x.score,
+    rank: x.rank,
+  }));
 }
 
 if (require.main === module) {
@@ -92,6 +132,6 @@ if (require.main === module) {
     }
     const results = await search({ query, n_results });
     writeFileSync("searchResults.json", JSON.stringify(results, null, 2));
-    console.log(results.map(formatSearchResult).join("\n---\n"));
+    console.log(results);
   })();
 }

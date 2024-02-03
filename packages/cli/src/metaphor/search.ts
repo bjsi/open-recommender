@@ -2,6 +2,7 @@ import Exa from "exa-js";
 import dotenv from "dotenv";
 import { youtubeUrlToId } from "shared/src/youtube";
 import { compact } from "remeda";
+import { nearestSubstring } from "./nearestSubstring";
 
 dotenv.config();
 
@@ -10,15 +11,17 @@ const metaphor = new Exa(process.env.METAPHOR_API_KEY!);
 export interface MetaphorYouTubeResult {
   metaphorId: string;
   type: "youtube";
+  source: "metaphor";
   title: string;
   url: string;
   channelName: string | undefined;
   id: string;
 }
 
-interface MetaphorArticleResult {
+export interface MetaphorArticleResult {
   metaphorId: string;
   id: string;
+  source: "metaphor";
   type: "article";
   title: string;
   url: string;
@@ -40,7 +43,6 @@ export async function searchYouTube(args: {
     useAutoprompt: true,
     includeDomains: ["youtube.com"],
   });
-  console.log("metaphor response", response);
   return compact(
     response.results
       .filter((x) => !!x.title)
@@ -49,6 +51,7 @@ export async function searchYouTube(args: {
         return !ytId || !x.title
           ? null
           : {
+              source: "metaphor",
               metaphorId: x.id,
               type: "youtube" as const,
               title: x.title,
@@ -74,6 +77,7 @@ export async function searchNonYouTube(args: {
     text: {
       includeHtmlTags: false,
     },
+    excludeDomains: ["youtube.com"],
   });
 
   return compact(
@@ -82,6 +86,7 @@ export async function searchNonYouTube(args: {
         return null;
       }
       return {
+        source: "metaphor",
         metaphorId: res.id,
         id: res.id,
         type: "article",
@@ -127,8 +132,21 @@ if (require.main === module) {
   // exampleQueries[Math.floor(Math.random() * exampleQueries.length)];
   console.log("query", query);
   (async () => {
-    console.log(
-      JSON.stringify(await searchYouTube({ query, numResults: 10 }), null, 2)
-    );
+    const results = await searchNonYouTube({ query, numResults: 10 });
+    const fst = results[0];
+    console.log(fst.text);
+
+    for (const highlight of fst.highlights) {
+      const idx = fst.text.indexOf(highlight.text);
+      if (idx === -1) {
+        console.log("naive substring search failed");
+      }
+      const res = nearestSubstring(highlight.text, fst.text);
+      if (res.bestStartIdx === -1) {
+        console.log("nearest substring search failed");
+      } else {
+        console.log("substring search results", res);
+      }
+    }
   })();
 }

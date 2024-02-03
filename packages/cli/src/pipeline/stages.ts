@@ -3,20 +3,39 @@ import { twitter } from "../twitter";
 import { Tweet } from "shared/src/manual/Tweet";
 import { yt } from "../youtube";
 import { Failure, Success, failure, success } from "./run";
-import { Transcript } from "../youtube/transcript";
+import { Transcript, transcriptToString } from "../youtube/transcript";
 import { PipelineArgs, pipelineArgsSchema } from "./pipeline";
 import { pAll } from "./utils/pAll";
 import { createRequestTags } from "../openpipe/requestTags";
 import { recursivelySummarizeTweets } from "../recommender/prompts/recursiveTwitterSummarizer/recursiveTwitterSummarizer";
 import { createQueriesFromProfile } from "../recommender/prompts/createQueriesFromProfile/createQueriesFromProfile";
-import { MetaphorYouTubeResult, searchYouTube } from "../metaphor/search";
+import {
+  MetaphorArticleResult,
+  MetaphorYouTubeResult,
+  searchNonYouTube,
+  searchYouTube,
+} from "../metaphor/search";
 import { trpc } from "../trpc";
-import { searchTranscripts } from "../rag/rag";
+import {
+  ArticleSnippetWithScore,
+  HighlightMetadata,
+  RAGChunk,
+  RAGInput,
+  TranscriptClipWithScore,
+  YTMetadata,
+  chunkTranscript,
+  searchChunks,
+} from "../rag/rag";
 import { brainstormQuestions } from "../recommender/prompts/brainstormSubQuestions/brainstormQuestions";
-import { compact } from "remeda";
-import { TranscriptClipWithScore } from "../recommender/prompts/recommendClips/helpers/transcriptClip";
+import { compact, last, uniqBy } from "remeda";
 import { getUserProfile } from "../twitter/getUserContext";
 import { initTwitterAPI } from "../twitter/twitterAPI";
+import { readFileSync } from "fs";
+import { YouTubeResult } from "../youtube/search";
+import { youtubeUrlWithTimestamp } from "shared/src/youtube";
+import { findStartOfAnswer } from "../recommender/prompts/findStartOfAnswer/findStartOfAnswer";
+import { nearestSubstring } from "../metaphor/nearestSubstring";
+import { findStartOfAnswerYouTube } from "../recommender/prompts/findStartOfAnswerYouTube/findStartOfAnswerYouTube";
 
 export const STAGES = [
   "validate-args",
@@ -27,6 +46,7 @@ export const STAGES = [
   "download-transcripts",
   "appraise-transcripts",
   "rag",
+  "clean-clips",
   "save-results",
 ] as const;
 
@@ -53,6 +73,10 @@ export const getTweets = {
     args: GetTweetsStageArgs
   ): Promise<Success<SummarizeTweetsArgs> | Failure> {
     const { user } = args;
+    if (args.summaryFile) {
+      console.log(chalk.blue("Using summary file, skipping tweets"));
+      return success({ ...args, tweets: [] });
+    }
     const dbUser = await trpc.getUser.query({ username: user });
     if (!dbUser) {
       const msg = "User not found in Open Recommender DB";
@@ -110,13 +134,26 @@ export const summarizeTweets = {
   ): Promise<Success<CreateQueriesStageArgs> | Failure> {
     const { tweets, user } = args;
     console.log(chalk.blue("Summarizing tweets..."));
+
     const { api, bridge } = initTwitterAPI();
     const twitterUser = await getUserProfile(api, user);
     bridge.close();
+    if (args.summaryFile) {
+      console.log(chalk.blue("Using summary file, skipping summary"));
+      const summary = readFileSync(args.summaryFile, "utf-8");
+      console.log(summary);
+      return success({
+        ...args,
+        profile: summary,
+        bio: twitterUser.rawDescription,
+      });
+    }
+
     const profile = await recursivelySummarizeTweets().execute({
       user: twitterUser,
       tweets,
     });
+
     if (!profile) {
       const msg = "Failed to summarize tweets";
       console.log(chalk.red(msg));
@@ -143,13 +180,19 @@ export const createQueriesMetaphor = {
   ): Promise<Success<SearchForVideosStageArgs> | Failure> {
     const { profile, bio, user } = args;
     console.log(chalk.blue("Creating search queries..."));
-    const { queries } = await createQueriesFromProfile().execute({
-      enableOpenPipeLogging: args.enableLogging,
-      openPipeRequestTags: createRequestTags(args),
-      profile,
-      bio,
-      user,
-    });
+    const queries: string[] = [];
+    if (args.customQuery) {
+      queries.push(args.customQuery);
+    } else {
+      const res = await createQueriesFromProfile().execute({
+        enableOpenPipeLogging: args.enableLogging,
+        openPipeRequestTags: createRequestTags(args),
+        profile,
+        bio,
+        user,
+      });
+      queries.push(...res.queries);
+    }
     const queriesWithQuestions = await pAll(
       queries.map((query) => async () => {
         const questions = await brainstormQuestions().execute({
@@ -191,7 +234,10 @@ interface SearchForVideosStageArgs extends CreateQueriesStageArgs {
 }
 
 type QueryWithSearchResult = {
-  searchResults: MetaphorYouTubeResult[];
+  searchResults:
+    | MetaphorYouTubeResult[]
+    | YouTubeResult[]
+    | MetaphorArticleResult[];
   query: string;
   questions: string[];
 };
@@ -206,9 +252,27 @@ export const searchForVideos = {
 
     console.log(chalk.blue("Searching YouTube..."));
 
-    const queryWithResults: QueryWithSearchResult[] = await pAll(
+    const youtubeResults = await pAll(
       queriesWithQuestions.map(({ query, questions }) => async () => {
-        const rawSearchResultsForQuery = await searchYouTube({ query });
+        const results = await yt.search({
+          query: query,
+          n_results: 20,
+        });
+        return {
+          query,
+          questions: [query, ...questions],
+          searchResults: results,
+        };
+      }),
+      { concurrency: 2 }
+    );
+
+    const metaphorYouTubeResults = await pAll(
+      queriesWithQuestions.map(({ query, questions }) => async () => {
+        const rawSearchResultsForQuery = await searchYouTube({
+          query,
+          numResults: 20,
+        });
         console.log(
           chalk.blue(
             rawSearchResultsForQuery
@@ -218,21 +282,51 @@ export const searchForVideos = {
         );
         return {
           query,
-          questions,
+          questions: [query, ...questions],
           searchResults: rawSearchResultsForQuery,
         };
       }),
       { concurrency: 10 }
     );
-    console.log(
-      chalk.blue("Found " + queryWithResults.length + " search results")
+
+    const metaphorArticleResults = await pAll(
+      queriesWithQuestions.map(({ query, questions }) => async () => {
+        const results = await searchNonYouTube({
+          query,
+          numResults: 20,
+        });
+        return {
+          query,
+          questions: [query, ...questions],
+          searchResults: results,
+        };
+      }),
+      { concurrency: 2 }
     );
-    return success({ ...args, queryWithResults });
+    console.log(
+      "all results",
+      JSON.stringify({
+        metaphorArticleResults,
+        metaphorYouTubeResults,
+        youtubeResults,
+      })
+    );
+
+    const all = [
+      ...youtubeResults,
+      ...metaphorYouTubeResults,
+      ...metaphorArticleResults,
+    ];
+    console.log(chalk.blue("Found " + all.length + " search results"));
+    return success({ ...args, queryWithResults: all });
   },
 };
 
+type VideoResult = MetaphorYouTubeResult | YouTubeResult;
+type VideoResultWithTranscript = VideoResult & { transcript: Transcript };
+
 type QueryWithSearchResultWithTranscript = {
-  searchResults: (MetaphorYouTubeResult & { transcript: Transcript })[];
+  searchResults: (VideoResultWithTranscript | MetaphorArticleResult)[];
   query: string;
   questions: string[];
 };
@@ -254,6 +348,9 @@ export const downloadTranscripts = {
       const searchResultsWithTranscripts = compact(
         await pAll(
           results.searchResults.map((result) => async () => {
+            if (result.type === "article") {
+              return result;
+            }
             const { id, title } = result;
             const fetchResult = await yt.transcript.fetch({ id, title });
             if (!fetchResult || !fetchResult.cues.length) {
@@ -280,7 +377,8 @@ export const downloadTranscripts = {
     } else {
       console.log(
         chalk.green(
-          resultsWithTranscripts.length + " transcripts fetched successfully"
+          resultsWithTranscripts.flatMap((x) => x.searchResults).length +
+            " transcripts fetched successfully"
         )
       );
       return success({ ...args, resultsWithTranscripts });
@@ -288,103 +386,250 @@ export const downloadTranscripts = {
   },
 };
 
-// interface AppraiseTranscriptsStageArgs extends DownloadTranscriptsStageArgs {
-//   resultsWithTranscripts: QueryWithSearchResultWithTranscript[];
-// }
-
-// export const appraiseTranscripts = {
-//   name: "appraise-transcripts",
-//   description: "Appraise transcripts",
-//   run: async function (args: AppraiseTranscriptsStageArgs) {
-//     const { resultsWithTranscripts } = args;
-//     console.log(
-//       chalk.blue(`Appraising ${resultsWithTranscripts.length} transcripts...`)
-//     );
-//     const appraisedResults: QueryWithSearchResultWithTranscript[] = (
-//       await pAll(
-//         resultsWithTranscripts.map((result) => async () => {
-//           const { recommend, reasoning } = await appraiseTranscript().execute({
-//             transcript: result.cues,
-//             title: result.searchResult.title,
-//             profile: args.profile,
-//             enableOpenPipeLogging: args.enableLogging,
-//             openPipeRequestTags: createRequestTags(args),
-//           });
-//           if (!recommend) {
-//             console.log(
-//               chalk.blue(
-//                 `Rejecting video ${result.searchResult.title}. ${reasoning}`
-//               )
-//             );
-//             return;
-//           } else {
-//             console.log(
-//               chalk.green(
-//                 `Accepting video ${result.searchResult.title}. ${reasoning}`
-//               )
-//             );
-//             return result;
-//           }
-//         }),
-//         { concurrency: 10 }
-//       )
-//     ).filter(Boolean) as QueryWithSearchResultWithTranscript[];
-//     if (!appraisedResults.length) {
-//       const msg = "No transcripts passed the appraisal filter";
-//       console.log(chalk.red(msg));
-//       return failure(msg);
-//     } else {
-//       console.log(
-//         chalk.green(
-//           appraisedResults.length + " transcripts passed the appraisal filter"
-//         )
-//       );
-//       return success({ ...args, appraisedResults });
-//     }
-//   },
-// };
-
 interface RAGStageArgs extends DownloadTranscriptsStageArgs {
   resultsWithTranscripts: QueryWithSearchResultWithTranscript[];
 }
+
+const chunksToClips = (args: {
+  results: Record<string, RAGChunk[]>;
+  scoreCutOff: number;
+  searchResults: (VideoResultWithTranscript | MetaphorArticleResult)[];
+}) => {
+  const clips: Record<
+    string,
+    (TranscriptClipWithScore | ArticleSnippetWithScore)[]
+  > = {};
+  for (const [question, chunks] of Object.entries(args.results)) {
+    for (const chunk of chunks) {
+      if (chunk.score < args.scoreCutOff) {
+        continue;
+      }
+      const searchResult = args.searchResults.find((searchResult) =>
+        chunk.metadata.type === "youtube"
+          ? searchResult.type === "youtube" &&
+            searchResult.transcript.videoId === chunk.metadata.videoId
+          : chunk.metadata.articleId === searchResult.id
+      );
+      if (!searchResult) {
+        console.error("Search result not found for chunk", chunk);
+        continue;
+      } else if (searchResult.type === "article") {
+        const articleHighlight = chunk as RAGChunk & {
+          metadata: HighlightMetadata;
+        };
+        if (!clips[question]) {
+          clips[question] = [];
+        }
+        clips[question].push({
+          type: "article",
+          title: question,
+          question: question,
+          text: articleHighlight.content,
+          score: chunk.score,
+          rank: chunk.rank,
+          articleTitle: searchResult.title,
+          articleUrl: searchResult.url,
+        });
+      } else {
+        const videoChunk = chunk as RAGChunk & { metadata: YTMetadata };
+        const cues = searchResult.transcript.cues.slice(
+          videoChunk.metadata.minCueIdx,
+          videoChunk.metadata.maxCueIdx
+        );
+        if (!clips[question]) {
+          clips[question] = [];
+        }
+        clips[question].push({
+          type: "youtube",
+          title: question,
+          question: question,
+          start: cues[0].start,
+          end: last(cues)!.end,
+          videoTitle: searchResult.transcript.videoTitle,
+          videoUrl: youtubeUrlWithTimestamp(
+            searchResult.transcript.videoId,
+            cues[0].start
+          ),
+          videoId: searchResult.transcript.videoId,
+          text: transcriptToString(cues),
+          score: chunk.score,
+          rank: chunk.rank,
+          cues,
+        });
+      }
+    }
+  }
+  return clips;
+};
+
+type YouTubeRAGInput = RAGInput & { metadata: YTMetadata };
+type ArticleRAGInput = RAGInput & { metadata: HighlightMetadata };
 
 export const RAGStage = {
   name: "rag",
   description: "RAG Chunk transcripts",
   run: async function (
     args: RAGStageArgs
-  ): Promise<
-    | Success<
-        RAGStageArgs & { chunks: Record<string, TranscriptClipWithScore[]> }
-      >
-    | Failure
-  > {
+  ): Promise<Success<CleanClipsStageArgs> | Failure> {
     const { resultsWithTranscripts } = args;
     console.log(
-      chalk.blue(`Chunking ${resultsWithTranscripts.length} transcripts...`)
+      chalk.blue(
+        `Chunking ${
+          resultsWithTranscripts.flatMap((x) => x.searchResults).length
+        } transcripts...`
+      )
     );
-    const clips: Record<string, TranscriptClipWithScore[]> = {};
-    for (const result of resultsWithTranscripts) {
-      const chunks = await searchTranscripts({
-        queries: result.questions,
-        transcripts: result.searchResults.map((x) => x.transcript),
-        scoreCutOff: 19,
-      });
-      for (const question of Object.keys(chunks)) {
-        if (!clips[question]) {
-          clips[question] = [];
-        }
-        clips[question].push(...chunks[question]);
-      }
-    }
-    if (!Object.keys(clips).length) {
-      const msg = "No transcripts chunked";
+    const chunks: (YouTubeRAGInput | ArticleRAGInput)[] = compact(
+      (
+        await Promise.all(
+          resultsWithTranscripts.flatMap(async (results) => {
+            if (results.searchResults.length === 0) {
+              return null;
+            } else if (results.searchResults[0]?.type === "article") {
+              const ragInput = (
+                results.searchResults as MetaphorArticleResult[]
+              ).flatMap((result) =>
+                result.highlights.map((highlight) => ({
+                  content: highlight.text,
+                  metadata: {
+                    type: "highlight" as const,
+                    articleId: result.id,
+                  },
+                }))
+              );
+              return ragInput;
+            } else {
+              const ragInput = (
+                await Promise.all(
+                  results.searchResults.flatMap((result) =>
+                    chunkTranscript(
+                      (result as VideoResultWithTranscript).transcript
+                    )
+                  )
+                )
+              ).flat();
+              return ragInput;
+            }
+          })
+        )
+      ).flat()
+    );
+
+    const results = await searchChunks<HighlightMetadata | YTMetadata>({
+      queries: args.queriesWithQuestions.flatMap((x) => [
+        x.query,
+        ...x.questions,
+      ]),
+      chunks,
+      scoreCutOff: 0,
+    });
+
+    const clips = chunksToClips({
+      results,
+      scoreCutOff: 15,
+      searchResults: resultsWithTranscripts.flatMap((x) => x.searchResults),
+    });
+    if (!clips || !Object.keys(clips).length) {
+      const msg = "No clips created";
       console.log(chalk.red(msg));
       return failure(msg);
     } else {
       console.log(chalk.green(Object.keys(clips).length + " chunks created"));
-      return success({ ...args, chunks: clips });
+      return success({ ...args, clips });
     }
+  },
+};
+
+interface CleanClipsStageArgs extends RAGStageArgs {
+  clips: Record<string, (TranscriptClipWithScore | ArticleSnippetWithScore)[]>;
+}
+
+// deduplication
+// validation that they are relevant and find start
+export const cleanClipsAndClusterStage = {
+  name: "clean-clips",
+  description: "Clean clips and cluster",
+  run: async function (args: CleanClipsStageArgs): Promise<
+    | Success<
+        CleanClipsStageArgs & {
+          groupedClips: Record<
+            string,
+            Record<
+              string,
+              (TranscriptClipWithScore | ArticleSnippetWithScore)[]
+            >
+          >;
+        }
+      >
+    | Failure
+  > {
+    const { clips } = args;
+    console.log(chalk.blue("Cleaning clips..."));
+    const tasks = Object.entries(clips).flatMap(([question, clips]) => {
+      return clips.flatMap((clip) => async () => {
+        if (clip.type === "article") {
+          const result = await findStartOfAnswer().execute({
+            question,
+            text: clip.text,
+          });
+          if (result?.answersQuestion) {
+            if (result.quotedAnswer) {
+              const match = nearestSubstring(result.quotedAnswer, clip.text);
+              if (match.bestMatch && match.bestScore > 0.8) {
+                return {
+                  ...clip,
+                  text: clip.text.slice(match.bestStartIdx),
+                };
+              }
+            }
+            return clip;
+          }
+          return null;
+        } else {
+          const result = await findStartOfAnswerYouTube().execute({
+            question,
+            cues: clip.cues,
+          });
+          if (result?.answersQuestion) {
+            if (result.cueId !== undefined) {
+              const newCues = clip.cues.slice(result.cueId);
+              return {
+                ...clip,
+                start: newCues[0].start,
+                cues: newCues,
+              };
+            }
+            return clip;
+          }
+          return null;
+        }
+      });
+    });
+
+    const cleanedClips = uniqBy(
+      compact(await pAll(tasks, { concurrency: 10 })),
+      (x) => (x.type === "article" ? x.text : x.videoId + x.start)
+    );
+
+    const groupedClips: Record<
+      string,
+      Record<string, (TranscriptClipWithScore | ArticleSnippetWithScore)[]>
+    > = {};
+
+    for (const { query, questions } of args.queriesWithQuestions) {
+      groupedClips[query] = {};
+      for (const question of [query, ...questions]) {
+        if (!groupedClips[query][question]) {
+          groupedClips[query][question] = [];
+        }
+        groupedClips[query][question].push(
+          ...cleanedClips.filter((x) => x.question === question)
+        );
+      }
+    }
+
+    console.log(chalk.green(cleanedClips.length + " clips cleaned"));
+    return success({ ...args, groupedClips });
   },
 };
 
