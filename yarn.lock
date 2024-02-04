@@ -6401,6 +6401,20 @@ __metadata:
   languageName: node
   linkType: hard
 
+"graphile-saga@npm:^0.0.2":
+  version: 0.0.2
+  resolution: "graphile-saga@npm:0.0.2"
+  dependencies:
+    pg: "npm:^8.11.3"
+  peerDependencies:
+    graphile-worker: ^0.16.2
+    graphile-worker-zod: ^0.0.1
+    typescript: ^5.0.0
+    zod: ^3.22.4
+  checksum: 042968c10a75f647cfcb0a3b9aed3f068e11d0d1e6c3602b25b289373fdd88b3f2e8c33a46b4ed59994b2e25a0081d748ce0fb2930cd797cbd2331a675a60ac7
+  languageName: node
+  linkType: hard
+
 "graphile-worker@npm:^0.16.2":
   version: 0.16.2
   resolution: "graphile-worker@npm:0.16.2"
@@ -11042,6 +11056,7 @@ __metadata:
     dotenv: "npm:^16.3.1"
     express: "npm:^4.18.2"
     express-session: "npm:^1.17.3"
+    graphile-saga: "npm:^0.0.2"
     graphile-worker: "npm:^0.16.2"
     nodemon: "npm:^3.0.2"
     passport: "npm:^0.7.0"
