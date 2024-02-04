@@ -73,8 +73,8 @@ export const getTweets = {
     args: GetTweetsStageArgs
   ): Promise<Success<SummarizeTweetsArgs> | Failure> {
     const { user } = args;
-    if (args.summaryFile) {
-      console.log(chalk.blue("Using summary file, skipping tweets"));
+    if (args.summary) {
+      console.log(chalk.blue("Using existing summary file, skipping tweets"));
       return success({ ...args, tweets: [] });
     }
     const dbUser = await trpc.getUser.query({ username: user });
@@ -138,13 +138,11 @@ export const summarizeTweets = {
     const { api, bridge } = initTwitterAPI();
     const twitterUser = await getUserProfile(api, user);
     bridge.close();
-    if (args.summaryFile) {
-      console.log(chalk.blue("Using summary file, skipping summary"));
-      const summary = readFileSync(args.summaryFile, "utf-8");
-      console.log(summary);
+    if (args.summary) {
+      console.log(chalk.blue("Using existing summary, skipping summary"));
       return success({
         ...args,
-        profile: summary,
+        profile: args.summary,
         bio: twitterUser.rawDescription,
       });
     }
@@ -546,7 +544,7 @@ export const RAGStage = {
   },
 };
 
-interface CleanClipsStageArgs extends RAGStageArgs {
+export interface CleanClipsStageArgs extends RAGStageArgs {
   clips: Record<string, (TranscriptClipWithScore | ArticleSnippetWithScore)[]>;
 }
 

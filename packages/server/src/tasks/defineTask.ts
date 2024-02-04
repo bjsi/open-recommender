@@ -1,11 +1,16 @@
 import _ from "remeda";
 import { Helpers, Task, TaskSpec, makeWorkerUtils } from "graphile-worker";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 let workerUtilsPromise: ReturnType<typeof makeWorkerUtils> | null = null;
 
 function workerUtils() {
   if (!workerUtilsPromise) {
-    workerUtilsPromise = makeWorkerUtils({});
+    workerUtilsPromise = makeWorkerUtils({
+      connectionString: process.env.DATABASE_URL!,
+    });
   }
   return workerUtilsPromise;
 }

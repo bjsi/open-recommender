@@ -21,13 +21,13 @@ export type PipelineStage<T, U> = {
 
 export const pipelineArgsSchema = z.object({
   runId: z.string(),
-  cloneRunId: z.string().optional(),
   user: z.string(),
-  searchFilterRelevancyCutOff: z.number().min(0).max(1).default(0.65),
+
+  cloneRunId: z.string().optional(),
   stage: z.enum(STAGES).optional(),
   print: z.string().optional(),
   enableLogging: z.boolean().optional().default(true),
-  summaryFile: z.string().optional(),
+  summary: z.string().optional(),
   customQuery: z.string().optional(),
 });
 

@@ -1,16 +1,8 @@
-import { Pipeline, PipelineArgs, pipelineArgsSchema } from "./pipeline";
+import { PipelineArgs, pipelineArgsSchema } from "./pipeline";
+import { twitterPipeline } from "./pipelines/twitter";
 import { getRunById } from "./run";
-import {
-  RAGStage,
-  cleanClipsAndClusterStage,
-  createQueriesMetaphor,
-  downloadTranscripts,
-  getTweets,
-  searchForVideos,
-  summarizeTweets,
-  validateArgs,
-} from "./stages";
 import { Command } from "commander";
+import fs from "fs";
 
 (async () => {
   const program = new Command();
@@ -44,20 +36,16 @@ import { Command } from "commander";
     )
     .parse(process.argv);
 
+  const summary = program.opts().summaryFile
+    ? fs.readFileSync(program.opts().summaryFile, "utf-8")
+    : undefined;
+
   const opts: PipelineArgs = pipelineArgsSchema.parse({
     ...program.opts(),
     runId: new Date().toISOString(),
+    summary,
   });
-  const pipeline = new Pipeline(opts)
-    .addStage(validateArgs)
-    .addStage(getTweets)
-    .addStage(summarizeTweets)
-    .addStage(createQueriesMetaphor)
-    .addStage(searchForVideos)
-    .addStage(downloadTranscripts)
-    .addStage(RAGStage)
-    .addStage(cleanClipsAndClusterStage);
-
+  const pipeline = twitterPipeline(opts);
   const print = opts.print;
   if (print) {
     const clonedRun = getRunById(opts.cloneRunId || "");
