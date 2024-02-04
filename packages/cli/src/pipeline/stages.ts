@@ -30,7 +30,7 @@ import { brainstormQuestions } from "../recommender/prompts/brainstormSubQuestio
 import { compact, last, uniqBy } from "remeda";
 import { getUserProfile } from "../twitter/getUserContext";
 import { initTwitterAPI } from "../twitter/twitterAPI";
-import { readFileSync } from "fs";
+import { readFileSync, writeFileSync } from "fs";
 import { YouTubeResult } from "../youtube/search";
 import { youtubeUrlWithTimestamp } from "shared/src/youtube";
 import { findStartOfAnswer } from "../recommender/prompts/findStartOfAnswer/findStartOfAnswer";
@@ -515,14 +515,20 @@ export const RAGStage = {
       ).flat()
     );
 
+    const queries = args.queriesWithQuestions.flatMap((x) => [
+      x.query,
+      ...x.questions,
+    ]);
     const results = await searchChunks<HighlightMetadata | YTMetadata>({
-      queries: args.queriesWithQuestions.flatMap((x) => [
-        x.query,
-        ...x.questions,
-      ]),
+      queries,
       chunks,
       scoreCutOff: 0,
     });
+
+    writeFileSync(
+      "rag-input.json",
+      JSON.stringify({ chunks, queries }, null, 2)
+    );
 
     const clips = chunksToClips({
       results,

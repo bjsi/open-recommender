@@ -1,4 +1,3 @@
-import json
 from typing import List, Optional, TypedDict
 
 import modal
@@ -36,15 +35,29 @@ stub = modal.Stub("rag-server")
     image=my_img,
 )
 class RAG:
-    @method()
-    def rag(self, args: SearchArgs) -> List[List[SearchResult]]:
+    @build()
+    def download_model(self):
         from ragatouille import RAGPretrainedModel
 
-        RAG = RAGPretrainedModel.from_pretrained("colbert-ir/colbertv2.0", verbose=0)
+        # This downloads the model weights when not present.
+        RAGPretrainedModel.from_pretrained("colbert-ir/colbertv2.0", verbose=0)
+
+    @enter()
+    def setup(self):
+        from ragatouille import RAGPretrainedModel
+
+        self.model = RAGPretrainedModel.from_pretrained(
+            "colbert-ir/colbertv2.0", verbose=0
+        )
+
+    @method()
+    def rag(self, args: SearchArgs) -> List[List[SearchResult]]:
         metadatas = [doc["metadata"] for doc in args["docs"] if "metadata" in doc]
         doc_contents = [doc["content"] for doc in args["docs"]]
         k = args.get("k", len(doc_contents))
-        search_results = RAG.rerank(query=args["query"], documents=doc_contents, k=k)
+        search_results = self.model.rerank(
+            query=args["query"], documents=doc_contents, k=k
+        )
         if type(search_results[0]) is not list:
             if len(metadatas) > 0:
                 for result in search_results:
