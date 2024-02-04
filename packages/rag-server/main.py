@@ -23,7 +23,7 @@ class SearchResult(TypedDict):
     metadata: dict
 
 
-GPU_CONFIG = gpu.A10G()
+GPU_CONFIG = gpu.T4()
 
 my_img = modal.Image.debian_slim().apt_install("git").pip_install("ragatouille")
 
@@ -54,7 +54,7 @@ class RAG:
     def rag(self, args: SearchArgs) -> List[List[SearchResult]]:
         metadatas = [doc["metadata"] for doc in args["docs"] if "metadata" in doc]
         doc_contents = [doc["content"] for doc in args["docs"]]
-        k = args.get("k", len(doc_contents))
+        k = min(args.get("k", len(doc_contents)), len(doc_contents))
         search_results = self.model.rerank(
             query=args["query"], documents=doc_contents, k=k
         )
