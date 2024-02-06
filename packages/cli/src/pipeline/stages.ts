@@ -30,7 +30,7 @@ import { brainstormQuestions } from "../recommender/prompts/brainstormSubQuestio
 import { compact, last, uniqBy } from "remeda";
 import { getUserProfile } from "../twitter/getUserContext";
 import { initTwitterAPI } from "../twitter/twitterAPI";
-import { readFileSync, writeFileSync } from "fs";
+import { writeFileSync } from "fs";
 import { YouTubeResult } from "../youtube/search";
 import { youtubeUrlWithTimestamp } from "shared/src/youtube";
 import { findStartOfAnswer } from "../recommender/prompts/findStartOfAnswer/findStartOfAnswer";

@@ -6,6 +6,7 @@ import {
   addRecommendationSchema,
   addRecommendations,
 } from "../lib/addRecomendations";
+import { getSavedTweetsForUser } from "../lib/tweets";
 
 export const adminRouter = router({
   addRecommendations: publicProcedure
@@ -30,30 +31,7 @@ export const adminRouter = router({
       })
     )
     .query(async ({ input }) => {
-      const user = await prisma.user.findUnique({
-        where: {
-          username: input.username,
-        },
-      });
-      if (!user) {
-        throw new Error("user not found");
-      }
-      const tweets = await prisma.tweet.findMany({
-        where: {
-          userId: user.id,
-          ...(input.before
-            ? { tweetedAt: { lt: new Date(input.before) } }
-            : {}),
-        },
-        orderBy: {
-          tweetedAt: "desc",
-        },
-        take: input.limit,
-      });
-      return tweets.map((t) => ({
-        ...t,
-        data: TweetSchema.parse(t.data),
-      }));
+      return getSavedTweetsForUser(input);
     }),
   saveTweets: publicProcedure
     .input(

@@ -1,13 +1,7 @@
 import { PyBridge, RemoteController } from "pybridge-zod";
 import { z } from "zod";
 import { TokenTextSplitter } from "../recommender/textSplitter";
-import {
-  Transcript,
-  transcriptToMarkdownCues,
-  transcriptToString,
-} from "../youtube/transcript";
-import { last } from "remeda";
-import { youtubeUrlWithTimestamp } from "shared/src/youtube";
+import { Transcript, transcriptToMarkdownCues } from "../youtube/transcript";
 import { TranscriptClip } from "../recommender/prompts/recommendClips/helpers/transcriptClip";
 import { getTopicFromQuestion } from "../recommender/prompts/getTopicFromQuestion/getTopicFromQuestion";
 
@@ -48,19 +42,30 @@ export type RAGApi = RemoteController<z.infer<typeof RAGAPISchema>>;
 class PythonController {
   api: RAGApi;
 
-  constructor(protected python: PyBridge) {
+  constructor(protected python: PyBridge, filename: string) {
     this.python = python;
-    this.api = this.python.controller("rag.py", RAGAPISchema);
+    this.api = this.python.controller(filename, RAGAPISchema);
   }
 }
 
-export const initRAGApi = () => {
+export const initLocalRAGApi = () => {
   const bridge = new PyBridge({
     python: "python3",
     cwd: __dirname,
   });
   return {
-    api: new PythonController(bridge).api,
+    api: new PythonController(bridge, "rag.py").api,
+    bridge,
+  };
+};
+
+export const initRemoteRAGApi = () => {
+  const bridge = new PyBridge({
+    python: "python3",
+    cwd: __dirname,
+  });
+  return {
+    api: new PythonController(bridge, "rag-remote.py").api,
     bridge,
   };
 };
@@ -102,7 +107,7 @@ export const rerankSearchResults = async (args: {
   results: { content: string; metadata: { id: number } }[];
   scoreCutOff: number;
 }) => {
-  const { api, bridge } = initRAGApi();
+  const { api, bridge } = initLocalRAGApi();
   // This formulates the question into a better format for re-ranking
   const topic = await getTopicFromQuestion().execute({
     question: args.query,
@@ -160,7 +165,7 @@ export const searchChunks = async <T extends { type: string }>(args: {
   }[];
   scoreCutOff: number;
 }): Promise<Record<string, RAGChunk[]>> => {
-  const { api, bridge } = initRAGApi();
+  const { api, bridge } = initLocalRAGApi();
   const resultsList = await api.rag({
     query: args.queries,
     docs: args.chunks,

@@ -2,14 +2,14 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator zod {
-  provider                 = "zod-prisma"
-  output                   = "../../shared/src/schemas" // (default) the directory where generated zod schemas will be saved
-  relationModel            = true // (default) Create and export both plain and related models.
-  modelCase                = "PascalCase" // (default) Output models using pascal case (ex. UserModel, PostModel)
-  modelSuffix              = "Model" // (default) Suffix to apply to your prisma models when naming Zod schemas
+  provider              = "zod-prisma"
+  output                = "../../shared/src/schemas" // (default) the directory where generated zod schemas will be saved
+  relationModel         = true // (default) Create and export both plain and related models.
+  modelCase             = "PascalCase" // (default) Output models using pascal case (ex. UserModel, PostModel)
+  modelSuffix           = "Model" // (default) Suffix to apply to your prisma models when naming Zod schemas
   useDecimalJs          = false // (default) represent the prisma Decimal type using as a JS number
   // https://www.prisma.io/docs/concepts/components/prisma-client/working-with-fields/working-with-json-fields#filtering-by-null-values
-  prismaJsonNullability    = true // (default) uses prisma's scheme for JSON field nullability
+  prismaJsonNullability = true // (default) uses prisma's scheme for JSON field nullability
 }
 
 generator client {
@@ -30,7 +30,7 @@ model User {
   profile_image_url String
   createdAt         DateTime             @default(now())
   updatedAt         DateTime             @updatedAt
-  apiKey            String?               @unique
+  apiKey            String?              @unique
   tweets            Tweet[]
   summaries         Summary[]
   recommendations   UserRecommendation[]
@@ -38,6 +38,7 @@ model User {
   notes             Note[]
   followers         Follow[]             @relation("Followed")
   following         Follow[]             @relation("Follower")
+  pipelineRuns      PipelineRun[]
 }
 
 model Tweet {
@@ -67,12 +68,12 @@ model Summary {
 }
 
 model Query {
-  id        Int      @id @default(autoincrement())
-  summaryId Int
-  summary   Summary  @relation(fields: [summaryId], references: [id], onDelete: Cascade)
-  text      String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id                    Int                           @id @default(autoincrement())
+  summaryId             Int
+  summary               Summary                       @relation(fields: [summaryId], references: [id], onDelete: Cascade)
+  text                  String
+  createdAt             DateTime                      @default(now())
+  updatedAt             DateTime                      @updatedAt
   public                Boolean
   recommendationSources QueryToRecommendationSource[]
 }
@@ -82,25 +83,25 @@ enum RecommendationType {
 }
 
 model Recommendation {
-  id                  Int                  @id @default(autoincrement())
-  createdAt           DateTime             @default(now())
-  updatedAt           DateTime             @updatedAt
-  type                RecommendationType
-  data                Json
-  sourceId            Int
-  source              RecommendationSource @relation(fields: [recommendationSourceId], references: [id], onDelete: Cascade)
-  votes               Vote[]
-  notes               Note[]
-  userRecommendations UserRecommendation[] @relation("UserRecommendation")
+  id                     Int                  @id @default(autoincrement())
+  createdAt              DateTime             @default(now())
+  updatedAt              DateTime             @updatedAt
+  type                   RecommendationType
+  data                   Json
+  sourceId               Int
+  source                 RecommendationSource @relation(fields: [recommendationSourceId], references: [id], onDelete: Cascade)
+  votes                  Vote[]
+  notes                  Note[]
+  userRecommendations    UserRecommendation[] @relation("UserRecommendation")
   recommendationSourceId Int
-  public                Boolean
+  public                 Boolean
 }
 
 model RecommendationSource {
-  id              Int                @id @default(autoincrement())
-  externalId      String             @unique
-  createdAt       DateTime           @default(now())
-  updatedAt       DateTime           @updatedAt
+  id              Int                           @id @default(autoincrement())
+  externalId      String                        @unique
+  createdAt       DateTime                      @default(now())
+  updatedAt       DateTime                      @updatedAt
   type            RecommendationType
   data            Json
   recommendations Recommendation[]
@@ -108,13 +109,13 @@ model RecommendationSource {
 }
 
 model QueryToRecommendationSource {
-  id                      Int                  @id @default(autoincrement())
-  queryId                 Int
-  query                   Query                @relation(fields: [queryId], references: [id], onDelete: Cascade)
-  recommendationSourceId  Int
-  recommendationSource    RecommendationSource @relation(fields: [recommendationSourceId], references: [id], onDelete: Cascade)
-  createdAt               DateTime             @default(now())
-  updatedAt               DateTime             @updatedAt
+  id                     Int                  @id @default(autoincrement())
+  queryId                Int
+  query                  Query                @relation(fields: [queryId], references: [id], onDelete: Cascade)
+  recommendationSourceId Int
+  recommendationSource   RecommendationSource @relation(fields: [recommendationSourceId], references: [id], onDelete: Cascade)
+  createdAt              DateTime             @default(now())
+  updatedAt              DateTime             @updatedAt
 }
 
 model UserRecommendation {
@@ -173,4 +174,32 @@ model Follow {
   createdAt  DateTime   @default(now())
   updatedAt  DateTime   @updatedAt
   followType FollowType
+}
+
+enum TaskStatus {
+  retrying
+  running
+  completed
+  failed
+}
+
+model PipelineRun {
+  id        Int            @id @default(autoincrement())
+  jobId         String        @unique
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+  userId    Int
+  user      User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tasks     PipelineTask[]
+  status    TaskStatus     @default(running)
+}
+
+model PipelineTask {
+  id            Int         @id @default(autoincrement())
+  jobId         String        @unique
+  pipelineRunId Int
+  pipelineRun   PipelineRun @relation(fields: [pipelineRunId], references: [id], onDelete: Cascade)
+  name          String
+  data          Json
+  status        TaskStatus  @default(running)
 }
