@@ -1,18 +1,17 @@
 import * as z from "zod"
 import { TaskStatus } from "@prisma/client"
-import { CompleteUser, RelatedUserModel, CompletePipelineTask, RelatedPipelineTaskModel } from "./index"
+import { CompletePipelineTask, RelatedPipelineTaskModel } from "./index"
 
 export const PipelineRunModel = z.object({
   id: z.number().int(),
-  jobId: z.string(),
+  jobKeyId: z.string(),
   createdAt: z.date(),
   updatedAt: z.date(),
-  userId: z.number().int(),
+  username: z.string(),
   status: z.nativeEnum(TaskStatus),
 })
 
 export interface CompletePipelineRun extends z.infer<typeof PipelineRunModel> {
-  user: CompleteUser
   tasks: CompletePipelineTask[]
 }
 
@@ -22,6 +21,5 @@ export interface CompletePipelineRun extends z.infer<typeof PipelineRunModel> {
  * NOTE: Lazy required in case of potential circular dependencies within schema
  */
 export const RelatedPipelineRunModel: z.ZodSchema<CompletePipelineRun> = z.lazy(() => PipelineRunModel.extend({
-  user: RelatedUserModel,
   tasks: RelatedPipelineTaskModel.array(),
 }))

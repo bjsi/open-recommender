@@ -1,5 +1,5 @@
 import { groupBy, shuffle } from "remeda";
-import { tokenize } from "../../tokenize";
+import { tokenize } from "../tokenize";
 
 type Clip = {
   videoId: string;

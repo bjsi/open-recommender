@@ -2,7 +2,6 @@ import { PyBridge, RemoteController } from "pybridge-zod";
 import { z } from "zod";
 import { TokenTextSplitter } from "../recommender/textSplitter";
 import { Transcript, transcriptToMarkdownCues } from "../youtube/transcript";
-import { TranscriptClip } from "../recommender/prompts/recommendClips/helpers/transcriptClip";
 import { getTopicFromQuestion } from "../recommender/prompts/getTopicFromQuestion/getTopicFromQuestion";
 
 const RAGChunkSchema = z.object({
@@ -123,27 +122,6 @@ export const rerankSearchResults = async (args: {
   bridge.close();
   return resultsList.flat().filter((x) => x.score >= args.scoreCutOff);
 };
-
-export interface TranscriptClipWithScore extends TranscriptClip {
-  score: number;
-  rank: number;
-}
-
-export interface ArticleSnippet {
-  type: "article";
-  title: string;
-  question: string;
-  text: string;
-  score: number;
-  rank: number;
-  articleTitle: string;
-  articleUrl: string;
-}
-
-export interface ArticleSnippetWithScore extends ArticleSnippet {
-  rank: number;
-  score: number;
-}
 
 export interface HighlightMetadata {
   type: "highlight";

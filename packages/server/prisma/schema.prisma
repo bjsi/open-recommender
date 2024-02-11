@@ -38,7 +38,6 @@ model User {
   notes             Note[]
   followers         Follow[]             @relation("Followed")
   following         Follow[]             @relation("Follower")
-  pipelineRuns      PipelineRun[]
 }
 
 model Tweet {
@@ -185,11 +184,10 @@ enum TaskStatus {
 
 model PipelineRun {
   id        Int            @id @default(autoincrement())
-  jobId         String        @unique
+  jobKeyId  String         @unique
   createdAt DateTime       @default(now())
   updatedAt DateTime       @updatedAt
-  userId    Int
-  user      User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  username  String
   tasks     PipelineTask[]
   status    TaskStatus     @default(running)
 }
@@ -200,6 +198,5 @@ model PipelineTask {
   pipelineRunId Int
   pipelineRun   PipelineRun @relation(fields: [pipelineRunId], references: [id], onDelete: Cascade)
   name          String
-  data          Json
   status        TaskStatus  @default(running)
 }

@@ -2,7 +2,7 @@ import { Job, JobHelpers } from "graphile-worker";
 import { createTask, TypedTask } from "graphile-worker-zod";
 import { ZodTypeAny, z } from "zod";
 
-type TaskNamePayloadMaps<TaskListType> = {
+export type TaskNamePayloadMaps<TaskListType> = {
   [Name in keyof TaskListType]: TaskListType[Name] extends TypedTask<
     infer Payload,
     any
@@ -11,7 +11,7 @@ type TaskNamePayloadMaps<TaskListType> = {
     : never;
 };
 
-type KeysWithoutBar<T> = {
+export type KeysWithoutBar<T> = {
   [K in keyof T]: K extends `${infer _Start}|${infer _End}` ? never : K;
 }[keyof T];
 
@@ -95,6 +95,14 @@ type AddStepToPriorSteps<
   >;
 };
 
+interface SagaOptions<InitialPayload> {
+  beforeEnqueueStage?: (
+    initialPayload: InitialPayload,
+    step: StepTemplate,
+    helpers: JobHelpers
+  ) => Promise<void>;
+}
+
 const wrappedRunPayloadSchema = z.object({
   initialPayload: z.any(),
   previousResults: z.record(z.any()),
@@ -115,7 +123,8 @@ export class Saga<
 
   constructor(
     public sagaName: SagaName,
-    public initialPayload: InitialPayload
+    public initialPayload: InitialPayload,
+    public options: SagaOptions<z.infer<InitialPayload>> = {}
   ) {}
 
   addStep<StepName extends string, StepResult>(
@@ -152,6 +161,13 @@ export class Saga<
         const helpersWithCancel = makeSagaJobHelpers(helpers);
 
         try {
+          if (this.options.beforeEnqueueStage) {
+            await this.options.beforeEnqueueStage(
+              this.initialPayload,
+              this.steps[stepIdx],
+              helpers
+            );
+          }
           const stepExecutionResult = await run(
             initialPayload,
             previousResults,

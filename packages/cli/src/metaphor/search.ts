@@ -3,6 +3,8 @@ import dotenv from "dotenv";
 import { youtubeUrlToId } from "shared/src/youtube";
 import { compact } from "remeda";
 import { nearestSubstring } from "./nearestSubstring";
+import { YouTubeResult } from "../youtube/search";
+import { Transcript } from "../youtube/transcript";
 
 dotenv.config();
 
@@ -33,6 +35,10 @@ export interface MetaphorArticleResult {
 }
 
 export type MetaphorResult = MetaphorYouTubeResult | MetaphorArticleResult;
+export type VideoResult = MetaphorYouTubeResult | YouTubeResult;
+export type VideoResultWithTranscript = VideoResult & {
+  transcript: Transcript;
+};
 
 export async function searchYouTube(args: {
   query: string;

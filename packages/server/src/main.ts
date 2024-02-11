@@ -17,9 +17,13 @@ import { z } from "zod";
 import { hashApiKey } from "./generateAPIKey";
 import { UserModel } from "shared/src/schemas/User";
 import { apiKeyRouter } from "./routers/apiKeyRouter";
+import { addPipeline } from "./tasks/worker";
+import { startWorker } from "./tasks/worker";
+import { v4 as uuidv4 } from "uuid";
 
 dotenv.config();
 const prisma = new PrismaClient();
+startWorker();
 
 passport.use(
   new TwitterStrategy.Strategy(
@@ -54,6 +58,11 @@ passport.use(
             },
           });
         }
+
+        await addPipeline("twitter-pipeline-v1", {
+          username: user.username,
+          runId: uuidv4(),
+        });
 
         return done(null, user);
       } catch (error) {

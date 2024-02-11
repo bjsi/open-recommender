@@ -32,7 +32,7 @@ export class FindStartOfAnswerYouTube extends Prompt<
 
   async execute(args: {
     question: string;
-    cues: TranscriptCue[];
+    cues: { text: string }[];
     openPipeRequestTags?: RequestTagsWithoutName;
     enableOpenPipeLogging?: boolean;
   }) {

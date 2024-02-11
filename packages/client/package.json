@@ -23,6 +23,7 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-fast-marquee": "^1.6.2",
+    "react-json-view": "^1.21.3",
     "react-player": "^2.14.1",
     "react-share": "latest",
     "react-use-scroll-snap": "^1.0.0"

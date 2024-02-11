@@ -8,6 +8,7 @@ import { ProfilePage } from "./components/ProfilePage";
 import { useAuth } from "./lib/useAuth";
 import { TermsOfService } from "./components/TermsOfService";
 import { Privacy } from "./components/Privacy";
+import { AdminPage } from "./components/AdminPage";
 
 function App() {
   const auth = useAuth();
@@ -23,6 +24,7 @@ function App() {
           />
           <Route path="terms" element={<TermsOfService />} />
           <Route path="privacy" element={<Privacy />} />
+          <Route path="admin" element={<AdminPage />} />
           <Route path="*" element={<NoPage />} />
         </Route>
       </Routes>

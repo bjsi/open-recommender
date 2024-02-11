@@ -563,15 +563,15 @@ async function seed() {
     return;
   }
 
-  await addRecommendations({
-    input: json,
-    user,
-  });
+  // await addRecommendations({
+  //   input: json,
+  //   user,
+  // });
 
-  await addRecommendations({
-    input: json2,
-    user: user2,
-  });
+  // await addRecommendations({
+  //   input: json2,
+  //   user: user2,
+  // });
 }
 
 seed()

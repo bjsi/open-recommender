@@ -1,4 +1,4 @@
-import { chunkClipArray } from "../pipeline/utils/chunkClipArray";
+import { chunkClipArray } from "../utils/chunkClipArray";
 
 test("chunkClipArray works", async () => {
   const clips = [

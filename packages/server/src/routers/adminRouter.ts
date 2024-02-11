@@ -85,4 +85,12 @@ export const adminRouter = router({
       }
       return user;
     }),
+  getPipelinesAndTasks: publicProcedure.query(async () => {
+    const pipelines = await prisma.pipelineRun.findMany({
+      include: {
+        tasks: true,
+      },
+    });
+    return pipelines;
+  }),
 });
