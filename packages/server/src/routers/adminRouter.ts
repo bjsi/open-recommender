@@ -7,6 +7,8 @@ import {
   addRecommendations,
 } from "../lib/addRecomendations";
 import { getSavedTweetsForUser } from "../lib/tweets";
+import { workerUtils } from "../tasks/workerUtils";
+import { Prisma } from "@prisma/client";
 
 export const adminRouter = router({
   addRecommendations: publicProcedure
@@ -85,7 +87,7 @@ export const adminRouter = router({
       }
       return user;
     }),
-  getPipelinesAndTasks: publicProcedure.query(async () => {
+  getPipelinesAndTasks: publicProcedure.query(async ({ ctx }) => {
     const pipelines = await prisma.pipelineRun.findMany({
       include: {
         tasks: true,
@@ -93,4 +95,34 @@ export const adminRouter = router({
     });
     return pipelines;
   }),
+  retryPipeline: publicProcedure
+    .input(
+      z.object({
+        pipelineId: z.number(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const utils = await workerUtils();
+      const pipeline = await prisma.pipelineRun.findUnique({
+        where: {
+          id: input.pipelineId,
+        },
+        include: {
+          tasks: true,
+        },
+      });
+      if (!pipeline) {
+        throw new Error("pipeline not found");
+      }
+      const jobId = await prisma.$queryRaw(
+        Prisma.sql`SELECT id FROM graphile_worker.jobs WHERE key = ${pipeline.jobKeyId}`
+      );
+      if (jobId == null) {
+        throw new Error("job not found");
+      }
+
+      // utils.rescheduleJobs([jobId], {
+      //   runAt: new Date(),
+      // });
+    }),
 });

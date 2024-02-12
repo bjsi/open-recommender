@@ -64,14 +64,33 @@ export const twitterPipeline = new Saga(
           jobKeyId: initialPayload.runId,
         },
       }))!;
-      await prisma.pipelineTask.create({
-        data: {
+
+      const existingTask = await prisma.pipelineTask.findFirst({
+        where: {
           jobId: helpers.job.id,
           pipelineRunId: pipeline?.id,
-          name: step.name,
-          status: "running",
         },
       });
+
+      if (!existingTask) {
+        await prisma.pipelineTask.create({
+          data: {
+            jobId: helpers.job.id,
+            pipelineRunId: pipeline?.id,
+            name: step.name,
+            status: "running",
+          },
+        });
+      } else {
+        await prisma.pipelineTask.update({
+          where: {
+            id: existingTask.id,
+          },
+          data: {
+            status: "running",
+          },
+        });
+      }
     },
   }
 )
@@ -85,7 +104,9 @@ export const twitterPipeline = new Saga(
       if (!user && !initialPayload.skipUserCheck) {
         throw new Error("User not found");
       }
-      helpers.logger.info(`Creating recommendations for Twitter user @${user}`);
+      helpers.logger.info(
+        `Creating recommendations for Twitter user @${username}`
+      );
       return { user };
     },
   })
@@ -400,6 +421,9 @@ export const twitterPipeline = new Saga(
         x.query,
         ...x.questions,
       ]);
+      helpers.logger.debug(
+        "Running RAG with queries: " + JSON.stringify(queries)
+      );
       const results = await searchChunks<HighlightMetadata | YTMetadata>({
         queries,
         chunks,

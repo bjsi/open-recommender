@@ -163,7 +163,7 @@ export class Saga<
         try {
           if (this.options.beforeEnqueueStage) {
             await this.options.beforeEnqueueStage(
-              this.initialPayload,
+              initialPayload,
               this.steps[stepIdx],
               helpers
             );

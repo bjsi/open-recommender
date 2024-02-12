@@ -23,7 +23,7 @@ import { v4 as uuidv4 } from "uuid";
 
 dotenv.config();
 const prisma = new PrismaClient();
-startWorker();
+// startWorker();
 
 passport.use(
   new TwitterStrategy.Strategy(
@@ -39,15 +39,7 @@ passport.use(
           where: { twitterId: profile.id },
         });
 
-        if (user) {
-          console.log("user already exists", user);
-        }
-
         if (!user) {
-          console.log(
-            "user does not exist, creating new user with profile",
-            JSON.stringify(profile, null, 2)
-          );
           user = await prisma.user.create({
             data: {
               twitterId: profile.id,
@@ -73,7 +65,6 @@ passport.use(
 );
 
 passport.serializeUser(function (user, done) {
-  console.log("serializeUser", user);
   done(null, (user as any).id);
 });
 
@@ -141,12 +132,10 @@ async function apiKeyValidationMiddleware(
 ) {
   try {
     const apiKey = z.string().parse(req.headers["x-api-key"]);
-    console.log("apiKey", apiKey);
     if (!apiKey) {
       return res.status(401).send("API key is required");
     }
     const hash = hashApiKey(apiKey);
-    console.log("hash", hash);
     const user = await prisma.user.findUnique({
       where: { apiKey: hash },
     });
@@ -193,7 +182,7 @@ app.use(
   })
 );
 
-const appRouter = mergeRouters(publicRouter, adminRouter, authenticatedRouter);
+const appRouter = mergeRouters(publicRouter, authenticatedRouter);
 
 export type AppRouter = typeof appRouter;
 

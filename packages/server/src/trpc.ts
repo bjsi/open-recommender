@@ -7,7 +7,6 @@ export const createContext = ({
   req,
   res,
 }: trpcExpress.CreateExpressContextOptions) => {
-  console.log(req.headers);
   return {
     req,
     res,

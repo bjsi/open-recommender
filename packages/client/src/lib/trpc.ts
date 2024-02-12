@@ -1,5 +1,5 @@
 import { createTRPCClient, httpBatchLink } from "@trpc/client";
-import type { AppRouter } from "server/src/main";
+import type { AdminRouter, AppRouter } from "server/src/main";
 
 const customFetch = async (url: any, options: any) => {
   const enhancedOptions: RequestInit = {
@@ -21,7 +21,18 @@ export const trpc = createTRPCClient<AppRouter>({
   ],
 });
 
+export const trpcAdmin = createTRPCClient<AdminRouter>({
+  links: [
+    httpBatchLink({
+      url: import.meta.env.VITE_SERVER_URL! + "/admin",
+      fetch: customFetch,
+    }),
+  ],
+});
+
 import type { inferRouterInputs, inferRouterOutputs } from "@trpc/server";
 
 export type RouterInput = inferRouterInputs<AppRouter>;
 export type RouterOutput = inferRouterOutputs<AppRouter>;
+export type AdminRouterInput = inferRouterInputs<AdminRouter>;
+export type AdminRouterOutput = inferRouterOutputs<AdminRouter>;

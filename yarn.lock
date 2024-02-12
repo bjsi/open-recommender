@@ -4157,6 +4157,7 @@ __metadata:
     "@vitejs/plugin-react": "npm:^4.2.1"
     autoprefixer: "npm:^10.4.16"
     clsx: "npm:^2.1.0"
+    dayjs: "npm:^1.11.10"
     eslint: "npm:^8.55.0"
     eslint-plugin-react: "npm:^7.33.2"
     eslint-plugin-react-hooks: "npm:^4.6.0"
