@@ -18,12 +18,11 @@ import { hashApiKey } from "./generateAPIKey";
 import { UserModel } from "shared/src/schemas/User";
 import { apiKeyRouter } from "./routers/apiKeyRouter";
 import { addPipeline } from "./tasks/worker";
-import { startWorker } from "./tasks/worker";
 import { v4 as uuidv4 } from "uuid";
 
 dotenv.config();
 const prisma = new PrismaClient();
-// startWorker();
+// startWorker().catch(console.error);
 
 passport.use(
   new TwitterStrategy.Strategy(
@@ -49,12 +48,11 @@ passport.use(
               profile_image_url: profile._json.profile_image_url,
             },
           });
+          await addPipeline("twitter-pipeline-v1", {
+            username: user.username,
+            runId: uuidv4(),
+          });
         }
-
-        await addPipeline("twitter-pipeline-v1", {
-          username: user.username,
-          runId: uuidv4(),
-        });
 
         return done(null, user);
       } catch (error) {
@@ -130,6 +128,7 @@ async function apiKeyValidationMiddleware(
   res: Response,
   next: NextFunction
 ) {
+  console.log("apiKeyValidationMiddleware");
   try {
     const apiKey = z.string().parse(req.headers["x-api-key"]);
     if (!apiKey) {
@@ -174,7 +173,6 @@ app.use(
 
 app.use(
   "/admin",
-  apiKeyValidationMiddleware,
   isAdminValidationMiddleware,
   trpcExpress.createExpressMiddleware({
     router: adminRouter,

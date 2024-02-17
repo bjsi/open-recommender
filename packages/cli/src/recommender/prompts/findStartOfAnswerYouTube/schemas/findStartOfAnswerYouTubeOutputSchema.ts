@@ -1,8 +1,7 @@
 import { z } from "zod";
 
 export const findStartOfAnswerYouTubeOutputSchema = z.object({
-  answersQuestion: z.boolean(),
-  cueId: z.number().optional(),
+  cueId: z.number().nullish(),
 });
 
 export type FindStartOfAnswerYouTubeOutput = z.infer<

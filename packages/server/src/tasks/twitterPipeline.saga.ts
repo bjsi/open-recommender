@@ -58,7 +58,7 @@ export const twitterPipeline = new Saga(
   }),
   {
     async beforeEnqueueStage(initialPayload, step, helpers) {
-      helpers.logger.info(`Beginning step ${step.name}`);
+      helpers.logInfo(`Beginning step ${step.name}`);
       const pipeline = (await prisma.pipelineRun.findUnique({
         where: {
           jobKeyId: initialPayload.runId,
@@ -104,9 +104,7 @@ export const twitterPipeline = new Saga(
       if (!user && !initialPayload.skipUserCheck) {
         throw new Error("User not found");
       }
-      helpers.logger.info(
-        `Creating recommendations for Twitter user @${username}`
-      );
+      helpers.logInfo(`Creating recommendations for Twitter user @${username}`);
       return { user };
     },
   })
@@ -115,12 +113,12 @@ export const twitterPipeline = new Saga(
     run: async (initialPayload, priorResults, helpers) => {
       const { user } = priorResults["get-user"];
       if (initialPayload.summary) {
-        helpers.logger.info("Using existing summary, skipping get-tweets step");
-        helpers.logger.debug(initialPayload.summary);
+        helpers.logInfo("Using existing summary, skipping get-tweets step");
+        helpers.logDebug(initialPayload.summary);
         return { tweets: [] };
       } else if (initialPayload.queries) {
-        helpers.logger.info("Using custom queries, skipping get-tweets step");
-        helpers.logger.debug(JSON.stringify(initialPayload.queries, null, 2));
+        helpers.logInfo("Using custom queries, skipping get-tweets step");
+        helpers.logDebug(JSON.stringify(initialPayload.queries, null, 2));
         return { tweets: [] };
       }
 
@@ -156,9 +154,9 @@ export const twitterPipeline = new Saga(
       }
 
       if (!tweets.length) {
-        helpers.logger.info("No tweets fetched");
+        helpers.logInfo("No tweets fetched");
       } else {
-        helpers.logger.info(`${tweets.length} tweets fetched successfully`);
+        helpers.logInfo(`${tweets.length} tweets fetched successfully`);
       }
       return { tweets };
     },
@@ -167,12 +165,12 @@ export const twitterPipeline = new Saga(
     name: "summarize-tweets",
     run: async (initialPayload, priorResults, helpers) => {
       const { username } = initialPayload;
-      helpers.logger.info(`Summarizing tweets for Twitter user @${username}`);
+      helpers.logInfo(`Summarizing tweets for Twitter user @${username}`);
       const api = getTwitterAPISingleton();
       const twitterUser = await getUserProfile(api, username);
       if (initialPayload.summary) {
-        helpers.logger.info("Using existing summary, skipping summary");
-        helpers.logger.debug(initialPayload.summary);
+        helpers.logInfo("Using existing summary, skipping summary");
+        helpers.logDebug(initialPayload.summary);
         return {
           profile: initialPayload.summary,
           twitterUser,
@@ -186,11 +184,11 @@ export const twitterPipeline = new Saga(
       });
 
       if (!profile) {
-        helpers.logger.info("Failed to summarize tweets");
+        helpers.logInfo("Failed to summarize tweets");
         throw new Error("Failed to summarize tweets");
       } else {
-        helpers.logger.info("Tweets summarized successfully");
-        helpers.logger.debug(profile);
+        helpers.logInfo("Tweets summarized successfully");
+        helpers.logDebug(profile);
         return {
           profile,
         };
@@ -200,7 +198,7 @@ export const twitterPipeline = new Saga(
   .addStep({
     name: "create-queries-metaphor",
     run: async (initialPayload, priorResults, helpers) => {
-      helpers.logger.info("Creating Metaphor search queries...");
+      helpers.logInfo("Creating Metaphor search queries...");
       const queries: string[] = [];
       if (initialPayload.queries) {
         queries.push(...initialPayload.queries);
@@ -239,9 +237,9 @@ export const twitterPipeline = new Saga(
         const msg = "No search queries generated";
         throw new Error(msg);
       } else {
-        helpers.logger.info(`${queriesWithQuestions.length} queries generated`);
-        helpers.logger.debug(JSON.stringify(queriesWithQuestions, null, 2));
-        helpers.logger.info("Limiting to 5 queries");
+        helpers.logInfo(`${queriesWithQuestions.length} queries generated`);
+        helpers.logDebug(JSON.stringify(queriesWithQuestions, null, 2));
+        helpers.logInfo("Limiting to 5 queries");
         return {
           queriesWithQuestions: queriesWithQuestions.slice(0, 5),
         };
@@ -253,7 +251,7 @@ export const twitterPipeline = new Saga(
     run: async (initialPayload, priorResults, helpers) => {
       const { queriesWithQuestions } = priorResults["create-queries-metaphor"];
 
-      helpers.logger.info("Searching YouTube...");
+      helpers.logInfo("Searching YouTube...");
 
       const youtubeResults = await pAll(
         queriesWithQuestions.map(({ query, questions }) => async () => {
@@ -276,10 +274,10 @@ export const twitterPipeline = new Saga(
             query,
             numResults: 20,
           });
-          helpers.logger.info(
+          helpers.logInfo(
             `Found ${rawSearchResultsForQuery.length} results for query "${query}"`
           );
-          helpers.logger.debug(
+          helpers.logDebug(
             rawSearchResultsForQuery
               .map((result, idx) => `${idx + 1}. ${result.title}`)
               .join("\n")
@@ -321,7 +319,7 @@ export const twitterPipeline = new Saga(
         ...metaphorYouTubeResults,
         ...metaphorArticleResults,
       ];
-      helpers.logger.info(`Found ${all.length} search results`);
+      helpers.logInfo(`Found ${all.length} search results`);
       return { queryWithResults: all };
     },
   })
@@ -330,7 +328,7 @@ export const twitterPipeline = new Saga(
     run: async (initialPayload, priorResults, helpers) => {
       const { queryWithResults: searchResults } =
         priorResults["search-for-videos"];
-      helpers.logger.info(`Fetching ${searchResults.length} transcripts...`);
+      helpers.logInfo(`Fetching ${searchResults.length} transcripts...`);
       const resultsWithTranscripts: QueryWithSearchResultWithTranscript[] = [];
       for (const results of searchResults) {
         const searchResultsWithTranscripts = compact(
@@ -363,7 +361,7 @@ export const twitterPipeline = new Saga(
         helpers.logger.warn(msg);
         throw new Error(msg);
       } else {
-        helpers.logger.info(
+        helpers.logInfo(
           resultsWithTranscripts.flatMap((x) => x.searchResults).length +
             " transcripts fetched successfully"
         );
@@ -376,7 +374,7 @@ export const twitterPipeline = new Saga(
     run: async (initialPayload, priorResults, helpers) => {
       const { resultsWithTranscripts } = priorResults["download-transcripts"];
       const { queriesWithQuestions } = priorResults["create-queries-metaphor"];
-      helpers.logger.info(
+      helpers.logInfo(
         `Chunking ${
           resultsWithTranscripts.flatMap((x) => x.searchResults).length
         } transcripts...`
@@ -421,9 +419,7 @@ export const twitterPipeline = new Saga(
         x.query,
         ...x.questions,
       ]);
-      helpers.logger.debug(
-        "Running RAG with queries: " + JSON.stringify(queries)
-      );
+      helpers.logDebug("Running RAG with queries: " + JSON.stringify(queries));
       const results = await searchChunks<HighlightMetadata | YTMetadata>({
         queries,
         chunks,
@@ -439,7 +435,7 @@ export const twitterPipeline = new Saga(
         const msg = "No clips created";
         helpers.logger.warn(msg);
       } else {
-        helpers.logger.info(Object.keys(clips).length + " chunks created");
+        helpers.logInfo(Object.keys(clips).length + " chunks created");
       }
       return { clips };
     },
@@ -449,7 +445,7 @@ export const twitterPipeline = new Saga(
     run: async (initialPayload, priorResults, helpers) => {
       const { clips } = priorResults["rag"];
       const { queriesWithQuestions } = priorResults["create-queries-metaphor"];
-      helpers.logger.info("Cleaning clips...");
+      helpers.logInfo("Cleaning clips...");
       const tasks = Object.entries(clips).flatMap(([question, clips]) => {
         return clips.flatMap((clip) => async () => {
           if (clip.type === "article") {
@@ -457,15 +453,13 @@ export const twitterPipeline = new Saga(
               question,
               text: clip.text,
             });
-            if (result?.answersQuestion) {
-              if (result.quotedAnswer) {
-                const match = nearestSubstring(result.quotedAnswer, clip.text);
-                if (match.bestMatch && match.bestScore > 0.8) {
-                  return {
-                    ...clip,
-                    text: clip.text.slice(match.bestStartIdx),
-                  };
-                }
+            if (result?.quotedAnswer) {
+              const match = nearestSubstring(result.quotedAnswer, clip.text);
+              if (match.bestMatch && match.bestScore > 0.8) {
+                return {
+                  ...clip,
+                  text: clip.text.slice(match.bestStartIdx),
+                };
               }
               return clip;
             }
@@ -475,16 +469,13 @@ export const twitterPipeline = new Saga(
               question,
               cues: clip.cues,
             });
-            if (result?.answersQuestion) {
-              if (result.cueId !== undefined) {
-                const newCues = clip.cues.slice(result.cueId);
-                return {
-                  ...clip,
-                  start: newCues[0].start,
-                  cues: newCues,
-                };
-              }
-              return clip;
+            if (result?.cueId != null) {
+              const newCues = clip.cues.slice(result.cueId);
+              return {
+                ...clip,
+                start: newCues[0].start,
+                cues: newCues,
+              };
             }
             return null;
           }
@@ -517,7 +508,7 @@ export const twitterPipeline = new Saga(
         const msg = "No clips left after cleaning";
         helpers.logger.warn(msg);
       } else {
-        helpers.logger.info(cleanedClips.length + " clips cleaned");
+        helpers.logInfo(cleanedClips.length + " clips cleaned");
       }
       return { groupedClips };
     },
@@ -534,7 +525,7 @@ export const twitterPipeline = new Saga(
       if (user) {
         await addRecommendations({ input: finalData, user });
       } else {
-        helpers.logger.info("No user found in DB, skipping save-results step");
+        helpers.logInfo("No user found in DB, skipping save-results step");
       }
     },
   })
@@ -543,8 +534,8 @@ export const twitterPipeline = new Saga(
     run: async (initialPayload, priorResults, helpers) => {
       const user = priorResults["get-user"].user;
       if (!initialPayload.emailResults || !user?.email) {
-        helpers.logger.info("Skipping email-results step");
-        helpers.logger.debug(
+        helpers.logInfo("Skipping email-results step");
+        helpers.logDebug(
           JSON.stringify(
             {
               emailResults: initialPayload.emailResults,

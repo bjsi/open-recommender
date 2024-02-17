@@ -31,6 +31,8 @@ export { SagaTolerantAddJobFn as AddJobFn };
 
 type SagaJobHelpers = JobHelpers & {
   cancel: (reason?: string) => void;
+  logInfo: (message: string) => void;
+  logDebug: (message: string) => void;
 };
 
 class CancelError extends Error {}
@@ -41,6 +43,10 @@ const makeSagaJobHelpers = (helpers: JobHelpers): SagaJobHelpers => {
     cancel: (reason?: string) => {
       throw new CancelError(reason);
     },
+    logInfo: (message: string) =>
+      helpers.logger.info(message, { jobId: helpers.job.id }),
+    logDebug: (message: string) =>
+      helpers.logger.debug(message, { jobId: helpers.job.id }),
   };
 };
 
@@ -99,7 +105,7 @@ interface SagaOptions<InitialPayload> {
   beforeEnqueueStage?: (
     initialPayload: InitialPayload,
     step: StepTemplate,
-    helpers: JobHelpers
+    helpers: SagaJobHelpers
   ) => Promise<void>;
 }
 
@@ -158,14 +164,13 @@ export class Saga<
             ? { initialPayload: payload, previousResults: {} }
             : wrappedRunPayloadSchema.parse(payload);
 
-        const helpersWithCancel = makeSagaJobHelpers(helpers);
-
         try {
+          const helpersWithCancel = makeSagaJobHelpers(helpers);
           if (this.options.beforeEnqueueStage) {
             await this.options.beforeEnqueueStage(
               initialPayload,
               this.steps[stepIdx],
-              helpers
+              helpersWithCancel
             );
           }
           const stepExecutionResult = await run(
@@ -190,7 +195,9 @@ export class Saga<
 
           // If next step is null, the saga is done!
         } catch (ex) {
+          console.log("saga exception", ex);
           if (ex instanceof CancelError) {
+            console.log("saga cancel triggered", ex);
             // If there's a prior step, queue its cancel function
             const stepsUntilMeReversed = this.steps.slice(0, stepIdx).reverse();
 

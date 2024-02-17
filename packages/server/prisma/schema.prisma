@@ -193,10 +193,23 @@ model PipelineRun {
 }
 
 model PipelineTask {
-  id            Int         @id @default(autoincrement())
-  jobId         String        @unique
+  id            Int               @id @default(autoincrement())
+  jobId         String            @unique
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
   pipelineRunId Int
-  pipelineRun   PipelineRun @relation(fields: [pipelineRunId], references: [id], onDelete: Cascade)
+  pipelineRun   PipelineRun       @relation(fields: [pipelineRunId], references: [id], onDelete: Cascade)
   name          String
-  status        TaskStatus  @default(running)
+  status        TaskStatus        @default(running)
+  logs          PipelineTaskLog[]
+}
+
+model PipelineTaskLog {
+  id             Int          @id @default(autoincrement())
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  pipelineTaskId Int
+  pipelineTask   PipelineTask @relation(fields: [pipelineTaskId], references: [id])
+  level          String
+  log            String
 }

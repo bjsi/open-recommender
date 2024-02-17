@@ -8,7 +8,7 @@ import {
 } from "../lib/addRecomendations";
 import { getSavedTweetsForUser } from "../lib/tweets";
 import { workerUtils } from "../tasks/workerUtils";
-import { Prisma } from "@prisma/client";
+import { getPipelineJobByKey, getPipelineTaskJobById } from "../lib/jobsPrisma";
 
 export const adminRouter = router({
   addRecommendations: publicProcedure
@@ -90,22 +90,73 @@ export const adminRouter = router({
   getPipelinesAndTasks: publicProcedure.query(async ({ ctx }) => {
     const pipelines = await prisma.pipelineRun.findMany({
       include: {
-        tasks: true,
+        tasks: {
+          include: {
+            logs: true,
+          },
+        },
       },
     });
     return pipelines;
   }),
-  retryPipeline: publicProcedure
+  retryPipelineTask: publicProcedure
     .input(
       z.object({
-        pipelineId: z.number(),
+        id: z.string(),
       })
     )
     .mutation(async ({ input }) => {
       const utils = await workerUtils();
+      const task = await prisma.pipelineTask.findUnique({
+        where: {
+          jobId: input.id,
+        },
+      });
+      if (!task) {
+        throw new Error("pipeline not found");
+      }
+      const job = await getPipelineTaskJobById(task.jobId);
+      if (!job) {
+        throw new Error("job not found");
+      }
+      const xs = await utils.rescheduleJobs([job.id.toString()], {
+        runAt: new Date(),
+        attempts: 0,
+      });
+      console.log("rescheduled", xs);
+    }),
+  cancelPipelineTask: publicProcedure
+    .input(
+      z.object({
+        id: z.string(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const task = await prisma.pipelineTask.findUnique({
+        where: {
+          jobId: input.id,
+        },
+      });
+      if (!task) {
+        throw new Error("pipeline not found");
+      }
+      const job = await getPipelineTaskJobById(task.jobId);
+      if (!job) {
+        throw new Error("job not found");
+      }
+      const utils = await workerUtils();
+      await utils.permanentlyFailJobs([job.id.toString()]);
+    }),
+  deletePipeline: publicProcedure
+    .input(
+      z.object({
+        id: z.number(),
+      })
+    )
+    .mutation(async ({ input }) => {
       const pipeline = await prisma.pipelineRun.findUnique({
         where: {
-          id: input.pipelineId,
+          id: input.id,
         },
         include: {
           tasks: true,
@@ -114,15 +165,22 @@ export const adminRouter = router({
       if (!pipeline) {
         throw new Error("pipeline not found");
       }
-      const jobId = await prisma.$queryRaw(
-        Prisma.sql`SELECT id FROM graphile_worker.jobs WHERE key = ${pipeline.jobKeyId}`
-      );
-      if (jobId == null) {
-        throw new Error("job not found");
-      }
-
-      // utils.rescheduleJobs([jobId], {
-      //   runAt: new Date(),
-      // });
+      const utils = await workerUtils();
+      const pipelineJob = await getPipelineJobByKey(pipeline.jobKeyId);
+      const failed = await utils.permanentlyFailJobs([
+        pipelineJob.id.toString(),
+        ...pipeline.tasks.map((t) => t.jobId.toString()),
+      ]);
+      console.log("successfully failed jobs", failed);
+      await prisma.pipelineRun.delete({
+        where: {
+          id: input.id,
+        },
+      });
+      await prisma.pipelineTask.deleteMany({
+        where: {
+          pipelineRunId: input.id,
+        },
+      });
     }),
 });

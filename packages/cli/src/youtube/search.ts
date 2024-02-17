@@ -102,24 +102,29 @@ export async function search(
     .map((line) => searchResultSchema.safeParse(tryParseJSON(line)))
     .map((r) => (r.success ? r.data : undefined))
     .filter(Boolean) as SearchResult[];
-  const ranked = await rerankSearchResults({
-    query: args.query,
-    results: results.map((x, idx) => ({
-      content: `${x.title}\n${formatChapters(x.chapters || [])}`,
-      metadata: { id: idx },
-    })),
-    scoreCutOff: 19,
-  });
-  return ranked.map((x) => ({
-    title: results[x.metadata.id].title,
-    type: "youtube",
-    source: "youtube",
-    id: results[x.metadata.id].id,
-    channelName: results[x.metadata.id].channel,
-    url: `https://www.youtube.com/watch?v=${results[x.metadata.id].id}`,
-    score: x.score,
-    rank: x.rank,
-  }));
+
+  if (results.length === 0) {
+    return [];
+  } else {
+    const ranked = await rerankSearchResults({
+      query: args.query,
+      results: results.map((x, idx) => ({
+        content: `${x.title}\n${formatChapters(x.chapters || [])}`,
+        metadata: { id: idx },
+      })),
+      scoreCutOff: 19,
+    });
+    return ranked.map((x) => ({
+      title: results[x.metadata.id].title,
+      type: "youtube",
+      source: "youtube",
+      id: results[x.metadata.id].id,
+      channelName: results[x.metadata.id].channel,
+      url: `https://www.youtube.com/watch?v=${results[x.metadata.id].id}`,
+      score: x.score,
+      rank: x.rank,
+    }));
+  }
 }
 
 if (require.main === module) {

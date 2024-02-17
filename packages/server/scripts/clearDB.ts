@@ -18,6 +18,8 @@ async function main() {
   ).map((x) => x.id);
   const utils = await workerUtils();
   await utils.permanentlyFailJobs(result);
+  await prisma.pipelineRun.deleteMany();
+  await prisma.pipelineTask.deleteMany();
 }
 main()
   .catch((e) => {
