@@ -1,5 +1,5 @@
 import * as z from "zod"
-import { CompleteSummary, RelatedSummaryModel, CompleteQueryToRecommendationSource, RelatedQueryToRecommendationSourceModel } from "./index"
+import { CompleteSummary, RelatedSummaryModel, CompleteQueryToRecommendationSource, RelatedQueryToRecommendationSourceModel, CompleteSubQuery, RelatedSubQueryModel } from "./index"
 
 export const QueryModel = z.object({
   id: z.number().int(),
@@ -13,6 +13,7 @@ export const QueryModel = z.object({
 export interface CompleteQuery extends z.infer<typeof QueryModel> {
   summary: CompleteSummary
   recommendationSources: CompleteQueryToRecommendationSource[]
+  subQueries: CompleteSubQuery[]
 }
 
 /**
@@ -23,4 +24,5 @@ export interface CompleteQuery extends z.infer<typeof QueryModel> {
 export const RelatedQueryModel: z.ZodSchema<CompleteQuery> = z.lazy(() => QueryModel.extend({
   summary: RelatedSummaryModel,
   recommendationSources: RelatedQueryToRecommendationSourceModel.array(),
+  subQueries: RelatedSubQueryModel.array(),
 }))

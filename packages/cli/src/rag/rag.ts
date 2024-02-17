@@ -106,7 +106,7 @@ export const rerankSearchResults = async (args: {
   results: { content: string; metadata: { id: number } }[];
   scoreCutOff: number;
 }) => {
-  const { api, bridge } = initLocalRAGApi();
+  const { api, bridge } = initRemoteRAGApi();
   // This formulates the question into a better format for re-ranking
   const topic = await getTopicFromQuestion().execute({
     question: args.query,
@@ -143,7 +143,7 @@ export const searchChunks = async <T extends { type: string }>(args: {
   }[];
   scoreCutOff: number;
 }): Promise<Record<string, RAGChunk[]>> => {
-  const { api, bridge } = initLocalRAGApi();
+  const { api, bridge } = initRemoteRAGApi();
   const resultsList = await api.rag({
     query: args.queries,
     docs: args.chunks,

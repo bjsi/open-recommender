@@ -1,6 +1,6 @@
 import * as z from "zod"
 import { RecommendationType } from "@prisma/client"
-import { CompleteRecommendationSource, RelatedRecommendationSourceModel, CompleteVote, RelatedVoteModel, CompleteNote, RelatedNoteModel, CompleteUserRecommendation, RelatedUserRecommendationModel } from "./index"
+import { CompleteRecommendationSource, RelatedRecommendationSourceModel, CompleteVote, RelatedVoteModel, CompleteNote, RelatedNoteModel, CompleteUserRecommendation, RelatedUserRecommendationModel, CompleteSubQuery, RelatedSubQueryModel } from "./index"
 
 // Helper schema for JSON fields
 type Literal = boolean | number | string
@@ -17,6 +17,7 @@ export const RecommendationModel = z.object({
   sourceId: z.number().int(),
   recommendationSourceId: z.number().int(),
   public: z.boolean(),
+  subQueryId: z.number().int(),
 })
 
 export interface CompleteRecommendation extends z.infer<typeof RecommendationModel> {
@@ -24,6 +25,7 @@ export interface CompleteRecommendation extends z.infer<typeof RecommendationMod
   votes: CompleteVote[]
   notes: CompleteNote[]
   userRecommendations: CompleteUserRecommendation[]
+  subQuery: CompleteSubQuery
 }
 
 /**
@@ -36,4 +38,5 @@ export const RelatedRecommendationModel: z.ZodSchema<CompleteRecommendation> = z
   votes: RelatedVoteModel.array(),
   notes: RelatedNoteModel.array(),
   userRecommendations: RelatedUserRecommendationModel.array(),
+  subQuery: RelatedSubQueryModel,
 }))

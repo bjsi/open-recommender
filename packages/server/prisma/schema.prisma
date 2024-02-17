@@ -75,10 +75,22 @@ model Query {
   updatedAt             DateTime                      @updatedAt
   public                Boolean
   recommendationSources QueryToRecommendationSource[]
+  subQueries            SubQuery[]
 }
 
 enum RecommendationType {
   youtube
+}
+
+model SubQuery {
+  id              Int              @id @default(autoincrement())
+  queryId         Int
+  query           Query            @relation(fields: [queryId], references: [id], onDelete: Cascade)
+  text            String
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  recommendations Recommendation[]
+  public          Boolean
 }
 
 model Recommendation {
@@ -94,6 +106,8 @@ model Recommendation {
   userRecommendations    UserRecommendation[] @relation("UserRecommendation")
   recommendationSourceId Int
   public                 Boolean
+  subQueryId             Int
+  subQuery               SubQuery             @relation(fields: [subQueryId], references: [id], onDelete: Cascade)
 }
 
 model RecommendationSource {
