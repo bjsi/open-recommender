@@ -37,19 +37,16 @@ services:
           name: open-recommender-db
           property: connectionString
   - type: worker
-    plan: free
+    plan: starter
     name: open-recommender-worker
     env: python
-    buildCommand: yarn && yarn build && pip install -r requirements.txt
+    buildCommand: yarn && yarn build && pip install -r requirements.txt && cd packages/server && yarn build
     startCommand: yarn workspace server worker
     branch: main
     buildFilter:
       paths:
         - packages/server/**/*.ts
         - packages/server/**/*.py
-        - packages/shared/**/*.ts
-        - packages/cli/**/*.ts
-        - packages/cli/**/*.py
     envVars:
       - key: SKIP_INSTALL_DEPS
         value: true
