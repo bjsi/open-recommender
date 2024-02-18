@@ -80,6 +80,7 @@ model Query {
 
 enum RecommendationType {
   youtube
+  article
 }
 
 model SubQuery {
@@ -136,7 +137,6 @@ model UserRecommendation {
   recommendationId Int
   user             User           @relation(fields: [userId], references: [id], onDelete: Cascade)
   recommendation   Recommendation @relation("UserRecommendation", fields: [recommendationId], references: [id], onDelete: Cascade)
-  priority         Int
 
   viewed Boolean @default(false)
 

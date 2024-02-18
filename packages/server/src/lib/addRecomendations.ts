@@ -2,6 +2,7 @@ import { z } from "zod";
 import { prisma } from "../db";
 import { UserModel } from "shared/src/schemas/user";
 import { YouTubeRecommendationSource } from "shared/src/manual/YouTubeRecommendationSource";
+import { ArticleRecommendationSource } from "shared/src/manual/ArticleRecommendationSource";
 import { YouTubeRecommendation } from "shared/src/manual/YouTubeRecommendation";
 import { transcriptClipSchema } from "shared/src/manual/TranscriptClip";
 import { articleSnippetSchema } from "shared/src/manual/ArticleSnippet";
@@ -33,84 +34,100 @@ export const addRecommendations = async (args: {
   // add clips and queries
   const queryStringToObjectId: Record<string, number> = {};
 
-  // for (let idx = 0; idx < input.clips.length; idx++) {
-  //   const clip = input.clips[idx];
-  //   const query = clip.query;
-  //   const queryObjId = queryStringToObjectId[query];
-  //   let queryObject;
-  //   if (queryObjId) {
-  //     queryObject = await prisma.query.findUnique({
-  //       where: {
-  //         id: queryObjId,
-  //       },
-  //     });
-  //   }
-  //   if (!queryObject) {
-  //     queryObject = await prisma.query.create({
-  //       data: {
-  //         text: query,
-  //         summaryId: summary.id,
-  //         public: true,
-  //       },
-  //     });
-  //   }
-  //   queryStringToObjectId[query] = queryObject.id;
+  for (const [query, clusters] of Object.entries(input.clips)) {
+    const queryObject = await prisma.query.create({
+      data: {
+        text: query,
+        summaryId: summary.id,
+        public: true,
+      },
+    });
+    for (const [subquery, clips] of Object.entries(clusters)) {
+      const subqObj = await prisma.subQuery.create({
+        data: {
+          text: subquery,
+          queryId: queryObject.id,
+          public: true,
+        },
+      });
 
-  //   let recommendationSource = await prisma.recommendationSource.findUnique({
-  //     where: {
-  //       externalId: clip.videoId,
-  //     },
-  //   });
+      for (const clip of clips) {
+        let recommendationSource = await prisma.recommendationSource.findUnique(
+          {
+            where: {
+              externalId:
+                clip.type === "youtube" ? clip.videoId : clip.articleUrl,
+            },
+          }
+        );
 
-  //   if (!recommendationSource) {
-  //     recommendationSource = await prisma.recommendationSource.create({
-  //       data: {
-  //         queries: {
-  //           create: [
-  //             {
-  //               queryId: queryObject.id,
-  //             },
-  //           ],
-  //         },
-  //         type: "youtube",
-  //         externalId: clip.videoId,
-  //         data: {
-  //           type: "youtube",
-  //           id: clip.videoId,
-  //           title: clip.videoTitle,
-  //         } satisfies YouTubeRecommendationSource,
-  //       },
-  //     });
-  //   }
+        if (!recommendationSource) {
+          recommendationSource = await prisma.recommendationSource.create({
+            data: {
+              queries: {
+                create: [
+                  {
+                    queryId: queryObject.id,
+                  },
+                ],
+              },
+              type: clip.type,
+              externalId:
+                clip.type === "youtube" ? clip.videoId : clip.articleUrl,
+              data:
+                clip.type === "youtube"
+                  ? ({
+                      type: "youtube",
+                      id: clip.videoId,
+                      title: clip.videoTitle,
+                    } satisfies YouTubeRecommendationSource)
+                  : ({
+                      type: "article",
+                      title: clip.articleTitle,
+                      url: clip.articleUrl,
+                    } satisfies ArticleRecommendationSource),
+            },
+          });
+        }
 
-  //   const recommendation = await prisma.recommendation.create({
-  //     data: {
-  //       sourceId: recommendationSource.id,
-  //       type: "youtube",
-  //       public: true,
-  //       source: {
-  //         connect: {
-  //           id: recommendationSource.id,
-  //         },
-  //       },
-  //       data: {
-  //         type: "youtube",
-  //         title: clip.title,
-  //         summary: clip.summary,
-  //         url: clip.videoUrl,
-  //       } satisfies YouTubeRecommendation,
-  //     },
-  //   });
+        const recommendation = await prisma.recommendation.create({
+          data: {
+            sourceId: recommendationSource.id,
+            type: "youtube",
+            public: true,
+            subQuery: {
+              connect: {
+                id: subqObj.id,
+              },
+            },
+            source: {
+              connect: {
+                id: recommendationSource.id,
+              },
+            },
+            data:
+              clip.type === "youtube"
+                ? ({
+                    type: "youtube",
+                    title: clip.title,
+                    summary: clip.question,
+                    url: clip.videoUrl,
+                  } satisfies YouTubeRecommendation)
+                : ({
+                    type: "article",
+                    url: clip.articleUrl,
+                    title: clip.articleTitle,
+                  } satisfies ArticleRecommendationSource),
+          },
+        });
 
-  //   await prisma.userRecommendation.create({
-  //     data: {
-  //       recommendationId: recommendation.id,
-  //       userId: user.id,
-  //       priority: idx,
-  //     },
-  //   });
-  // }
-  // return {
-  //   summaryId: summary.id,
-  // };
+        await prisma.userRecommendation.create({
+          data: {
+            recommendationId: recommendation.id,
+            userId: user.id,
+          },
+        });
+      }
+    }
+  }
 };
