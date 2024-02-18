@@ -10,20 +10,25 @@ services:
         - packages/client/**/*.ts
         - packages/client/**/*.tsx
         - packages/shared/**/*.ts
+        - packages/cli/**/*.ts
+        - packages/cli/**/*.py
     envVars:
       - key: SKIP_INSTALL_DEPS
         value: true
   - type: web
     plan: free
     name: open-recommender-api
-    env: python
+    env: node
     buildCommand: yarn && cd packages/server && yarn build
     startCommand: cd packages/server && yarn start
     branch: main
     buildFilter:
       paths:
         - packages/server/**/*.ts
+        - packages/server/**/*.py
         - packages/shared/**/*.ts
+        - packages/cli/**/*.ts
+        - packages/cli/**/*.py
     envVars:
       - key: SKIP_INSTALL_DEPS
         value: true
@@ -31,6 +36,20 @@ services:
         fromDatabase:
           name: open-recommender-db
           property: connectionString
+  - type: web
+    plan: free
+    name: open-recommender-worker
+    env: python
+    buildCommand: yarn && pip install -r requirements.txt cd packages/server && yarn build
+    startCommand: yarn workspace server worker
+    branch: main
+    buildFilter:
+      paths:
+        - packages/server/**/*.ts
+        - packages/server/**/*.py
+        - packages/shared/**/*.ts
+        - packages/cli/**/*.ts
+        - packages/cli/**/*.py
 databases:
   - name: open-recommender-db
     plan: free
