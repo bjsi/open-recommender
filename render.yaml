@@ -2,7 +2,7 @@ services:
   - type: web
     name: open-recommender-ui
     env: static
-    buildCommand: cd packages/shared && yarn && cd ../client && yarn && yarn build
+    buildCommand: yarn && yarn build
     staticPublishPath: ./packages/client/dist
     branch: main
     buildFilter:
@@ -19,7 +19,7 @@ services:
     plan: free
     name: open-recommender-api
     env: node
-    buildCommand: yarn && cd packages/server && yarn build
+    buildCommand: yarn && yarn build
     startCommand: cd packages/server && yarn start
     branch: main
     buildFilter:
@@ -36,11 +36,11 @@ services:
         fromDatabase:
           name: open-recommender-db
           property: connectionString
-  - type: web
+  - type: worker
     plan: free
     name: open-recommender-worker
     env: python
-    buildCommand: yarn && pip install -r requirements.txt cd packages/server && yarn build
+    buildCommand: yarn && yarn build && pip install -r requirements.txt
     startCommand: yarn workspace server worker
     branch: main
     buildFilter:
@@ -50,6 +50,13 @@ services:
         - packages/shared/**/*.ts
         - packages/cli/**/*.ts
         - packages/cli/**/*.py
+    envVars:
+      - key: SKIP_INSTALL_DEPS
+        value: true
+      - key: DATABASE_URL
+        fromDatabase:
+          name: open-recommender-db
+          property: connectionString
 databases:
   - name: open-recommender-db
     plan: free
