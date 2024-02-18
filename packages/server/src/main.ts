@@ -51,6 +51,7 @@ passport.use(
           await addPipeline("twitter-pipeline-v1", {
             username: user.username,
             runId: uuidv4(),
+            emailResults: true,
           });
         }
 

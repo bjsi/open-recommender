@@ -6,13 +6,9 @@ import json
 
 def rag(args: SearchArgs) -> List[List[SearchResult]]:
     f = modal.Function.lookup("rag-server", "RAG.rag")
-    results = f.remote(
-        {
-            "query": args["query"],
-            "docs": args["docs"],
-            "k": args["k"],
-        }
-    )
+    doc_contents = [doc["content"] for doc in args["docs"]]
+    k = min(args.get("k", len(doc_contents)), len(doc_contents))
+    results = f.remote({"query": args["query"], "docs": args["docs"], "k": k})
     return results
 
 

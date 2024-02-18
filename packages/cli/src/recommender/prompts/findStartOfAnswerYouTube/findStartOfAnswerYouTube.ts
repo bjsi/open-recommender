@@ -10,9 +10,8 @@ import {
   findStartOfAnswerYouTubeInputSchema,
 } from "./schemas/findStartOfAnswerYouTubeInputSchema";
 import { findStartOfAnswerYouTubePrompt } from "./prompts/findStartOfAnswerYouTubePrompt";
-import { TranscriptCue } from "../../../youtube/transcript";
 
-export const FIND_START_OF_ANSWER_YOUTUBE = "Find Start Of Answer YouTube";
+export const FIND_START_OF_ANSWER_YOUTUBE = "Find Start Of Answer Cue";
 
 export class FindStartOfAnswerYouTube extends Prompt<
   typeof findStartOfAnswerYouTubeInputSchema,
@@ -21,7 +20,8 @@ export class FindStartOfAnswerYouTube extends Prompt<
   constructor() {
     super({
       name: FIND_START_OF_ANSWER_YOUTUBE,
-      description: "Find the start of an answer to a question in some text",
+      description:
+        "Find the start of an answer to a question in some transcript cues",
       prompts: [findStartOfAnswerYouTubePrompt],
       model: "gpt-4",
       input: findStartOfAnswerYouTubeInputSchema,

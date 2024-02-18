@@ -35,6 +35,7 @@ import { sendEmail } from "../lib/sendEmail";
 import { TranscriptClipWithScore } from "shared/src/manual/TranscriptClip";
 import { ArticleSnippetWithScore } from "shared/src/manual/ArticleSnippet";
 import { chunksToClips } from "cli/src/recommender/chunksToClips";
+import { format } from "path";
 
 type QueryWithSearchResultWithTranscript = {
   searchResults: (VideoResultWithTranscript | MetaphorArticleResult)[];
@@ -527,13 +528,22 @@ export const twitterPipeline = new Saga(
       } else {
         helpers.logInfo("No user found in DB, skipping save-results step");
       }
+      return { finalData };
     },
   })
   .addStep({
     name: "email-results",
     run: async (initialPayload, priorResults, helpers) => {
       const user = priorResults["get-user"].user;
-      if (!initialPayload.emailResults || !user?.email) {
+      const { finalData } = priorResults["save-results"];
+      const clipsFlat = Object.values(finalData.clips)
+        .flatMap((x) => Object.values(x))
+        .flat();
+      if (
+        !initialPayload.emailResults ||
+        !user?.email ||
+        clipsFlat.length === 0
+      ) {
         helpers.logInfo("Skipping email-results step");
         helpers.logDebug(
           JSON.stringify(
@@ -547,11 +557,39 @@ export const twitterPipeline = new Saga(
         );
         return;
       } else {
+        const formatEmail = () => {
+          let str = ``;
+          for (const [query, clusters] of Object.entries(finalData.clips)) {
+            str += `<h3>${query}</h3>`;
+            for (const [question, clips] of Object.entries(clusters)) {
+              str += `<h4>${question}</h4>`;
+              str += `<ul>`;
+              for (const clip of clips) {
+                str += `<li href="${
+                  clip.type === "article" ? clip.articleUrl : clip.videoUrl
+                }">${clip.title}</li>`;
+              }
+              str += `</ul>`;
+            }
+          }
+        };
+
         await sendEmail(
           user,
           "Your latest recommendations are ready!",
-          "<p>Congrats on sending your <strong>first email</strong>!</p>"
+          `
+Hi ${user.name},
+
+Your latest recommendations are ready. You can also view them <a href="https://open-recommender.com/#/user/experilearning/feed">here</a>.
+
+${formatEmail()}
+
+Best,
+
+<a href="https://twitter.com/experilearning">James</a>
+`.trim()
         );
+        helpers.logInfo("Email sent");
       }
     },
   });

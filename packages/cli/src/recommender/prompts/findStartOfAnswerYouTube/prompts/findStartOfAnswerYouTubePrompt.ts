@@ -1,11 +1,5 @@
-import {
-  CandidatePrompt,
-  ChatMessage,
-  toCamelCase,
-} from "prompt-iteration-assistant";
-import { FIND_START_OF_ANSWER_YOUTUBE } from "../findStartOfAnswerYouTube";
+import { CandidatePrompt, ChatMessage } from "prompt-iteration-assistant";
 import { FindStartOfAnswerYouTubeInput } from "../schemas/findStartOfAnswerYouTubeInputSchema";
-import { FindStartOfAnswerYouTubeOutput } from "../schemas/findStartOfAnswerYouTubeOutputSchema";
 
 export const findStartOfAnswerYouTubePrompt =
   new CandidatePrompt<FindStartOfAnswerYouTubeInput>({
@@ -16,8 +10,9 @@ export const findStartOfAnswerYouTubePrompt =
           `
 # Instructions
 - Given a question from the user, evalutate whether the beginning of the answer is in the transcript.
-- If the beginning of the answer is in the transcript, return the transcript cue ID where the answer starts.
+- If the beginning of the answer is in the transcript, return the ID of the transcript cure where the answer starts.
 - The answer doesn't need to be complete, just the start of it.
+- If the beginning of the answer is not in the transcript, return null.
 `.trim()
         ),
         //         ChatMessage.user(

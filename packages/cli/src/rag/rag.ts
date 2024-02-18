@@ -64,7 +64,7 @@ export const initRemoteRAGApi = () => {
     cwd: __dirname,
   });
   return {
-    api: new PythonController(bridge, "rag-remote.py").api,
+    api: new PythonController(bridge, "rag_remote.py").api,
     bridge,
   };
 };

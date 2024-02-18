@@ -55,9 +55,6 @@ export const publicRouter = router({
             },
           },
         },
-        orderBy: {
-          priority: "asc",
-        },
       });
       const queriesAndSummaries = raw
         .flatMap((rec) => rec.recommendation.source.queries.map((q) => q.query))

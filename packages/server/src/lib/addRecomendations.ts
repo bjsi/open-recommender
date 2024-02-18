@@ -31,9 +31,6 @@ export const addRecommendations = async (args: {
     },
   });
 
-  // add clips and queries
-  const queryStringToObjectId: Record<string, number> = {};
-
   for (const [query, clusters] of Object.entries(input.clips)) {
     const queryObject = await prisma.query.create({
       data: {
@@ -93,7 +90,7 @@ export const addRecommendations = async (args: {
         const recommendation = await prisma.recommendation.create({
           data: {
             sourceId: recommendationSource.id,
-            type: "youtube",
+            type: clip.type,
             public: true,
             subQuery: {
               connect: {
