@@ -8,8 +8,8 @@
     "packages/*"
   ],
   "scripts": {
-    "_build": "cd packages/shared && tsc -b && cd ../cli && tsc -b && cd ../server && tsc -b && cd ../client && tsc -b",
-    "build": "cd packages/server && yarn build:prisma && cd ../../ && yarn _build",
+    "_build": "cd packages/shared && tsc -p tsconfig.json -b && cd ../cli && tsc -p tsconfig.json -b && cd ../server && tsc -p tsconfig.json -b && cd ../client && tsc -p tsconfig.json -b",
+    "build": "cd packages/server && yarn build:prisma && yarn build",
     "chat": "yarn workspace cli chat",
     "search": "yarn workspace cli search",
     "server": "yarn workspace ui server",
