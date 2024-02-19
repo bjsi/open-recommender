@@ -10,7 +10,7 @@ api: Optional[API] = None
 
 async def login():
     account_pool = await AccountsPool().load_from_file(
-        "accounts.txt", "username:password:email:email_password"
+        "../../../../accounts.txt", "username:password:email:email_password"
     )
     global api
     api = API(account_pool)
