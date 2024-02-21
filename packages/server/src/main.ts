@@ -15,6 +15,8 @@ import { publicRouter } from "./routers/publicRouter";
 import { Request, Response, NextFunction } from "express";
 import { z } from "zod";
 import { hashApiKey } from "./generateAPIKey";
+import { YouTubeRecommendation } from "shared/src/manual/YouTubeRecommendation";
+console.log(YouTubeRecommendation);
 import { UserModel } from "shared/src/schemas/User";
 import { apiKeyRouter } from "./routers/apiKeyRouter";
 import { addPipeline } from "./tasks/worker";
