@@ -1,14 +1,14 @@
 <h1 align="center">
     <img src="https://raw.githubusercontent.com/bjsi/open-recommender/main/img/logo.webp" alt="Open Recommender Logo" height="200">
     <br/>
-    Open Recommender - An open source, LLM-powered YouTube video recommendation system
+    Open Recommender - An open source AI-powered recommendation system for videos and articles
 </h1>
 
 <h3 align="center">⚠️ Work in Progress... ⚠️</h3>
 
 ## 🚀 Overview
 
-Welcome to Open Recommender, an open source AI-powered recommendation system.
+Welcome to Open Recommender, an open source AI-powered recommendation system for videos and articles.
 
 ## 🏆 Goals
 
