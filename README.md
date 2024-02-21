@@ -6,33 +6,20 @@
 
 <h3 align="center">⚠️ Work in Progress... ⚠️</h3>
 
-- [x] Build an MVP of the data pipeline
-- [x] Iterate on the prompts until 8/10 recommendations are good
-- [ ] Curate fine tune dataset
-- [ ] Create a website so people can sign up
-- [ ] Collect more fine tune data
-- [ ] Fine tune using [OpenPipe](https://openpipe.ai/)
-- [ ] Scale to more users
-- [ ] Add more recommendation sources (e.g. articles, twitters, books, etc.)
-- [ ] Scale to millions of users
-
-<br/>
-
 ## 🚀 Overview
 
-Welcome to Open Recommender, an open source recommendation system for YouTube. _See the video intro below_
-
-[![Video](https://img.youtube.com/vi/KbBwhuVpqC0/hqdefault.jpg)](https://www.youtube.com/watch?v=KbBwhuVpqC0)
+Welcome to Open Recommender, an open source AI-powered recommendation system.
 
 ## 🏆 Goals
 
-- Understand your current interests by analyzing your Twitter engagement (likes, retweets, etc.)
-- Create a large database of potentially interesting videos
+- Understand your current interests by analyzing things like your Twitter engagement (likes, retweets, etc.) and other data sources.
+- Search the web for interesting content to recommend to you
 - Recommend interesting sections from videos
 - Recommend "timeless" content rather than "trending" content
 - Surface "niche bangers" - difficult to find but really high quality content
 - Biased towards learning as opposed to entertainment
 - Read my blog post for more: [Building an LLM-Powered Open Source Recommendation System for YouTube](https://dev.to/experilearning/building-an-llm-powered-open-source-recommendation-system-40fg)
+- [Create a system that borrows the best elements from YouTube Shorts, TikTok and incremental reading to create something that feels as effortless and engaging as a queue of YouTube shorts but actually helps you make progress towards meaningful goals](https://experimentallearning.substack.com/p/from-spaced-repetition-systems-to)
 
 ## How to Run
 
@@ -40,42 +27,36 @@ Welcome to Open Recommender, an open source recommendation system for YouTube. _
 
 - `git clone` this repo
 - `cd open-recommender`
-- `npm i`
+- `yarn && yarn build`
 - `python3 -m venv env`
 - `source env/bin/activate`
 - `pip install -r requirements.txt`
 - Install [yt-dlp](https://github.com/yt-dlp/yt-dlp)
 - `cp .env.example .env` and fill in the values
-- You need to create a fake Twitter account and create an `accounts.txt` file in the `src/twitter` folder with the account's credentials in the format `username:password:email:email_password`.
-- `npm run main -u <twitter-username>` to run the full data pipeline
+- If you want to use Twitter as an input data source for recommendations, you need to create a fake Twitter account and create an `accounts.txt` file in the `src/twitter` folder with the account's credentials in the format `username:password:email:email_password`.
+
+### Running
+
+- `yarn server`
+- `yarn client`
+- `yarn worker`
+- Open up the web client and click the login button in the top right.
+- After logging in using Twitter this will automatically trigger a new recommendations pipeline run task for the worker.
+- You can monitor a recommendations pipeline run using by navigating to http://localhost:5173/#/admin. Make sure you set ADMIN="<Your Twitter Username>" in the server `.env` file.
+- After a run is finished you can view your queue of recommendations by navigating to your feed.
 
 ### Commands
-
-- `npm run main -u <twitter-username>` to run the full data pipeline.
-  - There are some other flags for re-running pipelines from a certain step, see `src/pipeline/main.ts`
-  - Pipeline runs are saved in `src/pipeline/runs`.
-  - This is really useful for debugging crashes or errors.
-- `npm run test-prompts <optional prompt name>` to test the AI prompts (see `aiTests.ts`)
-- `npm run yt:queries <twitter username>` to create a list of YouTube queries based on a user's twitter feed
-- `npm run yt:filter` to test the YouTube search result filter.
-- `npm run yt:search <query>` to test YouTube search
-- `npm run yt:transcript <optional videoId>` to test downloading and parsing YouTube transcripts
-- `npm run yt:chunk` to test chunking YouTube transcripts into clips
-- `npm run twitter:context` to test getting a user's bio and tweets
 
 ## 📚 How it Works
 
 A summary of the data pipeline:
 
 - Download a user's Twitter data (tweets, likes, retweets, etc.)
-- Create a list of search queries to find interesting YouTube videos based on the user's Twitter data
-- Search YouTube for videos based using the queries
-- Filter videos based on how relevant they are to the user
-- Download transcripts and chunk them into clips
-- Create a database of video chunks
-- Recommend videos to the user
-
-See more detailed working notes [here](https://www.remnote.com/a/YouTube-Recommender/655daa97d42611e86f8536ec)
+- Recursively summarize into a user profile
+- Generate search queries using the user's profile
+- Search for videos and articles based using the queries
+- Download transcripts and articles and chunk them into "clips"
+- Recommend the best clips to the user in clusters (like mini learning playlists)
 
 ## Papers and Blog Posts
 
