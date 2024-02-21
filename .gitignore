@@ -7,5 +7,14 @@ accounts.db
 __pycache__
 *.db
 dist
-.yarn/cache
 runs
+.DS_Store
+
+# https://yarnpkg.com/getting-started/qa#which-files-should-be-gitignored
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
