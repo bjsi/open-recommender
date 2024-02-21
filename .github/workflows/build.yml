@@ -1,0 +1,33 @@
+name: Build
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  # TODO: this needs to be set to a valid db for the build:prisma to work
+  DATABASE_URL: "postgres://todo"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [18.x]
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+    - name: Install yarn
+      run: npm install -g yarn
+    - name: Install deps
+      run: yarn install
+    - name: Generate prisma
+      run: cd packages/server && npx prisma generate
+    - name: Build
+      run: npm run _build
