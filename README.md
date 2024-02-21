@@ -42,7 +42,7 @@ Welcome to Open Recommender, an open source AI-powered recommendation system.
 - `yarn worker`
 - Open up the web client and click the login button in the top right.
 - After logging in using Twitter this will automatically trigger a new recommendations pipeline run task for the worker.
-- You can monitor a recommendations pipeline run using by navigating to http://localhost:5173/#/admin. Make sure you set ADMIN="<Your Twitter Username>" in the server `.env` file.
+- You can monitor a recommendations pipeline run using by navigating to http://localhost:5173/#/admin. Make sure you set ADMIN="Your Twitter Username" in the server `.env` file.
 - After a run is finished you can view your queue of recommendations by navigating to your feed.
 
 ### Commands
