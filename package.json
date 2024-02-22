@@ -10,11 +10,9 @@
   "scripts": {
     "_build": "cd packages/shared && tsc -b && cd ../cli && tsc -b && cd ../server && tsc -b && cd ../client && tsc -b",
     "build": "yarn workspace server build:prisma && yarn _build",
-    "chat": "yarn workspace cli chat",
-    "search": "yarn workspace cli search",
-    "server": "yarn workspace ui server",
-    "client": "yarn workspace ui client",
-    "start": "concurrently \"yarn client\" \"yarn server\""
+    "server": "yarn workspace server dev",
+    "client": "yarn workspace client dev",
+    "worker": "yarn workspace server worker"
   },
   "dependencies": {
     "dotenv": "^16.3.1",
