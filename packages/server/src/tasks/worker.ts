@@ -20,6 +20,7 @@ export const addPipeline = async <Name extends KeysWithoutBar<typeof taskList>>(
     runId: string;
   }
 ) => {
+  console.log("Adding pipeline", taskName, payload);
   const utils = await workerUtils();
   await prisma.pipelineRun.create({
     data: {

@@ -9,6 +9,7 @@ const customFetch = async (url: any, options: any) => {
       ...(options?.headers ?? {}),
     },
   };
+  console.log("fetching", url, enhancedOptions);
   return fetch(url, enhancedOptions);
 };
 

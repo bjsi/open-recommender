@@ -39,6 +39,7 @@ passport.use(
         });
 
         if (!user) {
+          console.log("Creating user", profile.username);
           user = await prisma.user.create({
             data: {
               twitterId: profile.id,
