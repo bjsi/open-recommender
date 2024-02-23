@@ -54,6 +54,8 @@ passport.use(
             runId: uuidv4(),
             emailResults: true,
           });
+        } else {
+          console.log("User already exists", profile.username);
         }
 
         return done(null, user);
