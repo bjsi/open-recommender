@@ -96,6 +96,7 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session()); // if using sessions
 // set up cors to allow us to accept requests from our client
+console.log("process.env.CLIENT_URL", process.env.CLIENT_URL);
 app.use(
   cors({
     origin: process.env.CLIENT_URL!, // allow to server to accept request from different origin
