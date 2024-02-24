@@ -8,7 +8,12 @@ import {
 } from "../lib/addRecomendations";
 import { getSavedTweetsForUser } from "../lib/tweets";
 import { workerUtils } from "../tasks/workerUtils";
-import { getPipelineJobByKey, getPipelineTaskJobById } from "../lib/jobsPrisma";
+import {
+  getGraphileJobs,
+  getPipelineJobByKey,
+  getPipelineTaskJobById,
+} from "../lib/jobsPrisma";
+import { indexBy } from "remeda";
 
 export const adminRouter = router({
   addRecommendations: publicProcedure
@@ -88,15 +93,25 @@ export const adminRouter = router({
       return user;
     }),
   getPipelinesAndTasks: publicProcedure.query(async ({ ctx }) => {
-    const pipelines = await prisma.pipelineRun.findMany({
-      include: {
-        tasks: {
-          include: {
-            logs: true,
+    const jobs = indexBy(await getGraphileJobs(), (x) => x.key || x.id);
+    const pipelines = (
+      await prisma.pipelineRun.findMany({
+        include: {
+          tasks: {
+            include: {
+              logs: true,
+            },
           },
         },
-      },
-    });
+      })
+    ).map((p) => ({
+      ...p,
+      tasks: p.tasks.map((t) => ({
+        ...t,
+        job: jobs[t.jobId],
+      })),
+      job: jobs[p.jobKeyId],
+    }));
     return pipelines;
   }),
   retryPipelineTask: publicProcedure
@@ -171,11 +186,13 @@ export const adminRouter = router({
       }
       const utils = await workerUtils();
       const pipelineJob = await getPipelineJobByKey(pipeline.jobKeyId);
-      const failed = await utils.permanentlyFailJobs([
-        pipelineJob.id.toString(),
-        ...pipeline.tasks.map((t) => t.jobId.toString()),
-      ]);
-      console.log("successfully failed jobs", failed);
+      if (pipelineJob) {
+        const failed = await utils.permanentlyFailJobs([
+          pipelineJob.id.toString(),
+          ...pipeline.tasks.map((t) => t.jobId.toString()),
+        ]);
+        console.log("successfully failed", failed.length, "jobs");
+      }
       await prisma.pipelineRun.delete({
         where: {
           id: input.id,

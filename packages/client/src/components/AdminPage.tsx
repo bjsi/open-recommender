@@ -31,7 +31,7 @@ export const AdminPage = () => {
 
     // Fetch data immediately and then set up the interval
     fetchData();
-    const interval = setInterval(fetchData, 2000);
+    const interval = setInterval(fetchData, 5000);
 
     // Clear interval on component unmount
     return () => clearInterval(interval);
@@ -59,13 +59,8 @@ export const AdminPage = () => {
               <span className="font-semibold">Username</span>
             </TableCell>
             <TableCell>
-              <span className="font-semibold">Created</span>
+              <span className="font-semibold">Created At</span>
             </TableCell>
-            {
-              // <TableCell>
-              //   <span className="font-semibold">Status</span>
-              // </TableCell>
-            }
             <TableCell>
               <span className="font-semibold">Tasks</span>
             </TableCell>
@@ -82,7 +77,9 @@ export const AdminPage = () => {
                   <TableCell component="th" scope="row">
                     {pipeline.username}
                   </TableCell>
-                  <TableCell>{dayjs(pipeline.createdAt).fromNow()}</TableCell>
+                  <TableCell>
+                    {dayjs(pipeline.createdAt).format("YY-MM-DD HH:mm:ss")}
+                  </TableCell>
                   {
                     //<TableCell>{pipeline.status}</TableCell>
                   }
@@ -118,7 +115,15 @@ export const AdminPage = () => {
                               <TableRow key={task.id}>
                                 <TableCell>{task.name}</TableCell>
                                 <TableCell>
-                                  {dayjs(task.createdAt).fromNow()}
+                                  {
+                                    // mins since pipeline created
+                                    "+" +
+                                      dayjs(task.createdAt).diff(
+                                        dayjs(pipeline.createdAt),
+                                        "minute"
+                                      ) +
+                                      " mins"
+                                  }
                                 </TableCell>
                                 <TableCell>
                                   {idx === 0 ? pipeline.status : task.status}
@@ -129,11 +134,7 @@ export const AdminPage = () => {
                                       {task.logs
                                         .filter((x) => x.level !== "debug")
                                         .map((log, idx) => (
-                                          <li key={idx}>
-                                            {dayjs(log.createdAt).fromNow()}
-                                            {" - "}
-                                            {log.log}
-                                          </li>
+                                          <li key={idx}>{log.log}</li>
                                         ))}
                                     </ul>
                                   )}

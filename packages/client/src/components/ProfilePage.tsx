@@ -6,6 +6,7 @@ import { RouterOutput, trpc } from "../lib/trpc";
 import {
   Avatar,
   Button,
+  Collapse,
   Paper,
   Table,
   TableBody,
@@ -13,10 +14,14 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  TextField,
   Tooltip,
+  Typography,
 } from "@mui/material";
 import * as _ from "remeda";
-import { OnboardingModal } from "./OnboardingModal";
+import dayjs from "dayjs";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 
 interface ProfilePageProps {
   auth: AuthInfo | undefined;
@@ -84,10 +89,7 @@ export function ProfilePage(props: ProfilePageProps) {
         setProfileForUser(response);
       });
   }, [props.auth, usernameForProfile]);
-  const [apiKey, setApiKey] = React.useState<{
-    loading: boolean;
-    data?: string;
-  }>();
+
   if (!props.auth?.authenticated) {
     return (
       <div>
@@ -100,7 +102,7 @@ export function ProfilePage(props: ProfilePageProps) {
   summaries?.forEach((summary) => {
     rows.push({
       createdAt: summary.createdAt,
-      type: "Summary of User",
+      type: "Twitter Summary",
       content: summary.content,
       useForRecommendations: summary.useForRecommendations,
     });
@@ -147,61 +149,26 @@ export function ProfilePage(props: ProfilePageProps) {
               {isFollowing ? "Unfollow" : "Follow"}
             </Button>
           </Tooltip>
-        ) : (
-          <>
-            {!apiKey ? (
-              <Button
-                disabled={!!apiKey}
-                variant="outlined"
-                onClick={async () => {
-                  setApiKey({ loading: true });
-                  const key = await trpc.getAPIKey.mutate();
-                  if (!key) {
-                    console.log("error getting api key");
-                    return;
-                  }
-                  setApiKey({ loading: false, data: key });
-                }}
-              >
-                Get API Key
-              </Button>
-            ) : (
-              <div>
-                Your API Key (
-                <OnboardingModal
-                  shouldOpen
-                  okayText="Ok"
-                  title="API Key"
-                  content="This is your API key. You can use it to upload custom recommendation inputs and get recommendations programmatically. It's like a password, so don't share it with anyone. It will only be shown once. If you lose your key or accidentally share it, create a new API key. You can paste this into the RemNote Incremental Everything plugin to interleave your recommendations with existing elements."
-                >
-                  <a>What is this?</a>
-                </OnboardingModal>
-                ): <pre>{apiKey.data}</pre>
-              </div>
-            )}
-          </>
-        )}
+        ) : null}
       </div>
       <br></br>
-      <div>This table summarizes recommendation inputs.</div>
+
+      <div className="flex items-center gap-2">
+        <TextField
+          id="outlined-basic"
+          label="Custom Query"
+          variant="outlined"
+        />
+        <Button variant="contained">Search</Button>
+      </div>
       <br></br>
-      {
-        <OnboardingModal
-          shouldOpen
-          okayText="Ok"
-          title="TODO: DM James :)"
-          content="Didn't get around to implementing yet, please DM me and I can upload for you! Supports any text. Ideally summarized into max 2k tokens. Will eventually have full API support for create/update/delete recommendation inputs."
-        >
-          <Button variant="outlined">Upload Custom Input</Button>
-        </OnboardingModal>
-      }
-      <br></br>
+      <h3>Recommendation Inputs</h3>
       <br></br>
       <TableContainer component={Paper}>
         <Table aria-label="simple table">
           <TableHead>
             <TableRow>
-              <TableCell>Created At</TableCell>
+              <TableCell>Date</TableCell>
               <TableCell>Type</TableCell>
               <TableCell>Content</TableCell>
               {viewingOwnProfile && <TableCell>Actions</TableCell>}
@@ -209,16 +176,58 @@ export function ProfilePage(props: ProfilePageProps) {
           </TableHead>
           <TableBody>
             {_.sortBy(rows, (x) => x.createdAt).map((row, idx) => (
-              <TableRow key={idx}>
-                <TableCell>{row.createdAt}</TableCell>
-                <TableCell>{row.type}</TableCell>
-                <TableCell>{row.content}</TableCell>
-                {viewingOwnProfile && <TableCell>Edit</TableCell>}
-              </TableRow>
+              <SummaryRow
+                key={idx}
+                row={row}
+                viewingOwnProfile={!!viewingOwnProfile}
+              />
             ))}
           </TableBody>
         </Table>
       </TableContainer>
     </div>
+  );
+}
+
+interface SummaryRowProps {
+  row: TableRow;
+  viewingOwnProfile: boolean;
+}
+
+function SummaryRow(props: SummaryRowProps) {
+  const { row, viewingOwnProfile } = props;
+  const [expanded, setExpanded] = React.useState(false);
+  return (
+    <TableRow>
+      <TableCell>{dayjs(row.createdAt).format("YY-MM-DD")}</TableCell>
+      <TableCell>{row.type}</TableCell>
+      <TableCell>
+        <Collapse
+          className="relative max-w-[600px]"
+          collapsedSize={200}
+          in={expanded}
+        >
+          <Typography>{row.content}</Typography>
+          <div
+            className="absolute right-0 -bottom-2"
+            onClick={() => {
+              setExpanded(!expanded);
+            }}
+          >
+            {expanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+          </div>
+        </Collapse>
+      </TableCell>
+      {viewingOwnProfile && (
+        <TableCell>
+          <div>{/* <Button>Edit</Button> */}</div>
+          <div>
+            <Button onClick={() => {}} variant="contained">
+              Get Recommendations
+            </Button>
+          </div>
+        </TableCell>
+      )}
+    </TableRow>
   );
 }

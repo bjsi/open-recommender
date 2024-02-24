@@ -223,7 +223,7 @@ model PipelineTaskLog {
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
   pipelineTaskId Int
-  pipelineTask   PipelineTask @relation(fields: [pipelineTaskId], references: [id])
+  pipelineTask   PipelineTask @relation(fields: [pipelineTaskId], references: [id], onDelete: Cascade)
   level          String
   log            String
 }

@@ -51,18 +51,7 @@ export function Homepage(props: HomepageProps) {
       </p>
       <br></br>
       <p></p>
-      <p>Changelog</p>
-      <ul className="list-disc list-inside">
-        <li>2024-01-21: Implement user profile and follower system.</li>
-        <li>2024-01-14: Add API.</li>
-        <li>2024-01-13: Add auth and server.</li>
-        <li>
-          2024-01-08: Integrate <a href="https://metaphor.systems/">metaphor</a>
-          .
-        </li>
-      </ul>
-      <br></br>
-      <p>Top Users:</p>
+      <p>Example Users:</p>
       <ul className="list-disc list-inside">
         {(users || []).map((user) => (
           <li key={user.username}>

@@ -4,6 +4,7 @@ import { logout } from "../lib/login";
 import { useNavigate } from "react-router-dom";
 import { z } from "zod";
 import { UserModel } from "shared/src/schemas/user";
+import { SettingsModal } from "./SettingsModal";
 
 interface AccountDropdownProps {
   user: z.infer<typeof UserModel>;
@@ -51,6 +52,9 @@ export const AccountDropdown = (props: AccountDropdownProps) => {
           }}
         >
           View Profile
+        </MenuItem>
+        <MenuItem>
+          <SettingsModal>API Key</SettingsModal>
         </MenuItem>
         <MenuItem onClick={handleLogout}>Logout</MenuItem>
       </Menu>

@@ -20,3 +20,23 @@ export async function getPipelineTaskJobById(id: string): Promise<{
   console.log("getPipelineTaskJobById", raw);
   return raw[0];
 }
+
+interface Job {
+  id: number;
+  queue_name: string | null;
+  task_identifier: string;
+  priority: number;
+  run_at: Date;
+  attempts: number;
+  max_attempts: number;
+  last_error: string | null;
+  created_at: Date;
+  updated_at: Date;
+  key: string | null;
+}
+
+export async function getGraphileJobs(): Promise<any[]> {
+  return await prisma.$queryRaw<any[]>(
+    Prisma.sql`SELECT * FROM graphile_worker.jobs`
+  );
+}
