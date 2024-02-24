@@ -6,6 +6,7 @@
   "dependencies": {
     "@prisma/client": "5.8.0",
     "@quixo3/prisma-session-store": "^3.1.13",
+    "aws-sdk": "^2.1565.0",
     "cookie-parser": "^1.4.6",
     "cookie-session": "^2.0.0",
     "cors": "^2.8.5",
@@ -33,6 +34,7 @@
     "typescript": "^5.2.2"
   },
   "scripts": {
+    "download-secrets": "npx tsx scripts/downloadSecrets.ts",
     "dev": "nodemon -x 'tsc -b && ts-node src/main.ts'",
     "start": "ts-node --transpile-only src/main.ts",
     "build": "yarn && npx prisma generate && npx prisma migrate deploy",
