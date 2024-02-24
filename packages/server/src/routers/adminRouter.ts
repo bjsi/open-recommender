@@ -123,7 +123,11 @@ export const adminRouter = router({
         runAt: new Date(),
         attempts: 0,
       });
-      console.log("rescheduled", xs);
+      if (xs.length === 0) {
+        console.log("no jobs rescheduled");
+      } else {
+        console.log("rescheduled job");
+      }
     }),
   cancelPipelineTask: publicProcedure
     .input(

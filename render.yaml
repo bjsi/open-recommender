@@ -47,6 +47,8 @@ services:
       paths:
         - packages/server/**/*.ts
         - packages/server/**/*.py
+        - packages/cli/**/*.ts
+        - packages/cli/**/*.py
     envVars:
       - key: SKIP_INSTALL_DEPS
         value: true

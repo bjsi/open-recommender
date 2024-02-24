@@ -139,7 +139,7 @@ export const AdminPage = () => {
                                   )}
                                 </TableCell>
                                 <TableCell>
-                                  {task.status === "failed" && (
+                                  {
                                     <Button
                                       onClick={() =>
                                         handleRetryTask(task.jobId)
@@ -148,7 +148,7 @@ export const AdminPage = () => {
                                     >
                                       Retry Now
                                     </Button>
-                                  )}
+                                  }
                                 </TableCell>
                               </TableRow>
                             ))}
