@@ -8,7 +8,7 @@
     "packages/*"
   ],
   "scripts": {
-    "_build": "cd packages/shared && tsc -b && cd ../cli && tsc -b && cd ../server && tsc -b && cd ../client && tsc -b",
+    "_build": "cd packages/shared && tsc -b && cd ../cli && tsc -b && cd ../server && tsc -b && cd ../client && tsc -b && yarn build",
     "build": "yarn workspace server build:prisma && yarn _build",
     "server": "yarn workspace server dev",
     "client": "yarn workspace client dev",
