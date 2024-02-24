@@ -1,7 +1,6 @@
 import asyncio
-from distutils.file_util import write_file
 import json
-from typing import Awaitable, Dict, List, Optional
+from typing import Awaitable, List, Optional
 from twscrape import API, gather, AccountsPool
 from contextlib import aclosing
 
@@ -9,9 +8,7 @@ api: Optional[API] = None
 
 
 async def login():
-    account_pool = await AccountsPool().load_from_file(
-        "../../../../accounts.txt", "username:password:email:email_password"
-    )
+    account_pool = await AccountsPool("../../../../accounts.db")
     global api
     api = API(account_pool)
     await api.pool.login_all()
