@@ -35,7 +35,6 @@ import { sendEmail } from "../lib/sendEmail";
 import { TranscriptClipWithScore } from "shared/src/manual/TranscriptClip";
 import { ArticleSnippetWithScore } from "shared/src/manual/ArticleSnippet";
 import { chunksToClips } from "cli/src/recommender/chunksToClips";
-import { format } from "path";
 
 type QueryWithSearchResultWithTranscript = {
   searchResults: (VideoResultWithTranscript | MetaphorArticleResult)[];

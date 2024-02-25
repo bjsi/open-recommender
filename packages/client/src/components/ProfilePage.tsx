@@ -8,6 +8,7 @@ import {
   Button,
   Collapse,
   Paper,
+  Snackbar,
   Table,
   TableBody,
   TableCell,
@@ -27,7 +28,8 @@ interface ProfilePageProps {
   auth: AuthInfo | undefined;
 }
 
-interface TableRow {
+interface SummaryRowData {
+  id: number;
   createdAt: string;
   type: string;
   content: string;
@@ -48,6 +50,8 @@ export function ProfilePage(props: ProfilePageProps) {
     React.useState<RouterOutput["getPublicUser"]>();
 
   const [isFollowing, setIsFollowing] = React.useState<boolean>(false);
+  const [requestingRecommendations, setRequestingRecommendations] =
+    React.useState(false);
 
   React.useEffect(() => {
     if (!props.auth?.authenticated) return;
@@ -98,9 +102,10 @@ export function ProfilePage(props: ProfilePageProps) {
     );
   }
 
-  const rows: TableRow[] = [];
+  const rows: SummaryRowData[] = [];
   summaries?.forEach((summary) => {
     rows.push({
+      id: summary.id,
       createdAt: summary.createdAt,
       type: "Twitter Summary",
       content: summary.content,
@@ -108,18 +113,26 @@ export function ProfilePage(props: ProfilePageProps) {
     });
   });
 
+  const [customQuery, setCustomQuery] = React.useState<string>("");
+  const [customQueryMessage, setCustomQueryMessage] =
+    React.useState<string>("");
+  const handleClose = () => {
+    setCustomQueryMessage("");
+  };
+
   if (!profileForUser) {
     return <div>Loading...</div>;
   }
 
-  profileForUser.following.forEach((follow) => {
-    rows.push({
-      createdAt: follow.createdAt,
-      type: "Following",
-      content: follow.user.username,
-      useForRecommendations: true,
-    });
-  });
+  // profileForUser.following.forEach((follow) => {
+  //   rows.push({
+  //     id: follow.id,
+  //     createdAt: follow.createdAt,
+  //     type: "Following",
+  //     content: follow.user.username,
+  //     useForRecommendations: true,
+  //   });
+  // });
 
   return (
     <div className="p-4">
@@ -153,14 +166,43 @@ export function ProfilePage(props: ProfilePageProps) {
       </div>
       <br></br>
 
-      <div className="flex items-center gap-2">
-        <TextField
-          id="outlined-basic"
-          label="Custom Query"
-          variant="outlined"
-        />
-        <Button variant="contained">Search</Button>
-      </div>
+      {viewingOwnProfile && (
+        <div className="flex items-center gap-2">
+          <TextField
+            disabled={requestingRecommendations}
+            id="outlined-basic"
+            label="Custom Query"
+            variant="outlined"
+            value={customQuery}
+            onChange={(e) => setCustomQuery(e.target.value)}
+          />
+          <Button
+            disabled={!customQuery || requestingRecommendations}
+            onClick={async () => {
+              setRequestingRecommendations(true);
+              const res = await trpc.requestRecommendations.mutate({
+                customQuery,
+              });
+              console.log(res);
+              if (res.type === "success") {
+                setCustomQueryMessage("Recommendations pipeline started");
+              } else {
+                setCustomQueryMessage(res.error);
+              }
+              setRequestingRecommendations(false);
+            }}
+            variant="contained"
+          >
+            Search
+          </Button>
+          <Snackbar
+            open={!!customQueryMessage}
+            autoHideDuration={6000}
+            onClose={handleClose}
+            message={customQueryMessage}
+          />
+        </div>
+      )}
       <br></br>
       <h3>Recommendation Inputs</h3>
       <br></br>
@@ -177,9 +219,12 @@ export function ProfilePage(props: ProfilePageProps) {
           <TableBody>
             {_.sortBy(rows, (x) => x.createdAt).map((row, idx) => (
               <SummaryRow
+                requestingRecommendations={requestingRecommendations}
+                setRequestingRecommendations={setRequestingRecommendations}
                 key={idx}
                 row={row}
                 viewingOwnProfile={!!viewingOwnProfile}
+                auth={props.auth}
               />
             ))}
           </TableBody>
@@ -190,12 +235,15 @@ export function ProfilePage(props: ProfilePageProps) {
 }
 
 interface SummaryRowProps {
-  row: TableRow;
+  row: SummaryRowData;
   viewingOwnProfile: boolean;
+  auth: AuthInfo | undefined;
+  requestingRecommendations: boolean;
+  setRequestingRecommendations: (value: boolean) => void;
 }
 
 function SummaryRow(props: SummaryRowProps) {
-  const { row, viewingOwnProfile } = props;
+  const { row, viewingOwnProfile, auth } = props;
   const [expanded, setExpanded] = React.useState(false);
   return (
     <TableRow>
@@ -218,16 +266,60 @@ function SummaryRow(props: SummaryRowProps) {
           </div>
         </Collapse>
       </TableCell>
-      {viewingOwnProfile && (
+      {viewingOwnProfile && auth?.authenticated && (
         <TableCell>
           <div>{/* <Button>Edit</Button> */}</div>
           <div>
-            <Button onClick={() => {}} variant="contained">
-              Get Recommendations
-            </Button>
+            <GetRecommendationsButton
+              setRequestingRecommendations={props.setRequestingRecommendations}
+              row={row}
+              auth={auth}
+            />
           </div>
         </TableCell>
       )}
     </TableRow>
+  );
+}
+
+interface GetRecommendationsButtonProps {
+  row: SummaryRowData;
+  auth: AuthInfo | undefined;
+  disabled?: boolean;
+  setRequestingRecommendations: (value: boolean) => void;
+}
+
+function GetRecommendationsButton(props: GetRecommendationsButtonProps) {
+  const [message, setMessage] = React.useState("");
+  const handleClose = () => {
+    setMessage("");
+  };
+  return (
+    <>
+      <Button
+        disabled={props.disabled}
+        onClick={async () => {
+          props.setRequestingRecommendations(true);
+          const res = await trpc.requestRecommendations.mutate({
+            summaryId: props.row.id,
+          });
+          if (res.type === "success") {
+            setMessage("Recommendations pipeline started");
+          } else {
+            setMessage(res.error);
+          }
+          props.setRequestingRecommendations(false);
+        }}
+        variant="contained"
+      >
+        Get Recommendations
+      </Button>
+      <Snackbar
+        open={!!message}
+        autoHideDuration={6000}
+        onClose={handleClose}
+        message={message}
+      />
+    </>
   );
 }

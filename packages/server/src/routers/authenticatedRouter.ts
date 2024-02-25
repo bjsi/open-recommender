@@ -3,6 +3,9 @@ import { router, publicProcedure } from "../trpc";
 import { z } from "zod";
 import { PublicUserModel } from "shared/src/manual/PublicUser";
 import { generateAPIKey } from "../generateAPIKey";
+import { addPipeline } from "../tasks/worker";
+import { randomUUID } from "crypto";
+import { getNumRunningPipelines } from "../lib/getNumRunningPipelines";
 
 export const authenticatedRouter = router({
   voteOnRecommendation: publicProcedure
@@ -326,4 +329,61 @@ export const authenticatedRouter = router({
     });
     return apiKey;
   }),
+
+  getNumRunningPipelines: publicProcedure.query(async ({ ctx }) => {
+    const user = await prisma.user.findUnique({
+      where: {
+        id: ctx.user?.id,
+      },
+    });
+    if (!user) {
+      return;
+    }
+    return await getNumRunningPipelines(user);
+  }),
+
+  requestRecommendations: publicProcedure
+    .input(
+      z.object({
+        summaryId: z.number().optional(),
+        customQuery: z.string().optional(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const authenticatedUser = await prisma.user.findUnique({
+        where: {
+          id: ctx.user?.id,
+        },
+      });
+      if (!authenticatedUser) {
+        return { type: "error" as const, error: "User not found" };
+      }
+
+      const numRunning = await getNumRunningPipelines(authenticatedUser);
+      if (numRunning && numRunning >= 2) {
+        return {
+          type: "error" as const,
+          error: "You can only have max 2 pipelines running at a time",
+        };
+      }
+
+      const summary = input.summaryId
+        ? await prisma.summary.findFirst({
+            where: {
+              userId: authenticatedUser.id,
+              id: input.summaryId,
+            },
+          })
+        : undefined;
+
+      const job = await addPipeline("twitter-pipeline-v1", {
+        username: authenticatedUser.username,
+        summary: summary?.content,
+        queries: input.customQuery ? [input.customQuery] : undefined,
+        runId: randomUUID(),
+        emailResults: true,
+      });
+
+      return { type: "success" as const };
+    }),
 });
