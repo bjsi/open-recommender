@@ -8,7 +8,7 @@ api: Optional[API] = None
 
 
 async def login():
-    account_pool = await AccountsPool("../../../../accounts.db")
+    account_pool = AccountsPool("../../../../accounts.db")
     global api
     api = API(account_pool)
     await api.pool.login_all()
