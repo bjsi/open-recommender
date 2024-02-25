@@ -123,3 +123,9 @@ export async function startWorker() {
     }
   });
 }
+
+if (require.main === module) {
+  (async () => {
+    await startWorker();
+  })();
+}
