@@ -56,11 +56,6 @@ passport.use(
             runId: uuidv4(),
             emailResults: true,
           });
-
-          // add a cron job to run the pipeline every 24 hours
-          await 
-
-
         } else {
           console.log("User already exists", profile.username);
         }
