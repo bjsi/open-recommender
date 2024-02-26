@@ -9,7 +9,7 @@ import { articleSnippetSchema } from "shared/src/manual/ArticleSnippet";
 
 export const addRecommendationSchema = z.object({
   username: z.string(),
-  summary: z.string(),
+  summary: z.string().optional(),
   clips: z.record(
     z.record(z.union([transcriptClipSchema, articleSnippetSchema]).array())
   ),
@@ -23,20 +23,23 @@ export const addRecommendations = async (args: {
 }) => {
   const { input, user } = args;
   // create summary
-  const summary = await prisma.summary.create({
-    data: {
-      content: input.summary,
-      public: true,
-      userId: user.id,
-    },
-  });
+  const summary = input.summary
+    ? await prisma.summary.create({
+        data: {
+          content: input.summary,
+          public: true,
+          userId: user.id,
+        },
+      })
+    : undefined;
 
   for (const [query, clusters] of Object.entries(input.clips)) {
     const queryObject = await prisma.query.create({
       data: {
         text: query,
-        summaryId: summary.id,
+        summaryId: summary?.id,
         public: true,
+        userId: user.id,
       },
     });
     for (const [subquery, clips] of Object.entries(clusters)) {

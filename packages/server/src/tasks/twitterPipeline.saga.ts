@@ -59,11 +59,14 @@ export const twitterPipeline = new Saga(
   {
     async beforeEnqueueStage(initialPayload, step, helpers) {
       helpers.logInfo(`Beginning step ${step.name}`);
-      const pipeline = (await prisma.pipelineRun.findUnique({
+      const pipeline = await prisma.pipelineRun.findUnique({
         where: {
           jobKeyId: initialPayload.runId,
         },
-      }))!;
+      });
+      if (!pipeline) {
+        throw new Error("Pipeline not found");
+      }
 
       const existingTask = await prisma.pipelineTask.findFirst({
         where: {
@@ -168,9 +171,10 @@ export const twitterPipeline = new Saga(
       helpers.logInfo(`Summarizing tweets for Twitter user @${username}`);
       const api = getTwitterAPISingleton();
       const twitterUser = await getUserProfile(api, username);
-      if (initialPayload.summary) {
-        helpers.logInfo("Using existing summary, skipping summary");
-        helpers.logDebug(initialPayload.summary);
+      if (initialPayload.summary || initialPayload.queries) {
+        helpers.logInfo(
+          "Using existing summary or custom queries, skipping summary"
+        );
         return {
           profile: initialPayload.summary,
           twitterUser,
@@ -209,7 +213,7 @@ export const twitterPipeline = new Saga(
             runId: initialPayload.runId,
             user: initialPayload.username,
           }),
-          profile: priorResults["summarize-tweets"].profile,
+          profile: priorResults["summarize-tweets"].profile!,
           bio:
             priorResults["summarize-tweets"].twitterUser?.rawDescription || "",
           user: initialPayload.username,
@@ -571,6 +575,7 @@ export const twitterPipeline = new Saga(
               str += `</ul>`;
             }
           }
+          return str;
         };
 
         await sendEmail(

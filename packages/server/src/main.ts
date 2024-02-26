@@ -49,11 +49,18 @@ passport.use(
               profile_image_url: profile._json.profile_image_url,
             },
           });
+
+          // add an initial recommendations pipeline
           await addPipeline("twitter-pipeline-v1", {
             username: user.username,
             runId: uuidv4(),
             emailResults: true,
           });
+
+          // add a cron job to run the pipeline every 24 hours
+          await 
+
+
         } else {
           console.log("User already exists", profile.username);
         }

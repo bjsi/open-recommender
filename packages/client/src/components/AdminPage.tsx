@@ -4,6 +4,7 @@ import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import {
   Button,
+  Collapse,
   Paper,
   Table,
   TableBody,
@@ -37,16 +38,6 @@ export const AdminPage = () => {
     return () => clearInterval(interval);
   }, [force]);
 
-  const handleRetryTask = async (taskId: string) => {
-    await trpcAdmin.retryPipelineTask.mutate({ id: taskId });
-    setForce((prev) => prev + 1);
-  };
-
-  const handleDeletePipeline = async (pipelineId: number) => {
-    await trpcAdmin.deletePipeline.mutate({ id: pipelineId });
-    setForce((prev) => prev + 1);
-  };
-
   if (!pipelines) {
     return <div>Loading...</div>;
   }
@@ -72,102 +63,11 @@ export const AdminPage = () => {
         <TableBody>
           {sortBy(pipelines, (x) => dayjs(x.createdAt).valueOf()).map(
             (pipeline) => (
-              <React.Fragment key={pipeline.id}>
-                <TableRow>
-                  <TableCell component="th" scope="row">
-                    {pipeline.username}
-                  </TableCell>
-                  <TableCell>
-                    {dayjs(pipeline.createdAt).format("YY-MM-DD HH:mm:ss")}
-                  </TableCell>
-                  {
-                    //<TableCell>{pipeline.status}</TableCell>
-                  }
-                  <TableCell>
-                    {pipeline.tasks.length === 0 ? (
-                      "No tasks"
-                    ) : (
-                      <TableContainer component={Paper}>
-                        <Table aria-label="tasks table">
-                          <TableHead>
-                            <TableRow>
-                              <TableCell>
-                                <span className="font-semibold">Stage</span>
-                              </TableCell>
-                              <TableCell>
-                                <span className="font-semibold">Created</span>
-                              </TableCell>
-                              <TableCell>
-                                <span className="font-semibold">Status</span>
-                              </TableCell>
-                              <TableCell>
-                                <span className="font-semibold">Logs</span>
-                              </TableCell>
-                              <TableCell>
-                                <span className="font-semibold">Actions</span>
-                              </TableCell>
-                            </TableRow>
-                          </TableHead>
-                          <TableBody>
-                            {sortBy(pipeline.tasks, (x) =>
-                              dayjs(x.createdAt).valueOf()
-                            ).map((task, idx) => (
-                              <TableRow key={task.id}>
-                                <TableCell>{task.name}</TableCell>
-                                <TableCell>
-                                  {
-                                    // mins since pipeline created
-                                    "+" +
-                                      dayjs(task.createdAt).diff(
-                                        dayjs(pipeline.createdAt),
-                                        "minute"
-                                      ) +
-                                      " mins"
-                                  }
-                                </TableCell>
-                                <TableCell>
-                                  {idx === 0 ? pipeline.status : task.status}
-                                </TableCell>
-                                <TableCell>
-                                  {task.logs.length > 0 && (
-                                    <ul>
-                                      {task.logs
-                                        .filter((x) => x.level !== "debug")
-                                        .map((log, idx) => (
-                                          <li key={idx}>{log.log}</li>
-                                        ))}
-                                    </ul>
-                                  )}
-                                </TableCell>
-                                <TableCell>
-                                  {
-                                    <Button
-                                      onClick={() =>
-                                        handleRetryTask(task.jobId)
-                                      }
-                                      color="primary"
-                                    >
-                                      Retry Now
-                                    </Button>
-                                  }
-                                </TableCell>
-                              </TableRow>
-                            ))}
-                          </TableBody>
-                        </Table>
-                      </TableContainer>
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    <Button
-                      onClick={() => handleDeletePipeline(pipeline.id)}
-                      color="error"
-                    >
-                      Delete
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              </React.Fragment>
+              <PipelineRow
+                key={pipeline.id}
+                pipeline={pipeline}
+                setForce={setForce}
+              />
             )
           )}
         </TableBody>
@@ -175,3 +75,140 @@ export const AdminPage = () => {
     </TableContainer>
   );
 };
+
+interface TasksTableProps {
+  tasks: AdminRouterOutput["getPipelinesAndTasks"][0]["tasks"];
+  pipeline: AdminRouterOutput["getPipelinesAndTasks"][0];
+  setForce: React.Dispatch<React.SetStateAction<number>>;
+  expanded: boolean;
+}
+
+function TasksTable(props: TasksTableProps) {
+  const { tasks } = props;
+  const handleRetryTask = async (taskId: string) => {
+    await trpcAdmin.retryPipelineTask.mutate({ id: taskId });
+    props.setForce((prev) => prev + 1);
+  };
+
+  return (
+    <Collapse collapsedSize={100} in={props.expanded}>
+      <TableContainer component={Paper}>
+        <Table aria-label="tasks table">
+          <TableHead>
+            <TableRow>
+              <TableCell>
+                <span className="font-semibold">Stage</span>
+              </TableCell>
+              <TableCell>
+                <span className="font-semibold">Created</span>
+              </TableCell>
+              <TableCell>
+                <span className="font-semibold">Status</span>
+              </TableCell>
+              <TableCell>
+                <span className="font-semibold">Logs</span>
+              </TableCell>
+              <TableCell>
+                <span className="font-semibold">Actions</span>
+              </TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {sortBy(tasks, (x) => dayjs(x.createdAt).valueOf()).map(
+              (task, idx) => (
+                <TableRow key={task.id}>
+                  <TableCell>{task.name}</TableCell>
+                  <TableCell>
+                    {
+                      // mins since pipeline created
+                      "+" +
+                        dayjs(task.createdAt).diff(
+                          dayjs(props.pipeline.createdAt),
+                          "minute"
+                        ) +
+                        " mins"
+                    }
+                  </TableCell>
+                  <TableCell>
+                    {idx === 0 ? props.pipeline.status : task.status}
+                  </TableCell>
+                  <TableCell>
+                    {task.logs.length > 0 && (
+                      <ul>
+                        {task.logs
+                          .filter((x) => x.level !== "debug")
+                          .map((log, idx) => (
+                            <li key={idx}>{log.log}</li>
+                          ))}
+                      </ul>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    {
+                      <Button
+                        onClick={() => handleRetryTask(task.jobId)}
+                        color="primary"
+                      >
+                        Retry Now
+                      </Button>
+                    }
+                  </TableCell>
+                </TableRow>
+              )
+            )}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    </Collapse>
+  );
+}
+
+interface PipelineRowProps {
+  pipeline: AdminRouterOutput["getPipelinesAndTasks"][0];
+  setForce: React.Dispatch<React.SetStateAction<number>>;
+}
+
+function PipelineRow(props: PipelineRowProps) {
+  const [expanded, setExpanded] = useState(false);
+  const { pipeline, setForce } = props;
+  const handleDeletePipeline = async (pipelineId: number) => {
+    await trpcAdmin.deletePipeline.mutate({ id: pipelineId });
+    setForce((prev) => prev + 1);
+  };
+  return (
+    <TableRow
+      className="cursor-pointer"
+      onClick={() => {
+        setExpanded((prev) => !prev);
+      }}
+      key={pipeline.id}
+    >
+      <TableCell component="th" scope="row">
+        {pipeline.username}
+      </TableCell>
+      <TableCell>
+        {dayjs(pipeline.createdAt).format("YY-MM-DD HH:mm:ss")}
+      </TableCell>
+      {
+        //<TableCell>{pipeline.status}</TableCell>
+      }
+      <TableCell>
+        {pipeline.tasks.length === 0 ? (
+          "No tasks"
+        ) : (
+          <TasksTable
+            expanded={expanded}
+            pipeline={pipeline}
+            setForce={setForce}
+            tasks={pipeline.tasks}
+          />
+        )}
+      </TableCell>
+      <TableCell>
+        <Button onClick={() => handleDeletePipeline(pipeline.id)} color="error">
+          Delete
+        </Button>
+      </TableCell>
+    </TableRow>
+  );
+}

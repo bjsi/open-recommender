@@ -21,14 +21,18 @@ export function WhyRecommendedModal(props: WhyRecommendedModalProps) {
             Open Recommender created this summary of your interests based on
             your recent Tweets and any custom data you uploaded to your profile.
           </div>
-          <Card
-            className={clsx("border border-solid")}
-            onClick={() => setExpanded(!expanded)}
-          >
-            <Collapse collapsedSize={100} in={expanded}>
-              <Typography>{props.video.queries[0].summary.content}</Typography>
-            </Collapse>
-          </Card>
+          {props.video.queries[0].summary && (
+            <Card
+              className={clsx("border border-solid")}
+              onClick={() => setExpanded(!expanded)}
+            >
+              <Collapse collapsedSize={100} in={expanded}>
+                <Typography>
+                  {props.video.queries[0].summary.content}
+                </Typography>
+              </Collapse>
+            </Card>
+          )}
           <div>
             Open Recommender generated this search query based on your
             interests:

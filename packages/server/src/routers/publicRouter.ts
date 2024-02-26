@@ -58,7 +58,7 @@ export const publicRouter = router({
       });
       const queriesAndSummaries = raw
         .flatMap((rec) => rec.recommendation.source.queries.map((q) => q.query))
-        .filter((q) => q.summary.userId === user.id);
+        .filter((q) => q.userId === user.id);
       const validated = raw.map((rec) => ({
         ...rec,
         recommendation: {

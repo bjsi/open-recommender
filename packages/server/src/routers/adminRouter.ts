@@ -13,7 +13,7 @@ import {
   getPipelineJobByKey,
   getPipelineTaskJobById,
 } from "../lib/jobsPrisma";
-import { indexBy } from "remeda";
+import { indexBy, omit } from "remeda";
 
 export const adminRouter = router({
   addRecommendations: publicProcedure
@@ -108,9 +108,10 @@ export const adminRouter = router({
       ...p,
       tasks: p.tasks.map((t) => ({
         ...t,
-        job: jobs[t.jobId],
+        // bigint
+        job: jobs[t.jobId] ? omit(jobs[t.jobId], ["id"]) : null,
       })),
-      job: jobs[p.jobKeyId],
+      job: jobs[p.jobKeyId] ? omit(jobs[p.jobKeyId], ["id"]) : null,
     }));
     return pipelines;
   }),
@@ -164,7 +165,8 @@ export const adminRouter = router({
         throw new Error("job not found");
       }
       const utils = await workerUtils();
-      await utils.permanentlyFailJobs([job.id.toString()]);
+      const x = await utils.permanentlyFailJobs([job.id.toString()]);
+      console.log("successfully failed", x.length, "jobs");
     }),
   deletePipeline: publicProcedure
     .input(

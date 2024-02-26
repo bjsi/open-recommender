@@ -1,11 +1,5 @@
-import {
-  CandidatePrompt,
-  ChatMessage,
-  toCamelCase,
-} from "prompt-iteration-assistant";
+import { CandidatePrompt, ChatMessage } from "prompt-iteration-assistant";
 import { FindStartOfAnswerInput } from "../schemas/findStartOfAnswerOutputSchema";
-import { FIND_START_OF_ANSWER as FIND_START_OF_ANSWER } from "../findStartOfAnswer";
-import { FindStartOfAnswerOutput } from "../schemas/findStartOfAnswerInputSchema";
 
 export const findStartOfAnswerPrompt =
   new CandidatePrompt<FindStartOfAnswerInput>({
@@ -18,7 +12,7 @@ export const findStartOfAnswerPrompt =
 - Given a question from the user, evalutate whether the beginning of the answer is in the text.
 - If the beginning of the answer is in the text, quote the beginning of the answer.
 - The answer doesn't need to be complete, just the start of it.
-- Quote the beginning of the answer directly from the text.
+- Quote the beginning of the answer directly from the text as a JSON string, escaping any literal control characters.
 `.trim()
         ),
         //         ChatMessage.user(
@@ -54,6 +48,7 @@ export const findStartOfAnswerPrompt =
           `
 # Text
 ${this.getVariable("text")}
+
 # Question
 ${this.getVariable("question")}
 `.trim()

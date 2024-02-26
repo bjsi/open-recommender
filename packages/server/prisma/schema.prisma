@@ -38,6 +38,7 @@ model User {
   notes             Note[]
   followers         Follow[]             @relation("Followed")
   following         Follow[]             @relation("Follower")
+  queries           Query[]
 }
 
 model Tweet {
@@ -68,14 +69,16 @@ model Summary {
 
 model Query {
   id                    Int                           @id @default(autoincrement())
-  summaryId             Int
-  summary               Summary                       @relation(fields: [summaryId], references: [id], onDelete: Cascade)
+  summaryId             Int?
+  summary               Summary?                      @relation(fields: [summaryId], references: [id], onDelete: Cascade)
   text                  String
   createdAt             DateTime                      @default(now())
   updatedAt             DateTime                      @updatedAt
   public                Boolean
   recommendationSources QueryToRecommendationSource[]
   subQueries            SubQuery[]
+  userId                Int
+  user                  User                          @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 enum RecommendationType {

@@ -22,6 +22,7 @@ async function main() {
   await prisma.pipelineTaskLog.deleteMany();
   await prisma.pipelineTask.deleteMany();
   await prisma.pipelineRun.deleteMany();
+  await prisma.query.deleteMany();
 }
 main()
   .catch((e) => {

@@ -1,0 +1,1 @@
+export const MAX_RUNNING_PIPELINES_PER_USER = 2;

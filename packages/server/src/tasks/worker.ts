@@ -1,4 +1,4 @@
-import { Logger, TaskList, run } from "graphile-worker";
+import { Logger, TaskList, parseCronItem, run } from "graphile-worker";
 import dotenv from "dotenv";
 import { workerUtils } from "./workerUtils";
 import { prisma } from "../db";
@@ -6,6 +6,10 @@ import { TaskStatus } from "@prisma/client";
 import { twitterPipeline } from "./twitterPipeline.saga";
 import { KeysWithoutBar, TaskNamePayloadMaps } from "./saga";
 import { defaultLogger } from "graphile-worker/dist/logger";
+import { getNumRunningPipelines } from "../lib/getNumRunningPipelines";
+import { MAX_RUNNING_PIPELINES_PER_USER } from "./consts";
+import { v4 as uuidv4 } from "uuid";
+import { shuffle } from "remeda";
 
 dotenv.config();
 
@@ -13,14 +17,14 @@ const taskList = {
   ...twitterPipeline.getTaskList(),
 } as const;
 
-export const addPipeline = async <Name extends KeysWithoutBar<typeof taskList>>(
+export async function addPipeline<Name extends KeysWithoutBar<typeof taskList>>(
   taskName: Name,
   payload: TaskNamePayloadMaps<typeof taskList>[Name] & {
     username: string;
     runId: string;
     runAt?: Date;
   }
-) => {
+) {
   console.log("Adding pipeline", taskName, payload);
   const utils = await workerUtils();
   await prisma.pipelineRun.create({
@@ -34,12 +38,42 @@ export const addPipeline = async <Name extends KeysWithoutBar<typeof taskList>>(
     runAt: payload.runAt,
   });
   return job;
+}
+
+// iterate over all users
+// for each user, check if they have < max pipelines
+// if they have < max pipelines, add a pipeline to get recommendations
+export const addPipelineCronJob = {
+  id: "recurring-add-pipeline-cron",
+  handler: async () => {
+    const users = shuffle(await prisma.user.findMany());
+    for (const user of users) {
+      const numActivePipelines = await getNumRunningPipelines(user);
+      if (
+        !numActivePipelines ||
+        numActivePipelines < MAX_RUNNING_PIPELINES_PER_USER
+      ) {
+        await addPipeline("twitter-pipeline-v1", {
+          username: user.username,
+          runId: uuidv4(),
+          emailResults: true,
+        });
+      }
+    }
+  },
 };
 
 const consoleLogger = defaultLogger;
 
 export async function startWorker() {
   const runner = await run({
+    parsedCronItems: [
+      parseCronItem({
+        task: addPipelineCronJob.id,
+        // every 24 hrs
+        match: "0 0 * * *",
+      }),
+    ],
     concurrency: 2,
     noHandleSignals: false,
     pollInterval: 2000,

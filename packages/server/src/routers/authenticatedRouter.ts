@@ -4,8 +4,8 @@ import { z } from "zod";
 import { PublicUserModel } from "shared/src/manual/PublicUser";
 import { generateAPIKey } from "../generateAPIKey";
 import { addPipeline } from "../tasks/worker";
-import { randomUUID } from "crypto";
 import { getNumRunningPipelines } from "../lib/getNumRunningPipelines";
+import { v4 as uuidv4 } from "uuid";
 
 export const authenticatedRouter = router({
   voteOnRecommendation: publicProcedure
@@ -380,7 +380,7 @@ export const authenticatedRouter = router({
         username: authenticatedUser.username,
         summary: summary?.content,
         queries: input.customQuery ? [input.customQuery] : undefined,
-        runId: randomUUID(),
+        runId: uuidv4(),
         emailResults: true,
       });
 
