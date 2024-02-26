@@ -13,8 +13,32 @@ import { shuffle } from "remeda";
 
 dotenv.config();
 
+// iterate over all users
+// for each user, check if they have < max pipelines
+// if they have < max pipelines, add a pipeline to get recommendations
+export const addPipelineCronJob = {
+  id: "recurring-add-pipeline-cron",
+  handler: async () => {
+    const users = shuffle(await prisma.user.findMany());
+    for (const user of users) {
+      const numActivePipelines = await getNumRunningPipelines(user);
+      if (
+        !numActivePipelines ||
+        numActivePipelines < MAX_RUNNING_PIPELINES_PER_USER
+      ) {
+        await addPipeline("twitter-pipeline-v1", {
+          username: user.username,
+          runId: uuidv4(),
+          emailResults: true,
+        });
+      }
+    }
+  },
+};
+
 const taskList = {
   ...twitterPipeline.getTaskList(),
+  [addPipelineCronJob.id]: addPipelineCronJob,
 } as const;
 
 export async function addPipeline<Name extends KeysWithoutBar<typeof taskList>>(
@@ -39,29 +63,6 @@ export async function addPipeline<Name extends KeysWithoutBar<typeof taskList>>(
   });
   return job;
 }
-
-// iterate over all users
-// for each user, check if they have < max pipelines
-// if they have < max pipelines, add a pipeline to get recommendations
-export const addPipelineCronJob = {
-  id: "recurring-add-pipeline-cron",
-  handler: async () => {
-    const users = shuffle(await prisma.user.findMany());
-    for (const user of users) {
-      const numActivePipelines = await getNumRunningPipelines(user);
-      if (
-        !numActivePipelines ||
-        numActivePipelines < MAX_RUNNING_PIPELINES_PER_USER
-      ) {
-        await addPipeline("twitter-pipeline-v1", {
-          username: user.username,
-          runId: uuidv4(),
-          emailResults: true,
-        });
-      }
-    }
-  },
-};
 
 const consoleLogger = defaultLogger;
 
