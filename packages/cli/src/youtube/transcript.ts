@@ -53,6 +53,9 @@ export async function fetchTranscript(
   // search for file similar to ${id}.en-ehkg1hFWq8A.vtt
   // the other id is a random code
   // match using regex
+  if (!existsSync(dataFolder)) {
+    execSync(`mkdir -p ${dataFolder}`);
+  }
   const files = readdirSync(dataFolder);
   let transcriptFile = files.find((x) => x.startsWith(videoId));
   try {
