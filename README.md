@@ -31,7 +31,6 @@ Welcome to Open Recommender, an open source AI-powered recommendation system for
 - `python3 -m venv env`
 - `source env/bin/activate`
 - `pip install -r requirements.txt`
-- Install [yt-dlp](https://github.com/yt-dlp/yt-dlp)
 - In the client, server and cli packages, `cp .env.example .env` and fill in the values
 - If you want to use Twitter as an input data source for recommendations, you need to create a fake Twitter account and create an `accounts.txt` file in the root folder with the account's credentials in the format `username:password:email:email_password`.
 
