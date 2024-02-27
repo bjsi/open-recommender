@@ -146,7 +146,10 @@ function TasksTable(props: TasksTableProps) {
                   <TableCell>
                     {
                       <Button
-                        onClick={() => handleRetryTask(task.jobId)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleRetryTask(task.jobId);
+                        }}
                         color="primary"
                       >
                         Retry Now
