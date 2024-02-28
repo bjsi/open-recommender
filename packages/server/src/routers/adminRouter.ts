@@ -212,6 +212,6 @@ export const adminRouter = router({
     const utils = await workerUtils();
     const workerIds = await getRunningWorkerIds();
     await utils.forceUnlockWorkers(workerIds);
-    console.log("attempted to unlock workers");
+    console.log("attempted to unlock workers", workerIds);
   }),
 });
