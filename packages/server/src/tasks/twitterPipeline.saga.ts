@@ -269,7 +269,7 @@ export const twitterPipeline = new Saga(
             searchResults: results,
           };
         }),
-        { concurrency: 2 }
+        { concurrency: 4 }
       );
 
       const metaphorYouTubeResults = await pAll(
