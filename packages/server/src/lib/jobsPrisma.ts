@@ -44,7 +44,9 @@ export async function getGraphileJobs(): Promise<any[]> {
 
 export async function getRunningWorkerIds(): Promise<string[]> {
   // unique list of locked_by ids
-  return await prisma.$queryRaw<string[]>(
-    Prisma.sql`SELECT DISTINCT locked_by FROM graphile_worker.jobs`
-  );
+  return (
+    await prisma.$queryRaw<{ locked_by: string }[]>(
+      Prisma.sql`SELECT DISTINCT locked_by FROM graphile_worker.jobs`
+    )
+  ).map((x) => x.locked_by);
 }
