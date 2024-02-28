@@ -33,10 +33,18 @@ interface Job {
   created_at: Date;
   updated_at: Date;
   key: string | null;
+  locked_by: string | null;
 }
 
 export async function getGraphileJobs(): Promise<any[]> {
   return await prisma.$queryRaw<any[]>(
     Prisma.sql`SELECT * FROM graphile_worker.jobs`
+  );
+}
+
+export async function getRunningWorkerIds(): Promise<string[]> {
+  // unique list of locked_by ids
+  return await prisma.$queryRaw<string[]>(
+    Prisma.sql`SELECT DISTINCT locked_by FROM graphile_worker.jobs`
   );
 }

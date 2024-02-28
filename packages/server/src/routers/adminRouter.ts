@@ -12,6 +12,7 @@ import {
   getGraphileJobs,
   getPipelineJobByKey,
   getPipelineTaskJobById,
+  getRunningWorkerIds,
 } from "../lib/jobsPrisma";
 import { indexBy, omit } from "remeda";
 
@@ -206,4 +207,11 @@ export const adminRouter = router({
         },
       });
     }),
+
+  unlockWorkers: publicProcedure.mutation(async () => {
+    const utils = await workerUtils();
+    const workerIds = await getRunningWorkerIds();
+    await utils.forceUnlockWorkers(workerIds);
+    console.log("attempted to unlock workers");
+  }),
 });

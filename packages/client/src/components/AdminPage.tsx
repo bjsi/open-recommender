@@ -42,37 +42,42 @@ export const AdminPage = () => {
     return <div>Loading...</div>;
   }
   return (
-    <TableContainer component={Paper}>
-      <Table aria-label="pipelines table">
-        <TableHead>
-          <TableRow>
-            <TableCell>
-              <span className="font-semibold">Username</span>
-            </TableCell>
-            <TableCell>
-              <span className="font-semibold">Created At</span>
-            </TableCell>
-            <TableCell>
-              <span className="font-semibold">Tasks</span>
-            </TableCell>
-            <TableCell>
-              <span className="font-semibold">Actions</span>
-            </TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {sortBy(pipelines, (x) => dayjs(x.createdAt).valueOf()).map(
-            (pipeline) => (
-              <PipelineRow
-                key={pipeline.id}
-                pipeline={pipeline}
-                setForce={setForce}
-              />
-            )
-          )}
-        </TableBody>
-      </Table>
-    </TableContainer>
+    <>
+      <Button onClick={() => trpcAdmin.unlockWorkers.mutate()}>
+        Force unlock workers
+      </Button>
+      <TableContainer component={Paper}>
+        <Table aria-label="pipelines table">
+          <TableHead>
+            <TableRow>
+              <TableCell>
+                <span className="font-semibold">Username</span>
+              </TableCell>
+              <TableCell>
+                <span className="font-semibold">Created At</span>
+              </TableCell>
+              <TableCell>
+                <span className="font-semibold">Tasks</span>
+              </TableCell>
+              <TableCell>
+                <span className="font-semibold">Actions</span>
+              </TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {sortBy(pipelines, (x) => dayjs(x.createdAt).valueOf()).map(
+              (pipeline) => (
+                <PipelineRow
+                  key={pipeline.id}
+                  pipeline={pipeline}
+                  setForce={setForce}
+                />
+              )
+            )}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    </>
   );
 };
 

@@ -1,4 +1,10 @@
-import { Logger, TaskList, parseCronItem, run } from "graphile-worker";
+import {
+  JobHelpers,
+  Logger,
+  TaskList,
+  parseCronItem,
+  run,
+} from "graphile-worker";
 import dotenv from "dotenv";
 import { workerUtils } from "./workerUtils";
 import { prisma } from "../db";
@@ -18,7 +24,7 @@ dotenv.config();
 // if they have < max pipelines, add a pipeline to get recommendations
 export const addPipelineCronJob = {
   id: "recurring-add-pipeline-cron",
-  handler: async () => {
+  handler: async (_: any, helpers: JobHelpers) => {
     const users = shuffle(await prisma.user.findMany());
     for (const user of users) {
       const numActivePipelines = await getNumRunningPipelines(user);
@@ -31,6 +37,14 @@ export const addPipelineCronJob = {
           runId: uuidv4(),
           emailResults: true,
         });
+      } else {
+        helpers.logger.info(
+          "Skipping user " +
+            user.username +
+            " as they have " +
+            numActivePipelines +
+            " active pipelines"
+        );
       }
     }
   },
@@ -100,6 +114,7 @@ export async function startWorker() {
     taskList: taskList as TaskList,
     connectionString: process.env.DATABASE_URL,
   });
+
   const getTaskOrPipeline = async (jobOrKeyId: string) => {
     const pipeline = await prisma.pipelineRun.findFirst({
       where: { jobKeyId: jobOrKeyId },
