@@ -38,7 +38,7 @@ export const addPipelineCronJob = {
 
 const taskList = {
   ...twitterPipeline.getTaskList(),
-  [addPipelineCronJob.id]: addPipelineCronJob,
+  [addPipelineCronJob.id]: addPipelineCronJob.handler,
 } as const;
 
 export async function addPipeline<Name extends KeysWithoutBar<typeof taskList>>(
