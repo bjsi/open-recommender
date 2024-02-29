@@ -87,6 +87,7 @@ export const chunkTranscript = async (transcript: Transcript) => {
       metadata: {
         type: "youtube" as const,
         videoId: transcript.videoId,
+        videoTitle: transcript.videoTitle,
         minCueIdx: min,
         maxCueIdx: max,
       },

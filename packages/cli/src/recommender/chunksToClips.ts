@@ -4,15 +4,16 @@ import { last } from "remeda";
 import { ArticleSnippetWithScore } from "shared/src/manual/ArticleSnippet";
 import {
   MetaphorArticleResult,
-  VideoResultWithTranscript,
+  VideoResultWithTranscriptFile,
 } from "../metaphor/search";
 import { youtubeUrlWithTimestamp } from "shared/src/youtube";
 import { transcriptToString } from "../youtube/transcript";
+import { yt } from "../youtube";
 
-export const chunksToClips = (args: {
+export const chunksToClips = async (args: {
   results: Record<string, RAGChunk[]>;
   scoreCutOff: number;
-  searchResults: (VideoResultWithTranscript | MetaphorArticleResult)[];
+  searchResults: (VideoResultWithTranscriptFile | MetaphorArticleResult)[];
 }) => {
   const clips: Record<
     string,
@@ -23,10 +24,17 @@ export const chunksToClips = (args: {
       if (chunk.score < args.scoreCutOff) {
         continue;
       }
+      const transcript =
+        chunk.metadata.type === "youtube"
+          ? await yt.transcript.fetch({
+              id: chunk.metadata.videoId,
+              title: chunk.metadata.videoId,
+            })
+          : undefined;
       const searchResult = args.searchResults.find((searchResult) =>
         chunk.metadata.type === "youtube"
           ? searchResult.type === "youtube" &&
-            searchResult.transcript.videoId === chunk.metadata.videoId
+            transcript!.videoId === chunk.metadata.videoId
           : chunk.metadata.articleId === searchResult.id
       );
       if (!searchResult) {
@@ -51,7 +59,7 @@ export const chunksToClips = (args: {
         });
       } else {
         const videoChunk = chunk as RAGChunk & { metadata: YTMetadata };
-        const cues = searchResult.transcript.cues.slice(
+        const cues = transcript!.cues.slice(
           videoChunk.metadata.minCueIdx,
           videoChunk.metadata.maxCueIdx
         );
@@ -64,12 +72,9 @@ export const chunksToClips = (args: {
           question: question,
           start: cues[0].start,
           end: last(cues)!.end,
-          videoTitle: searchResult.transcript.videoTitle,
-          videoUrl: youtubeUrlWithTimestamp(
-            searchResult.transcript.videoId,
-            cues[0].start
-          ),
-          videoId: searchResult.transcript.videoId,
+          videoTitle: transcript!.videoTitle,
+          videoUrl: youtubeUrlWithTimestamp(transcript!.videoId, cues[0].start),
+          videoId: transcript!.videoId,
           text: transcriptToString(cues),
           score: chunk.score,
           rank: chunk.rank,

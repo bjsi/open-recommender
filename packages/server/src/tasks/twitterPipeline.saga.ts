@@ -15,6 +15,7 @@ import { pAll } from "cli/src/utils/pAll";
 import {
   MetaphorArticleResult,
   VideoResultWithTranscript,
+  VideoResultWithTranscriptFile,
   searchNonYouTube,
   searchYouTube,
 } from "cli/src/metaphor/search";
@@ -35,9 +36,10 @@ import { sendEmail } from "../lib/sendEmail";
 import { TranscriptClipWithScore } from "shared/src/manual/TranscriptClip";
 import { ArticleSnippetWithScore } from "shared/src/manual/ArticleSnippet";
 import { chunksToClips } from "cli/src/recommender/chunksToClips";
+import { readFileSync } from "fs";
 
 type QueryWithSearchResultWithTranscript = {
-  searchResults: (VideoResultWithTranscript | MetaphorArticleResult)[];
+  searchResults: (VideoResultWithTranscriptFile | MetaphorArticleResult)[];
   query: string;
   questions: string[];
 };
@@ -341,15 +343,16 @@ export const twitterPipeline = new Saga(
               if (result.type === "article") {
                 return result;
               }
-              const { id, title } = result;
-              const fetchResult = await yt.transcript.fetch({ id, title });
-              if (!fetchResult || !fetchResult.cues.length) {
+              const { id } = result;
+              // avoiding PG error from saving the payload with tons of transcript text
+              const fetchResult = await yt.transcript.download({ videoId: id });
+              if (!fetchResult) {
                 console.log("Skipping video without transcript");
                 return;
               }
               return {
                 ...result,
-                transcript: fetchResult,
+                transcriptFile: fetchResult,
               };
             }),
             { concurrency: 3 }
@@ -405,11 +408,16 @@ export const twitterPipeline = new Saga(
               } else {
                 const ragInput = (
                   await Promise.all(
-                    results.searchResults.flatMap((result) =>
-                      chunkTranscript(
-                        (result as VideoResultWithTranscript).transcript
-                      )
-                    )
+                    results.searchResults.flatMap(async (result) => {
+                      // should be cached on disk
+                      const transcript = await yt.transcript.fetch({
+                        id: result.id,
+                        title: result.title,
+                      });
+                      return transcript
+                        ? await chunkTranscript(transcript)
+                        : [];
+                    })
                   )
                 ).flat();
                 return ragInput;
@@ -430,7 +438,7 @@ export const twitterPipeline = new Saga(
         scoreCutOff: 0,
       });
 
-      const clips = chunksToClips({
+      const clips = await chunksToClips({
         results,
         scoreCutOff: 15,
         searchResults: resultsWithTranscripts.flatMap((x) => x.searchResults),
@@ -568,9 +576,9 @@ export const twitterPipeline = new Saga(
               str += `<h4>${question}</h4>`;
               str += `<ul>`;
               for (const clip of clips) {
-                str += `<li href="${
+                str += `<li><a href="${
                   clip.type === "article" ? clip.articleUrl : clip.videoUrl
-                }">${clip.title}</li>`;
+                }">${clip.title}</a></li>`;
               }
               str += `</ul>`;
             }

@@ -1,5 +1,5 @@
 import chalk from "chalk";
-import { execSync } from "child_process";
+import { exec, execSync } from "child_process";
 import {
   existsSync,
   readFileSync,
@@ -10,6 +10,9 @@ import {
 import path from "path";
 import { dataFolder } from "../filesystem";
 import { parseSync, stringifySync } from "subtitle";
+import { promisify } from "util";
+
+const execAsync = promisify(exec);
 
 export interface Transcript {
   cues: TranscriptCue[];
@@ -26,21 +29,9 @@ const tryReadFileSync = (file: string) => {
   }
 };
 
-export async function fetchTranscript(
-  videoId: string,
-  videoTitle: string
-): Promise<Transcript | undefined> {
-  "yt-dlp --write-sub --sub-lang='en.*' --skip-download -o";
-  // const bestQualityTranscriptCmd = [
-  //   "yt-dlp",
-  //   "--write-sub",
-  //   "--sub-lang='en.*'",
-  //   "--skip-download",
-  //   "-o",
-  //   `\"${dataFolder}/${videoId}\"`,
-  //   `https://www.youtube.com/watch?v=${videoId}`,
-  // ].join(" ");
-
+export async function downloadTranscript(
+  videoId: string
+): Promise<string | undefined> {
   const fallbackAutoSubsCmd = [
     "yt-dlp",
     "--write-auto-sub",
@@ -50,30 +41,33 @@ export async function fetchTranscript(
     `https://www.youtube.com/watch?v=${videoId}`,
   ].join(" ");
 
-  // search for file similar to ${id}.en-ehkg1hFWq8A.vtt
-  // the other id is a random code
-  // match using regex
   if (!existsSync(dataFolder)) {
     execSync(`mkdir -p ${dataFolder}`);
   }
-  const files = readdirSync(dataFolder);
-  let transcriptFile = files.find((x) => x.startsWith(videoId));
+  const filepath = path.join(dataFolder, `${videoId}.en.vtt`);
+  if (!existsSync(filepath)) {
+    await execAsync(fallbackAutoSubsCmd);
+    if (existsSync(filepath)) {
+      return filepath;
+    } else {
+      return undefined;
+    }
+  }
+  return filepath;
+}
+
+export async function fetchTranscript(
+  videoId: string,
+  videoTitle: string
+): Promise<Transcript | undefined> {
   try {
     // if (!transcriptFile || !existsSync(transcriptFile)) {
     //   execSync(bestQualityTranscriptCmd);
     // }
     // const files2 = readdirSync(dataFolder);
     // transcriptFile = files2.find((x) => x.startsWith(videoId));
-    let transcriptText = transcriptFile
-      ? tryReadFileSync(path.join(dataFolder, transcriptFile))
-      : undefined;
-    if (!transcriptText) {
-      console.log("Falling back to auto subs");
-      execSync(fallbackAutoSubsCmd);
-      transcriptText = tryReadFileSync(
-        path.join(dataFolder, `${videoId}.en.vtt`)
-      );
-    }
+    const filepath = await downloadTranscript(videoId);
+    let transcriptText = filepath ? tryReadFileSync(filepath) : undefined;
     if (!transcriptText) {
       console.error(
         chalk.red(
@@ -82,7 +76,6 @@ export async function fetchTranscript(
       );
       return;
     }
-
     const cues = await parseTranscript({
       transcript: transcriptText,
       videoId,

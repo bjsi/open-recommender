@@ -1,5 +1,5 @@
 import { search } from "./search";
-import { fetchTranscript } from "./transcript";
+import { downloadTranscript, fetchTranscript } from "./transcript";
 
 interface FetchArgs {
   id: string;
@@ -11,6 +11,9 @@ export const yt = {
   transcript: {
     fetch: (args: FetchArgs) => {
       return fetchTranscript(args.id, args.title);
+    },
+    download: (args: { videoId: string }) => {
+      return downloadTranscript(args.videoId);
     },
   },
 };

@@ -39,6 +39,9 @@ export type VideoResult = MetaphorYouTubeResult | YouTubeResult;
 export type VideoResultWithTranscript = VideoResult & {
   transcript: Transcript;
 };
+export type VideoResultWithTranscriptFile = VideoResult & {
+  transcriptFile: string;
+};
 
 export async function searchYouTube(args: {
   query: string;
