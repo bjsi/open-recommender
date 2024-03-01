@@ -32,28 +32,32 @@ const tryReadFileSync = (file: string) => {
 export async function downloadTranscript(
   videoId: string
 ): Promise<string | undefined> {
-  const fallbackAutoSubsCmd = [
-    "yt-dlp",
-    "--write-auto-sub",
-    "--skip-download",
-    "-o",
-    `"${dataFolder}/${videoId}.%(ext)s"`,
-    `https://www.youtube.com/watch?v=${videoId}`,
-  ].join(" ");
+  try {
+    const fallbackAutoSubsCmd = [
+      "yt-dlp",
+      "--write-auto-sub",
+      "--skip-download",
+      "-o",
+      `"${dataFolder}/${videoId}.%(ext)s"`,
+      `https://www.youtube.com/watch?v=${videoId}`,
+    ].join(" ");
 
-  if (!existsSync(dataFolder)) {
-    execSync(`mkdir -p ${dataFolder}`);
-  }
-  const filepath = path.join(dataFolder, `${videoId}.en.vtt`);
-  if (!existsSync(filepath)) {
-    await execAsync(fallbackAutoSubsCmd);
-    if (existsSync(filepath)) {
-      return filepath;
-    } else {
-      return undefined;
+    if (!existsSync(dataFolder)) {
+      execSync(`mkdir -p ${dataFolder}`);
     }
+    const filepath = path.join(dataFolder, `${videoId}.en.vtt`);
+    if (!existsSync(filepath)) {
+      await execAsync(fallbackAutoSubsCmd);
+      if (existsSync(filepath)) {
+        return filepath;
+      } else {
+        return undefined;
+      }
+    }
+    return filepath;
+  } catch (e) {
+    return undefined;
   }
-  return filepath;
 }
 
 export async function fetchTranscript(
