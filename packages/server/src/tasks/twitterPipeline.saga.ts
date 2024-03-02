@@ -14,7 +14,6 @@ import { brainstormQuestions } from "cli/src/recommender/prompts/brainstormSubQu
 import { pAll } from "cli/src/utils/pAll";
 import {
   MetaphorArticleResult,
-  VideoResultWithTranscript,
   VideoResultWithTranscriptFile,
   searchNonYouTube,
   searchYouTube,
@@ -32,11 +31,10 @@ import { nearestSubstring } from "cli/src/metaphor/nearestSubstring";
 import { findStartOfAnswerYouTube } from "cli/src/recommender/prompts/findStartOfAnswerYouTube/findStartOfAnswerYouTube";
 import { uniqBy } from "remeda";
 import { addRecommendations } from "../lib/addRecomendations";
-import { sendEmail } from "../lib/sendEmail";
+import { sendRecommendationsEmail } from "../lib/sendEmail";
 import { TranscriptClipWithScore } from "shared/src/manual/TranscriptClip";
 import { ArticleSnippetWithScore } from "shared/src/manual/ArticleSnippet";
 import { chunksToClips } from "cli/src/recommender/chunksToClips";
-import { readFileSync } from "fs";
 
 type QueryWithSearchResultWithTranscript = {
   searchResults: (VideoResultWithTranscriptFile | MetaphorArticleResult)[];
@@ -568,39 +566,7 @@ export const twitterPipeline = new Saga(
         );
         return;
       } else {
-        const formatEmail = () => {
-          let str = ``;
-          for (const [query, clusters] of Object.entries(finalData.clips)) {
-            str += `<h3>${query}</h3>`;
-            for (const [question, clips] of Object.entries(clusters)) {
-              str += `<h4>${question}</h4>`;
-              str += `<ul>`;
-              for (const clip of clips) {
-                str += `<li><a href="${
-                  clip.type === "article" ? clip.articleUrl : clip.videoUrl
-                }">${clip.title}</a></li>`;
-              }
-              str += `</ul>`;
-            }
-          }
-          return str;
-        };
-
-        await sendEmail(
-          user,
-          "Your latest recommendations are ready!",
-          `
-Hi ${user.name},
-
-Your latest recommendations are ready. You can also view them <a href="https://open-recommender.com/#/user/experilearning/feed">here</a>.
-
-${formatEmail()}
-
-Best,
-
-<a href="https://twitter.com/experilearning">James</a>
-`.trim()
-        );
+        await sendRecommendationsEmail(user, finalData);
         helpers.logInfo("Email sent");
       }
     },

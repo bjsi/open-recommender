@@ -6,6 +6,7 @@
   "dependencies": {
     "@prisma/client": "5.8.0",
     "@quixo3/prisma-session-store": "^3.1.13",
+    "@react-email/components": "^0.0.15",
     "aws-sdk": "^2.1565.0",
     "cookie-parser": "^1.4.6",
     "cookie-session": "^2.0.0",
@@ -19,6 +20,7 @@
     "nodemon": "^3.0.2",
     "passport": "^0.7.0",
     "passport-twitter": "^1.0.4",
+    "react-email": "^2.1.0",
     "resend": "^3.1.0",
     "uuid": "^9.0.1",
     "zod": "^3.22.4"
@@ -35,6 +37,7 @@
   },
   "scripts": {
     "download-secrets": "npx tsx scripts/downloadSecrets.ts",
+    "email": "email dev -d src/lib/email",
     "dev": "nodemon -x 'tsc -b && ts-node src/main.ts'",
     "start": "ts-node --transpile-only src/main.ts",
     "build": "yarn && npx prisma generate && npx prisma migrate deploy",
