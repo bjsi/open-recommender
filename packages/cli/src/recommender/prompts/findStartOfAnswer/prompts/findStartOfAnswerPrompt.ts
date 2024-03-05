@@ -46,11 +46,11 @@ export const findStartOfAnswerPrompt =
         //         }),
         ChatMessage.user(
           `
-# Text
-${this.getVariable("text")}
-
 # Question
 ${this.getVariable("question")}
+
+# Text
+${this.getVariable("text")}
 `.trim()
         ),
       ];

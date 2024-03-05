@@ -1,9 +1,5 @@
 import { Prompt } from "prompt-iteration-assistant";
-import {
-  RequestTagsWithoutName,
-  formatPromptName,
-} from "../../../openpipe/requestTags";
-import { openpipe } from "../../../openpipe/openpipe";
+import { RequestTagsWithoutName } from "../../../openpipe/requestTags";
 import { findStartOfAnswerYouTubeOutputSchema } from "./schemas/findStartOfAnswerYouTubeOutputSchema";
 import {
   FindStartOfAnswerYouTubeInput,
@@ -47,31 +43,10 @@ ${cue.text}
         .join(`\n---\n`),
       question: args.question,
     };
-    const candidatePrompt = this.chooseCandidatePrompt(promptVariables);
-    const res = await openpipe.functionCall({
-      function: {
-        name: this.name,
-        description: this.description,
-        input: this.input!,
-        output: this.output!,
-      },
-      vars: promptVariables,
-      prompt: candidatePrompt,
-      body: {
-        max_tokens: this.max_tokens,
-        temperature: this.temperature,
-        model: this.model,
-        stream: false,
-      },
-      openPipeRequestTags: args.openPipeRequestTags
-        ? {
-            ...args.openPipeRequestTags,
-            promptName: formatPromptName(this.name, candidatePrompt.name),
-          }
-        : undefined,
-      enableOpenPipeLogging: args.enableOpenPipeLogging,
+    return this.run({
+      stream: false,
+      promptVariables,
     });
-    return res;
   }
 }
 
