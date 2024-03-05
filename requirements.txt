@@ -61,7 +61,7 @@ markdown-it-py==3.0.0
 MarkupSafe==2.1.4
 marshmallow==3.20.2
 mdurl==0.1.2
-modal==0.56.4940
+modal==0.61.8
 mpmath==1.3.0
 multidict==6.0.4
 multiprocess==0.70.15
@@ -112,7 +112,7 @@ SQLAlchemy==2.0.25
 srsly==2.4.8
 starlette==0.35.1
 sympy==1.12
-synchronicity==0.6.1
+synchronicity==0.6.2
 tblib==3.0.0
 tenacity==8.2.3
 thinc==8.2.2
