@@ -378,7 +378,7 @@ export const authenticatedRouter = router({
 
       const job = await addPipeline("twitter-pipeline-v1", {
         username: authenticatedUser.username,
-        summary: summary?.content,
+        summary: summary?.id,
         queries: input.customQuery ? [input.customQuery] : undefined,
         runId: uuidv4(),
         emailResults: true,

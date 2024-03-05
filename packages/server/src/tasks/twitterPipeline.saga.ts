@@ -35,6 +35,8 @@ import { sendRecommendationsEmail } from "../lib/sendEmail";
 import { TranscriptClipWithScore } from "shared/src/manual/TranscriptClip";
 import { ArticleSnippetWithScore } from "shared/src/manual/ArticleSnippet";
 import { chunksToClips } from "cli/src/recommender/chunksToClips";
+import { titleClip } from "cli/src/recommender/prompts/titleClip/titleClip";
+import { answersQuestion } from "cli/src/recommender/prompts/answersQuestion/answersQuestion";
 
 type QueryWithSearchResultWithTranscript = {
   searchResults: (VideoResultWithTranscriptFile | MetaphorArticleResult)[];
@@ -50,9 +52,8 @@ export const twitterPipeline = new Saga(
   z.object({
     runId: z.string(),
     username: z.string(),
-    summary: z.string().optional(),
+    summary: z.number().optional(),
     queries: z.string().array().optional(),
-    skipUserCheck: z.boolean().optional(),
     enableOpenPipeLogging: z.boolean().optional(),
     emailResults: z.boolean().optional(),
   }),
@@ -104,7 +105,7 @@ export const twitterPipeline = new Saga(
       const user = await prisma.user.findUnique({
         where: { username },
       });
-      if (!user && !initialPayload.skipUserCheck) {
+      if (!user) {
         throw new Error("User not found");
       }
       helpers.logInfo(`Creating recommendations for Twitter user @${username}`);
@@ -117,7 +118,6 @@ export const twitterPipeline = new Saga(
       const { user } = priorResults["get-user"];
       if (initialPayload.summary) {
         helpers.logInfo("Using existing summary, skipping get-tweets step");
-        helpers.logDebug(initialPayload.summary);
         return { tweets: [] };
       } else if (initialPayload.queries) {
         helpers.logInfo("Using custom queries, skipping get-tweets step");
@@ -146,6 +146,9 @@ export const twitterPipeline = new Saga(
           helpers.logger
         )
       ).slice(0, 300);
+      helpers.logInfo(`Fetched ${tweets.length} new tweets from Twitter`);
+      const reuseExistingSummary = tweets.length === 0;
+      helpers.logInfo(`Reuse existing summary: ${reuseExistingSummary}`);
 
       if (tweets.length < 300 && lastSavedTweet) {
         const moreTweets = await getSavedTweetsForUser({
@@ -153,6 +156,7 @@ export const twitterPipeline = new Saga(
           before: lastSavedTweet.tweetedAt.toISOString(),
           limit: 300 - tweets.length,
         });
+        helpers.logInfo(`Fetched ${moreTweets.length} saved tweets from DB`);
         tweets.push(...moreTweets.map((x) => x.data));
       }
 
@@ -161,7 +165,7 @@ export const twitterPipeline = new Saga(
       } else {
         helpers.logInfo(`${tweets.length} tweets fetched successfully`);
       }
-      return { tweets };
+      return { tweets, reuseExistingSummary };
     },
   })
   .addStep({
@@ -171,16 +175,56 @@ export const twitterPipeline = new Saga(
       helpers.logInfo(`Summarizing tweets for Twitter user @${username}`);
       const api = getTwitterAPISingleton();
       const twitterUser = await getUserProfile(api, username);
-      if (initialPayload.summary || initialPayload.queries) {
-        helpers.logInfo(
-          "Using existing summary or custom queries, skipping summary"
-        );
+      if (initialPayload.summary) {
+        helpers.logInfo("Using existing summary specified in payload");
+        const summary = await prisma.summary.findFirst({
+          where: {
+            userId: priorResults["get-user"].user?.id,
+            id: initialPayload.summary,
+          },
+          orderBy: {
+            createdAt: "desc",
+          },
+        });
+        if (summary) {
+          return {
+            profile: summary,
+            twitterUser,
+          };
+        } else {
+          helpers.logInfo(
+            "Tried to reuse existing summary from DB, but no existing summary found"
+          );
+        }
+      } else if (initialPayload.queries) {
+        helpers.logInfo("Using custom queries, skipping summary");
         return {
-          profile: initialPayload.summary,
           twitterUser,
         };
       }
 
+      if (priorResults["get-tweets"]["reuseExistingSummary"]) {
+        const latestSummary = await prisma.summary.findFirst({
+          where: {
+            userId: priorResults["get-user"].user?.id,
+          },
+          orderBy: {
+            createdAt: "desc",
+          },
+        });
+        if (latestSummary) {
+          helpers.logInfo("Reusing latest summary from DB");
+          return {
+            profile: latestSummary,
+          };
+        } else {
+          helpers.logInfo(
+            "Tried to reuse latest summary from DB, but no existing summary found"
+          );
+        }
+      }
+
+      helpers.logInfo("Summarizing tweets...");
       const profile = await recursivelySummarizeTweets().execute({
         user: twitterUser,
         tweets: priorResults["get-tweets"].tweets,
@@ -191,11 +235,22 @@ export const twitterPipeline = new Saga(
         helpers.logInfo("Failed to summarize tweets");
         throw new Error("Failed to summarize tweets");
       } else {
-        helpers.logInfo("Tweets summarized successfully");
-        helpers.logDebug(profile);
-        return {
-          profile,
-        };
+        helpers.logInfo("Tweets summarized successfully into profile");
+        const summary = await prisma.summary.create({
+          data: {
+            userId: priorResults["get-user"].user?.id,
+            content: profile,
+            public: true,
+          },
+        });
+        if (!summary) {
+          helpers.logInfo("Failed to save summary to DB");
+          throw new Error("Failed to save summary to DB");
+        } else {
+          return {
+            profile: summary,
+          };
+        }
       }
     },
   })
@@ -213,7 +268,7 @@ export const twitterPipeline = new Saga(
             runId: initialPayload.runId,
             user: initialPayload.username,
           }),
-          profile: priorResults["summarize-tweets"].profile!,
+          profile: typeof priorResults["summarize-tweets"].profile?.content,
           bio:
             priorResults["summarize-tweets"].twitterUser?.rawDescription || "",
           user: initialPayload.username,
@@ -458,17 +513,39 @@ export const twitterPipeline = new Saga(
       helpers.logInfo("Cleaning clips...");
       const tasks = Object.entries(clips).flatMap(([question, clips]) => {
         return clips.flatMap((clip) => async () => {
-          if (clip.type === "article") {
-            const result = await findStartOfAnswer().execute({
-              question,
+          const answersQ = await answersQuestion().run({
+            promptVariables: {
+              question: clip.question,
               text: clip.text,
+            },
+            stream: false,
+          });
+          if (!answersQ.answersQuestion) {
+            return null;
+          }
+          if (clip.type === "article") {
+            const result = await findStartOfAnswer().run({
+              promptVariables: {
+                question,
+                text: clip.text,
+              },
+              stream: false,
             });
             if (result?.quotedAnswer) {
               const match = nearestSubstring(result.quotedAnswer, clip.text);
               if (match.bestMatch && match.bestScore > 0.8) {
+                const summarizedTitle = await titleClip().run({
+                  promptVariables: {
+                    clip: clip.text,
+                    videoTitle: clip.articleTitle,
+                    question: clip.question,
+                  },
+                  stream: false,
+                });
                 return {
                   ...clip,
                   text: clip.text.slice(match.bestStartIdx),
+                  summarizedTitle: summarizedTitle.title,
                 };
               }
               return clip;
@@ -481,10 +558,19 @@ export const twitterPipeline = new Saga(
             });
             if (result?.cueId != null) {
               const newCues = clip.cues.slice(result.cueId);
+              const summarizedTitle = await titleClip().run({
+                promptVariables: {
+                  clip: clip.text,
+                  videoTitle: clip.videoTitle,
+                  question: clip.question,
+                },
+                stream: false,
+              });
               return {
                 ...clip,
                 start: newCues[0].start,
                 cues: newCues,
+                summarizedTitle: summarizedTitle.title,
               };
             }
             return null;

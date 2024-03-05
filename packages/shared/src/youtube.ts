@@ -1,3 +1,7 @@
+export function youtubeIdToThumbnailUrl(id: string) {
+  return `https://i3.ytimg.com/vi/${id}/maxresdefault.jpg`;
+}
+
 export function youtubeUrlToId(url: string): string | undefined {
   const regex =
     /^.*(?:(?:youtu\.be\/|v\/|vi\/|u\/\w\/|embed\/|shorts\/)|(?:(?:watch)?\?v(?:i)?=|\&v(?:i)?=))([^#\&\?]*).*/;

@@ -9,6 +9,7 @@ export const transcriptClipSchema = z.object({
   videoTitle: z.string(),
   videoUrl: z.string(),
   videoId: z.string(),
+  summarizedTitle: z.string().optional(),
   text: z.string(),
   cues: z.array(
     z.object({

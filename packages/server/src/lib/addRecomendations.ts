@@ -6,10 +6,11 @@ import { ArticleRecommendationSource } from "shared/src/manual/ArticleRecommenda
 import { YouTubeRecommendation } from "shared/src/manual/YouTubeRecommendation";
 import { transcriptClipSchema } from "shared/src/manual/TranscriptClip";
 import { articleSnippetSchema } from "shared/src/manual/ArticleSnippet";
+import { SummaryModel } from "shared/src/schemas";
 
 export const addRecommendationSchema = z.object({
   username: z.string(),
-  summary: z.string().optional(),
+  summary: SummaryModel.optional(),
   clips: z.record(
     z.record(z.union([transcriptClipSchema, articleSnippetSchema]).array())
   ),
@@ -22,22 +23,11 @@ export const addRecommendations = async (args: {
   user: z.infer<typeof UserModel>;
 }) => {
   const { input, user } = args;
-  // create summary
-  const summary = input.summary
-    ? await prisma.summary.create({
-        data: {
-          content: input.summary,
-          public: true,
-          userId: user.id,
-        },
-      })
-    : undefined;
-
   for (const [query, clusters] of Object.entries(input.clips)) {
     const queryObject = await prisma.query.create({
       data: {
         text: query,
-        summaryId: summary?.id,
+        summaryId: input.summary?.id,
         public: true,
         userId: user.id,
       },

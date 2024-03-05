@@ -28,7 +28,7 @@ export const chunksToClips = async (args: {
         chunk.metadata.type === "youtube"
           ? await yt.transcript.fetch({
               id: chunk.metadata.videoId,
-              title: chunk.metadata.videoId,
+              title: chunk.metadata.videoTitle,
             })
           : undefined;
       const searchResult = args.searchResults.find((searchResult) =>
