@@ -85,8 +85,8 @@ export async function startWorker() {
     parsedCronItems: [
       parseCronItem({
         task: addPipelineCronJob.id,
-        // every 24 hrs
-        match: "0 0 * * *",
+        // every 48 hrs
+        match: "0 0 */2 * *",
       }),
     ],
     concurrency: 2,
