@@ -13,17 +13,42 @@ import { findStartOfAnswerPrompt } from "./prompts/findStartOfAnswerPrompt";
 
 export const FIND_START_OF_ANSWER = "Find Start Of Answer";
 
-export const findStartOfAnswer = () =>
-  new Prompt({
-    name: FIND_START_OF_ANSWER,
-    description: "Find the start of an answer to a question in some text",
-    prompts: [findStartOfAnswerPrompt],
-    model: "gpt-4",
-    input: findStartOfAnswerInputSchema,
-    output: findStartOfAnswerOutputSchema,
-    exampleData: [],
-  });
+class FindStartOfAnswer extends Prompt<
+  typeof findStartOfAnswerInputSchema,
+  typeof findStartOfAnswerOutputSchema
+> {
+  constructor() {
+    super({
+      name: FIND_START_OF_ANSWER,
+      description: "Find the start of an answer to a question in some text",
+      prompts: [findStartOfAnswerPrompt],
+      model: "gpt-4",
+      input: findStartOfAnswerInputSchema,
+      output: findStartOfAnswerOutputSchema,
+      exampleData: [],
+    });
+  }
 
-if (require.main === module) {
-  (async () => {})();
+  async execute(args: {
+    question: string;
+    text: string;
+    openPipeRequestTags?: RequestTagsWithoutName;
+    enableOpenPipeLogging?: boolean;
+  }) {
+    const promptVariables: FindStartOfAnswerInput = {
+      text: args.text,
+      question: args.question,
+    };
+    try {
+      return this.run({
+        stream: false,
+        promptVariables,
+      });
+    } catch (e) {
+      console.error(e);
+      return { quotedAnswer: null };
+    }
+  }
 }
+
+export const findStartOfAnswer = () => new FindStartOfAnswer();

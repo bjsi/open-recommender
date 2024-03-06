@@ -1,12 +1,6 @@
 import chalk from "chalk";
 import { exec, execSync } from "child_process";
-import {
-  existsSync,
-  readFileSync,
-  readdirSync,
-  writeFile,
-  writeFileSync,
-} from "fs";
+import { existsSync, readFileSync, writeFileSync } from "fs";
 import path from "path";
 import { dataFolder } from "../filesystem";
 import { parseSync, stringifySync } from "subtitle";

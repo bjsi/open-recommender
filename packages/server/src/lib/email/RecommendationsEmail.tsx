@@ -130,7 +130,7 @@ export default function RecommendationsEmail({
             className="mx-auto my-20 text-center"
           />
           <Container className="bg-white px-45">
-            <Heading className="my-0 leading-8 text-center">
+            <Heading className="my-20 leading-8 text-center">
               New Recommendations
             </Heading>
             <Section>
@@ -157,61 +157,68 @@ export default function RecommendationsEmail({
             <Section>
               {
                 // Loop through the recommendations and create a section for each query
-                Object.entries(input.clips).map(([query, clusters], i) => {
+                Object.entries(input.clips).map(([_, clusters], i) => {
                   return (
-                    <Section key={i}>
+                    <Section key={i} style={{ paddingLeft: 10 }}>
                       {
                         // Loop through the clusters and create a section for each question
                         Object.entries(clusters).map(([question, clips], i) => {
+                          if (clips.length === 0) return null;
                           return (
-                            <React.Fragment key={i}>
+                            <div key={i}>
                               <Heading as="h4">{question}</Heading>
-                              {clips.map((clip) => {
-                                if (clip.type === "article") {
-                                  return (
-                                    <Row>
-                                      <Link
-                                        href={
-                                          clip.articleUrl +
-                                          "#:~:text=" +
-                                          encodeURIComponent(
-                                            clip.text
-                                              .split(" ")
-                                              .slice(0, 5)
-                                              .join(" ")
-                                          )
-                                        }
-                                      >
-                                        <Text>{clip.articleTitle}</Text>
-                                      </Link>
-                                      <Text>"{truncate(clip.text, 300)}"</Text>
-                                    </Row>
-                                  );
-                                } else {
-                                  return (
-                                    <Row>
-                                      <Link href={clip.videoUrl}>
+                              <ol>
+                                {clips.map((clip, i) => {
+                                  if (clip.type === "article") {
+                                    return (
+                                      <li key={i}>
+                                        <Link
+                                          href={
+                                            clip.articleUrl +
+                                            "#:~:text=" +
+                                            encodeURIComponent(
+                                              clip.text
+                                                .split(" ")
+                                                .slice(0, 5)
+                                                .join(" ")
+                                            )
+                                          }
+                                        >
+                                          <Text>{clip.articleTitle}</Text>
+                                        </Link>
                                         <Text>
-                                          {clip.summarizedTitle} (
-                                          {clip.videoTitle})
+                                          "{truncate(clip.text, 450)}"
                                         </Text>
-                                      </Link>
-                                      <Link href={clip.videoUrl}>
-                                        <Text className="text-center">
-                                          <Img
-                                            width={200}
-                                            src={youtubeIdToThumbnailUrl(
-                                              clip.videoId
-                                            )}
-                                          ></Img>
+                                      </li>
+                                    );
+                                  } else {
+                                    return (
+                                      <li key={i}>
+                                        <Link href={clip.videoUrl}>
+                                          <Text>
+                                            {clip.summarizedTitle} (
+                                            {clip.videoTitle})
+                                          </Text>
+                                        </Link>
+                                        <Link href={clip.videoUrl}>
+                                          <Text className="text-center">
+                                            <Img
+                                              width={150}
+                                              src={youtubeIdToThumbnailUrl(
+                                                clip.videoId
+                                              )}
+                                            ></Img>
+                                          </Text>
+                                        </Link>
+                                        <Text>
+                                          "{truncate(clip.text, 300)}"
                                         </Text>
-                                      </Link>
-                                      <Text>"{truncate(clip.text, 300)}"</Text>
-                                    </Row>
-                                  );
-                                }
-                              })}
-                            </React.Fragment>
+                                      </li>
+                                    );
+                                  }
+                                })}
+                              </ol>
+                            </div>
                           );
                         })
                       }
@@ -224,10 +231,16 @@ export default function RecommendationsEmail({
               <Section>
                 <Row>
                   <Column className="px-20 text-right">
-                    <Link>Give Feedback</Link>
+                    <Link href="https://twitter.com/experilearning">
+                      Give Feedback
+                    </Link>
                   </Column>
                   <Column className="text-left">
-                    <Link>Manage Preferences</Link>
+                    <Link
+                      href={`https://open-recommender.com/#/user/${input.username}/profile`}
+                    >
+                      Manage Preferences
+                    </Link>
                   </Column>
                 </Row>
               </Section>

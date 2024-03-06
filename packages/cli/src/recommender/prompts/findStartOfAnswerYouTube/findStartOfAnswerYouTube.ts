@@ -43,10 +43,15 @@ ${cue.text}
         .join(`\n---\n`),
       question: args.question,
     };
-    return this.run({
-      stream: false,
-      promptVariables,
-    });
+    try {
+      return this.run({
+        stream: false,
+        promptVariables,
+      });
+    } catch (e) {
+      console.error(e);
+      return { cueId: null };
+    }
   }
 }
 

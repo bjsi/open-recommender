@@ -408,7 +408,7 @@ export const twitterPipeline = new Saga(
                 transcriptFile: fetchResult,
               };
             }),
-            { concurrency: 3 }
+            { concurrency: 5 }
           )
         );
         resultsWithTranscripts.push({
@@ -513,34 +513,25 @@ export const twitterPipeline = new Saga(
       helpers.logInfo("Cleaning clips...");
       const tasks = Object.entries(clips).flatMap(([question, clips]) => {
         return clips.flatMap((clip) => async () => {
-          const answersQ = await answersQuestion().run({
-            promptVariables: {
-              question: clip.question,
-              text: clip.text,
-            },
-            stream: false,
+          const answersQ = await answersQuestion().execute({
+            question: clip.question,
+            text: clip.text,
           });
           if (!answersQ.answersQuestion) {
             return null;
           }
           if (clip.type === "article") {
-            const result = await findStartOfAnswer().run({
-              promptVariables: {
-                question,
-                text: clip.text,
-              },
-              stream: false,
+            const result = await findStartOfAnswer().execute({
+              question,
+              text: clip.text,
             });
             if (result?.quotedAnswer) {
               const match = nearestSubstring(result.quotedAnswer, clip.text);
               if (match.bestMatch && match.bestScore > 0.8) {
-                const summarizedTitle = await titleClip().run({
-                  promptVariables: {
-                    clip: clip.text,
-                    videoTitle: clip.articleTitle,
-                    question: clip.question,
-                  },
-                  stream: false,
+                const summarizedTitle = await titleClip().execute({
+                  clip: clip.text,
+                  videoTitle: clip.articleTitle,
+                  question: clip.question,
                 });
                 return {
                   ...clip,
@@ -558,13 +549,10 @@ export const twitterPipeline = new Saga(
             });
             if (result?.cueId != null) {
               const newCues = clip.cues.slice(result.cueId);
-              const summarizedTitle = await titleClip().run({
-                promptVariables: {
-                  clip: clip.text,
-                  videoTitle: clip.videoTitle,
-                  question: clip.question,
-                },
-                stream: false,
+              const summarizedTitle = await titleClip().execute({
+                clip: clip.text,
+                videoTitle: clip.videoTitle,
+                question: clip.question,
               });
               return {
                 ...clip,
@@ -655,5 +643,11 @@ export const twitterPipeline = new Saga(
         await sendRecommendationsEmail(user, finalData);
         helpers.logInfo("Email sent");
       }
+    },
+  })
+  .addStep({
+    name: "done",
+    run: async (_, __, helpers) => {
+      helpers.logInfo("Pipeline complete");
     },
   });

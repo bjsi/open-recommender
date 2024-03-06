@@ -14,7 +14,7 @@ import {
   TableRow,
 } from "@mui/material";
 import React from "react";
-import { sortBy } from "remeda";
+import { sortBy, last } from "remeda";
 
 dayjs.extend(relativeTime);
 
@@ -22,6 +22,8 @@ export const AdminPage = () => {
   const [pipelines, setPipelines] =
     useState<AdminRouterOutput["getPipelinesAndTasks"]>();
   const [force, setForce] = useState(0);
+  const [hideSuccessful, setHideSuccessful] = useState(false);
+
   useEffect(() => {
     // Function to fetch data
     const fetchData = () => {
@@ -46,6 +48,13 @@ export const AdminPage = () => {
       <Button onClick={() => trpcAdmin.unlockWorkers.mutate()}>
         Force unlock workers
       </Button>
+      <Button
+        onClick={() => {
+          setHideSuccessful(true);
+        }}
+      >
+        {!hideSuccessful ? "Hide" : "Show"} Successful
+      </Button>
       <TableContainer component={Paper}>
         <Table aria-label="pipelines table">
           <TableHead>
@@ -65,15 +74,17 @@ export const AdminPage = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {sortBy(pipelines, (x) => dayjs(x.createdAt).valueOf()).map(
-              (pipeline) => (
+            {sortBy(pipelines, (x) => dayjs(x.createdAt).valueOf())
+              .filter((p) =>
+                hideSuccessful ? last(p.tasks)?.name !== "done" : true
+              )
+              .map((pipeline) => (
                 <PipelineRow
                   key={pipeline.id}
                   pipeline={pipeline}
                   setForce={setForce}
                 />
-              )
-            )}
+              ))}
           </TableBody>
         </Table>
       </TableContainer>
