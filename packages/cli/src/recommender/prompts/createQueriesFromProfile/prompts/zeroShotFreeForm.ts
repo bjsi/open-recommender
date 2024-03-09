@@ -1,5 +1,4 @@
 import { CandidatePrompt, ChatMessage } from "prompt-iteration-assistant";
-import { sharedCreateQueriesInstructions } from "./shared";
 import { CreateQueriesFromProfileInput } from "../schemas/createQueriesFromProfileInputSchema";
 
 export const createQueriesFromProfileZeroShotFreeFormPrompt =
@@ -7,17 +6,27 @@ export const createQueriesFromProfileZeroShotFreeFormPrompt =
     name: "zero shot free form-2",
     compile() {
       return [
-        ChatMessage.system(sharedCreateQueriesInstructions({ short: false })),
+        ChatMessage.system(
+          `
+# Instructions
+- Based on your persona, write 10 research questions you would be interested in investigating based on ideas, concepts, problems, people and events that interest you.
+- Don't include introductory or background questions.
+- Make sure the questions are interesting. Don't ask questions you likely know the answer to based on your persona.
+- Don't ask duplicate questions.
+`.trim()
+        ),
         {
           role: "user",
           content: `
-# My Twitter Username
+# Your Persona
+
+## Your Username
 ${this.getVariable("user")}
 
-# My Twitter Bio
+## Your Bio
 ${this.getVariable("bio")}
 
-# My Profile
+## Your Profile
 ${this.getVariable("profile")}
 `.trim(),
         },

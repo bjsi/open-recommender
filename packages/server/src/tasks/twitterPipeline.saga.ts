@@ -396,15 +396,6 @@ export const twitterPipeline = new Saga(
         }),
         { concurrency: 2 }
       );
-      console.log(
-        "all results",
-        JSON.stringify({
-          metaphorArticleResults,
-          metaphorYouTubeResults,
-          youtubeResults,
-        })
-      );
-
       const all = [
         ...youtubeResults,
         ...metaphorYouTubeResults,

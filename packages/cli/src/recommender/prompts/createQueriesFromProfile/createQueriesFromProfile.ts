@@ -3,15 +3,11 @@ import {
   CreateQueriesFromProfileInput,
   createQueriesFromProfileInputSchema,
 } from "./schemas/createQueriesFromProfileInputSchema";
-import { createQueriesFromProfileOutputSchema } from "./schemas/createQueriesFromProfileOutputSchema";
-import {
-  RequestTagsWithoutName,
-  formatPromptName,
-} from "../../../openpipe/requestTags";
-import { openpipe } from "../../../openpipe/openpipe";
 import { experilearningDataset } from "./datasets/experilearningDataset";
 import { createQueriesFromProfileZeroShotFreeFormPrompt } from "./prompts/zeroShotFreeForm";
 import { DefaultRun } from "modelfusion";
+import { z } from "zod";
+import dotenv from "dotenv";
 
 export const CREATE_SEARCH_QUERIES_FROM_PROFILE = "Create Questions";
 
@@ -21,7 +17,7 @@ export const CREATE_SEARCH_QUERIES_FROM_PROFILE = "Create Questions";
  */
 export class CreateSearchQueriesFromProfile extends Prompt<
   typeof createQueriesFromProfileInputSchema,
-  typeof createQueriesFromProfileOutputSchema
+  z.ZodString
 > {
   constructor() {
     super({
@@ -30,7 +26,6 @@ export class CreateSearchQueriesFromProfile extends Prompt<
       prompts: [createQueriesFromProfileZeroShotFreeFormPrompt],
       model: "gpt-4",
       input: createQueriesFromProfileInputSchema,
-      output: createQueriesFromProfileOutputSchema,
       exampleData: [],
     });
   }
@@ -47,12 +42,16 @@ export class CreateSearchQueriesFromProfile extends Prompt<
       profile: args.profile,
     };
     try {
-      const res = await this.run({
-        promptVariables,
-        stream: false,
-        run: args.run,
+      const res =
+        (await this.run({
+          promptVariables,
+          stream: false,
+          run: args.run,
+        })) || "";
+      const queries = res.split("\n").map((query) => {
+        return query.replace(/(^- )|(^\d+\. )/g, "").trim();
       });
-      return res || { queries: [] };
+      return { queries };
     } catch (e) {
       console.error(e);
       return { queries: [] };
@@ -72,6 +71,7 @@ export const createQueriesFromProfile = () =>
 
 if (require.main === module) {
   (async () => {
+    dotenv.config({ path: "packages/cli/.env" });
     const res = await createQueriesFromProfile().execute({
       user: experilearningDataset.user.value,
       bio: experilearningDataset.bio.value,
