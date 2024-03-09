@@ -22,7 +22,7 @@ export class GetTopicFromQuestion extends Prompt<
       name: GET_TOPIC_FROM_QUESTION,
       description: "Convert question to query topic",
       prompts: [getTopicFromQuestionZeroShotPrompt],
-      model: "gpt-4",
+      model: "gpt-3.5-turbo",
       input: getTopicFromQuestionInputSchema,
       output: getTopicFromQuestionOutputSchema,
       exampleData: [],

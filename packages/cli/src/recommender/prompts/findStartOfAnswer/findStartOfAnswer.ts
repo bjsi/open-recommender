@@ -1,5 +1,4 @@
 import { Prompt } from "prompt-iteration-assistant";
-import { RequestTagsWithoutName } from "../../../openpipe/requestTags";
 import {
   FindStartOfAnswerInput,
   findStartOfAnswerInputSchema,
@@ -19,7 +18,7 @@ class FindStartOfAnswer extends Prompt<
       name: FIND_START_OF_ANSWER,
       description: "Find the start of an answer to a question in some text",
       prompts: [findStartOfAnswerPrompt],
-      model: "gpt-4",
+      model: "gpt-3.5-turbo",
       input: findStartOfAnswerInputSchema,
       exampleData: [],
     });

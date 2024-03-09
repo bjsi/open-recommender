@@ -20,7 +20,7 @@ export class FindStartOfAnswerYouTube extends Prompt<
       description:
         "Find the start of an answer to a question in some transcript cues",
       prompts: [findStartOfAnswerYouTubePrompt],
-      model: "gpt-4",
+      model: "gpt-3.5-turbo",
       input: findStartOfAnswerYouTubeInputSchema,
       output: findStartOfAnswerYouTubeOutputSchema,
       exampleData: [],
