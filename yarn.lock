@@ -1613,6 +1613,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@modelfusion/cost-calculator@npm:^0.1.0":
+  version: 0.1.0
+  resolution: "@modelfusion/cost-calculator@npm:0.1.0"
+  checksum: d30b72b26bed7fafdf6b1381397a5a72bfbfd77c4bbd7d4bf22a965f79506c9f59f6bb4381c5a03e3c59ee151f14b55ffdb8f019fa5bde21a4922e9d52853a2d
+  languageName: node
+  linkType: hard
+
 "@mongodb-js/saslprep@npm:^1.1.0":
   version: 1.1.4
   resolution: "@mongodb-js/saslprep@npm:1.1.4"
@@ -5613,9 +5620,10 @@ __metadata:
     inquirer-search-list: "npm:^1.2.6"
     js-tiktoken: "npm:^1.0.8"
     llamaindex: "npm:^0.1.2"
+    modelfusion: "npm:^0.137.0"
     openai: "npm:^4.20.1"
     openpipe: "npm:^0.8.0"
-    prompt-iteration-assistant: "npm:^0.0.34"
+    prompt-iteration-assistant: "npm:^0.0.37"
     promptfoo: "npm:^0.28.1"
     pybridge-zod: "npm:^1.1.0"
     remeda: "npm:^1.29.0"
@@ -10692,29 +10700,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"modelfusion-experimental@npm:^0.2.0":
-  version: 0.2.0
-  resolution: "modelfusion-experimental@npm:0.2.0"
-  dependencies:
-    zod: "npm:3.22.4"
-  peerDependencies:
-    modelfusion: ">=0.105.0"
-  checksum: 24234d58db13f1351836444527991e8202581b69f47311333239e847b66f462f8c0cd36c07cc5c88b69362ff4b3c196d1357c72e91a181400c5ad9237a62a329
-  languageName: node
-  linkType: hard
-
-"modelfusion@npm:^0.107.0":
-  version: 0.107.0
-  resolution: "modelfusion@npm:0.107.0"
+"modelfusion@npm:^0.137.0":
+  version: 0.137.0
+  resolution: "modelfusion@npm:0.137.0"
   dependencies:
     eventsource-parser: "npm:1.1.1"
     js-tiktoken: "npm:1.0.7"
     nanoid: "npm:3.3.6"
     secure-json-parse: "npm:2.7.0"
+    type-fest: "npm:4.9.0"
     ws: "npm:8.14.2"
     zod: "npm:3.22.4"
     zod-to-json-schema: "npm:3.22.3"
-  checksum: d54654e091b80b8a3cf9ee3eb1fbb36274675cdaa8c470552d60822ef96c0fe177fc04a052052b861cb4ff932790c745b92c82652233f9b5948008a0b8c9a76f
+  checksum: 49391c04f2b23d4df725246ac28491c0f3ada70809fb644d15ee86357ce363a4172c83e4c7421db0705a50a7be4a11f9f0d74dec522f6728f8ae4cf59635344d
   languageName: node
   linkType: hard
 
@@ -12304,11 +12302,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"prompt-iteration-assistant@npm:^0.0.34":
-  version: 0.0.34
-  resolution: "prompt-iteration-assistant@npm:0.0.34"
+"prompt-iteration-assistant@npm:^0.0.37":
+  version: 0.0.37
+  resolution: "prompt-iteration-assistant@npm:0.0.37"
   dependencies:
     "@inquirer/prompts": "npm:^3.3.0"
+    "@modelfusion/cost-calculator": "npm:^0.1.0"
     boxen: "npm:^7.1.1"
     chalk: "npm:^4.1.2"
     cli-highlight: "npm:^2.1.11"
@@ -12319,15 +12318,14 @@ __metadata:
     json-schema-to-typescript: "npm:^13.1.1"
     marked: "npm:^10.0.0"
     marked-terminal: "npm:^6.1.0"
-    modelfusion: "npm:^0.107.0"
-    modelfusion-experimental: "npm:^0.2.0"
+    modelfusion: "npm:^0.137.0"
     openai: "npm:^4.20.1"
     promptfoo: "npm:^0.31.1"
     remeda: "npm:^1.29.0"
     tty-table: "npm:^4.2.3"
     zod: "npm:^3.22.4"
     zod-to-json-schema: "npm:^3.22.1"
-  checksum: cf59b33eef731b6bfa9c7198861be00aa6742b0449dd3dcf70caff33296fe053229bc9295d9caeeef1386ede280e028fafafb4966b42b8d5aa09014e96cdedc2
+  checksum: 1ef90850e841d0202967bcc8adda337c338bbc5b77e6334550eb30c60696821fd61998257789dbb5d910e16a3941f0a6faa3293c1900dd27d5219a04fab8892d
   languageName: node
   linkType: hard
 
@@ -13594,6 +13592,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "server@workspace:packages/server"
   dependencies:
+    "@modelfusion/cost-calculator": "npm:^0.1.0"
     "@prisma/client": "npm:5.8.0"
     "@quixo3/prisma-session-store": "npm:^3.1.13"
     "@react-email/components": "npm:^0.0.15"
@@ -13614,6 +13613,7 @@ __metadata:
     express-session: "npm:^1.17.3"
     graphile-worker: "npm:^0.16.2"
     graphile-worker-zod: "npm:0.0.2"
+    modelfusion: "npm:^0.137.0"
     nodemon: "npm:^3.0.2"
     passport: "npm:^0.7.0"
     passport-twitter: "npm:^1.0.4"
@@ -15037,6 +15037,13 @@ __metadata:
   version: 4.0.8
   resolution: "type-detect@npm:4.0.8"
   checksum: 8fb9a51d3f365a7de84ab7f73b653534b61b622aa6800aecdb0f1095a4a646d3f5eb295322127b6573db7982afcd40ab492d038cf825a42093a58b1e1353e0bd
+  languageName: node
+  linkType: hard
+
+"type-fest@npm:4.9.0":
+  version: 4.9.0
+  resolution: "type-fest@npm:4.9.0"
+  checksum: 7e6423f7337928a7323ce8a68cfbbaf30ecb70b9c635207899e58297d219c71be4a8c50b52afb9fe09c9f44b2c4276d0a44bb95acabab7bc942455f980aad267
   languageName: node
   linkType: hard
 

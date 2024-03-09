@@ -10,6 +10,7 @@ import {
 } from "./schemas/brainstormQuestionsInputSchema";
 import { brainstormQuestionsOutputSchema } from "./schemas/brainstormQuestionsOutputSchema";
 import { brainstormQuestionsZeroShotPrompt } from "./prompts/zeroShot";
+import { DefaultRun } from "modelfusion";
 
 export const BRAINSTORM_QUESTIONS = "Brainstorm Questions";
 
@@ -29,39 +30,22 @@ export class BrainstormQuestions extends Prompt<
     });
   }
 
-  async execute(args: {
-    query: string;
-    openPipeRequestTags?: RequestTagsWithoutName;
-    enableOpenPipeLogging?: boolean;
-  }) {
+  async execute(args: { query: string; run?: DefaultRun }) {
     const promptVariables: BrainstormQuestionsInput = {
       query: args.query,
     };
-    const candidatePrompt = this.chooseCandidatePrompt(promptVariables);
-    const res = await openpipe.functionCall({
-      function: {
-        name: this.name,
-        description: this.description,
-        input: this.input!,
-        output: this.output!,
-      },
-      vars: promptVariables,
-      prompt: candidatePrompt,
-      body: {
-        max_tokens: this.max_tokens,
-        temperature: this.temperature,
-        model: this.model,
+    try {
+      const res = await this.run({
+        promptVariables,
         stream: false,
-      },
-      openPipeRequestTags: args.openPipeRequestTags
-        ? {
-            ...args.openPipeRequestTags,
-            promptName: formatPromptName(this.name, candidatePrompt.name),
-          }
-        : undefined,
-      enableOpenPipeLogging: args.enableOpenPipeLogging,
-    });
-    return res?.questions || [];
+        run: args.run,
+      });
+
+      return res?.questions || [];
+    } catch (e) {
+      console.error(e);
+      return [];
+    }
   }
 }
 

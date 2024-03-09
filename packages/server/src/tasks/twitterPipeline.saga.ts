@@ -37,6 +37,11 @@ import { ArticleSnippetWithScore } from "shared/src/manual/ArticleSnippet";
 import { chunksToClips } from "cli/src/recommender/chunksToClips";
 import { titleClip } from "cli/src/recommender/prompts/titleClip/titleClip";
 import { answersQuestion } from "cli/src/recommender/prompts/answersQuestion/answersQuestion";
+import { DefaultRun } from "modelfusion";
+import {
+  OpenAICostCalculator,
+  calculateCost,
+} from "@modelfusion/cost-calculator";
 
 type QueryWithSearchResultWithTranscript = {
   searchResults: (VideoResultWithTranscriptFile | MetaphorArticleResult)[];
@@ -46,6 +51,8 @@ type QueryWithSearchResultWithTranscript = {
 
 type YouTubeRAGInput = RAGInput & { metadata: YTMetadata };
 type ArticleRAGInput = RAGInput & { metadata: HighlightMetadata };
+
+const MAX_TWEETS = 120;
 
 export const twitterPipeline = new Saga(
   "twitter-pipeline-v1",
@@ -96,6 +103,38 @@ export const twitterPipeline = new Saga(
         });
       }
     },
+    async afterStage(initialPayload, step, helpers) {
+      const pipeline = await prisma.pipelineRun.findUnique({
+        where: {
+          jobKeyId: initialPayload.runId,
+        },
+      });
+
+      const existingTask = await prisma.pipelineTask.findFirst({
+        where: {
+          jobId: helpers.job.id,
+          pipelineRunId: pipeline?.id,
+        },
+      });
+
+      const cost = await calculateCost({
+        calls: helpers.run.getSuccessfulModelCalls(),
+        costCalculators: [new OpenAICostCalculator()],
+      });
+
+      if (existingTask && pipeline) {
+        await prisma.pipelineTask.update({
+          where: {
+            id: existingTask.id,
+            pipelineRunId: pipeline?.id,
+          },
+          data: {
+            costInMillicents:
+              (existingTask.costInMillicents || 0) + cost.costInMillicents,
+          },
+        });
+      }
+    },
   }
 )
   .addStep({
@@ -140,21 +179,21 @@ export const twitterPipeline = new Saga(
           () =>
             twitter.tweets.fetch({
               user: initialPayload.username,
-              n_tweets: 200,
+              n_tweets: MAX_TWEETS,
               since_id: lastSavedTweet?.tweetId,
             }),
           helpers.logger
         )
-      ).slice(0, 300);
+      ).slice(0, MAX_TWEETS);
       helpers.logInfo(`Fetched ${tweets.length} new tweets from Twitter`);
       const reuseExistingSummary = tweets.length === 0;
       helpers.logInfo(`Reuse existing summary: ${reuseExistingSummary}`);
 
-      if (tweets.length < 300 && lastSavedTweet) {
+      if (tweets.length < MAX_TWEETS && lastSavedTweet) {
         const moreTweets = await getSavedTweetsForUser({
           username: initialPayload.username,
           before: lastSavedTweet.tweetedAt.toISOString(),
-          limit: 300 - tweets.length,
+          limit: MAX_TWEETS - tweets.length,
         });
         helpers.logInfo(`Fetched ${moreTweets.length} saved tweets from DB`);
         tweets.push(...moreTweets.map((x) => x.data));
@@ -170,6 +209,7 @@ export const twitterPipeline = new Saga(
   })
   .addStep({
     name: "summarize-tweets",
+    maxAttempts: 3,
     run: async (initialPayload, priorResults, helpers) => {
       const { username } = initialPayload;
       helpers.logInfo(`Summarizing tweets for Twitter user @${username}`);
@@ -229,6 +269,7 @@ export const twitterPipeline = new Saga(
         user: twitterUser,
         tweets: priorResults["get-tweets"].tweets,
         enableOpenPipeLogging: initialPayload.enableOpenPipeLogging,
+        run: helpers.run,
       });
 
       if (!profile) {
@@ -263,11 +304,6 @@ export const twitterPipeline = new Saga(
         queries.push(...initialPayload.queries);
       } else {
         const res = await createQueriesFromProfile().execute({
-          enableOpenPipeLogging: initialPayload.enableOpenPipeLogging,
-          openPipeRequestTags: createRequestTags({
-            runId: initialPayload.runId,
-            user: initialPayload.username,
-          }),
           profile: typeof priorResults["summarize-tweets"].profile?.content,
           bio:
             priorResults["summarize-tweets"].twitterUser?.rawDescription || "",
@@ -278,12 +314,8 @@ export const twitterPipeline = new Saga(
       const queriesWithQuestions = await pAll(
         queries.map((query) => async () => {
           const questions = await brainstormQuestions().execute({
+            run: helpers.run,
             query,
-            enableOpenPipeLogging: initialPayload.enableOpenPipeLogging,
-            openPipeRequestTags: createRequestTags({
-              runId: initialPayload.runId,
-              user: initialPayload.username,
-            }),
           });
           return {
             query,
@@ -507,6 +539,7 @@ export const twitterPipeline = new Saga(
   })
   .addStep({
     name: "clean-clips",
+    maxAttempts: 3,
     run: async (initialPayload, priorResults, helpers) => {
       const { clips } = priorResults["rag"];
       const { queriesWithQuestions } = priorResults["create-queries-metaphor"];
@@ -516,21 +549,24 @@ export const twitterPipeline = new Saga(
           const answersQ = await answersQuestion().execute({
             question: clip.question,
             text: clip.text,
+            run: helpers.run,
           });
           if (!answersQ.answersQuestion) {
             return null;
           }
           if (clip.type === "article") {
-            const result = await findStartOfAnswer().execute({
+            const quotedAnswer = await findStartOfAnswer().execute({
               question,
               text: clip.text,
+              run: helpers.run,
             });
-            if (result?.quotedAnswer) {
-              const match = nearestSubstring(result.quotedAnswer, clip.text);
+            if (quotedAnswer) {
+              const match = nearestSubstring(quotedAnswer, clip.text);
               if (match.bestMatch && match.bestScore > 0.8) {
                 const summarizedTitle = await titleClip().execute({
                   clip: clip.text,
                   videoTitle: clip.articleTitle,
+                  run: helpers.run,
                   question: clip.question,
                 });
                 return {
@@ -546,6 +582,7 @@ export const twitterPipeline = new Saga(
             const result = await findStartOfAnswerYouTube().execute({
               question,
               cues: clip.cues,
+              run: helpers.run,
             });
             if (result?.cueId != null) {
               const newCues = clip.cues.slice(result.cueId);
@@ -553,6 +590,7 @@ export const twitterPipeline = new Saga(
                 clip: clip.text,
                 videoTitle: clip.videoTitle,
                 question: clip.question,
+                run: helpers.run,
               });
               return {
                 ...clip,

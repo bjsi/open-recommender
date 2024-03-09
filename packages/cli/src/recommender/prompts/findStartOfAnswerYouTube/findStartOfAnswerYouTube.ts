@@ -6,6 +6,7 @@ import {
   findStartOfAnswerYouTubeInputSchema,
 } from "./schemas/findStartOfAnswerYouTubeInputSchema";
 import { findStartOfAnswerYouTubePrompt } from "./prompts/findStartOfAnswerYouTubePrompt";
+import { DefaultRun } from "modelfusion";
 
 export const FIND_START_OF_ANSWER_YOUTUBE = "Find Start Of Answer Cue";
 
@@ -29,8 +30,7 @@ export class FindStartOfAnswerYouTube extends Prompt<
   async execute(args: {
     question: string;
     cues: { text: string }[];
-    openPipeRequestTags?: RequestTagsWithoutName;
-    enableOpenPipeLogging?: boolean;
+    run?: DefaultRun;
   }) {
     const promptVariables: FindStartOfAnswerYouTubeInput = {
       transcript: args.cues
@@ -47,6 +47,7 @@ ${cue.text}
       return this.run({
         stream: false,
         promptVariables,
+        run: args.run,
       });
     } catch (e) {
       console.error(e);

@@ -1,12 +1,8 @@
 import { Prompt } from "prompt-iteration-assistant";
 import { zeroShot } from "./prompts/zeroShot";
-import {
-  RequestTagsWithoutName,
-  formatPromptName,
-} from "../../../openpipe/requestTags";
+import { RequestTagsWithoutName } from "../../../openpipe/requestTags";
 import { Tweet, TwitterUser } from "shared/src/manual/Tweet";
 import { tweetsToString } from "../../../twitter/getUserContext";
-import { openpipe } from "../../../openpipe/openpipe";
 import {
   experilearningDataset,
   experilearningTweets,
@@ -17,8 +13,15 @@ import {
   RecursiveTwitterSummarizerInput,
   recursiveTwitterSummarizerInputSchema,
 } from "./schemas/recursiveTwitterSummarizerInputSchema";
-import { recursiveTwitterSummarizerOutputSchema } from "./schemas/recursiveTwitterSummarizerOutputSchema";
 import { tokenize } from "../../../tokenize";
+import { z } from "zod";
+import dotenv from "dotenv";
+import path from "path";
+import { DefaultRun, Run } from "modelfusion";
+import {
+  calculateCost,
+  OpenAICostCalculator,
+} from "@modelfusion/cost-calculator";
 
 export const SUMMARIZE_TWEETS = "Summarize Data";
 
@@ -27,16 +30,15 @@ export const SUMMARIZE_TWEETS = "Summarize Data";
  */
 export class RecursiveTwitterSummarizer extends Prompt<
   typeof recursiveTwitterSummarizerInputSchema,
-  typeof recursiveTwitterSummarizerOutputSchema
+  z.ZodString
 > {
   constructor() {
     super({
       name: SUMMARIZE_TWEETS,
-      description: "Summarize the user's data.",
+      description: "Summarize the user's data into a user profile.",
       prompts: [zeroShot],
       model: "gpt-4",
       input: recursiveTwitterSummarizerInputSchema,
-      output: recursiveTwitterSummarizerOutputSchema,
       exampleData: [],
     });
   }
@@ -46,6 +48,7 @@ export class RecursiveTwitterSummarizer extends Prompt<
     tweets: Tweet[];
     openPipeRequestTags?: RequestTagsWithoutName;
     enableOpenPipeLogging?: boolean;
+    run?: Run;
   }) {
     if (args.tweets.length === 0) {
       return undefined;
@@ -70,31 +73,13 @@ export class RecursiveTwitterSummarizer extends Prompt<
         bio,
         user: args.user.displayname,
       };
-      const candidatePrompt = this.chooseCandidatePrompt(promptVariables);
-      const res = await openpipe.functionCall({
-        function: {
-          name: this.name,
-          description: this.description,
-          input: this.input!,
-          output: this.output!,
-        },
-        vars: promptVariables,
-        prompt: candidatePrompt,
-        body: {
-          max_tokens: this.max_tokens,
-          temperature: this.temperature,
-          model: this.model,
-          stream: false,
-        },
-        openPipeRequestTags: args.openPipeRequestTags
-          ? {
-              ...args.openPipeRequestTags,
-              promptName: formatPromptName(this.name, candidatePrompt.name),
-            }
-          : undefined,
-        enableOpenPipeLogging: args.enableOpenPipeLogging,
+      const res = await this.run({
+        stream: false,
+        promptVariables,
+        // @ts-ignore
+        run: args.run,
       });
-      return res?.summary || "";
+      return res || "";
     };
 
     const parts = await new RecursiveCharacterTextSplitter({
@@ -142,19 +127,22 @@ export class RecursiveTwitterSummarizer extends Prompt<
         .map((x) => x.replace(/\r?\n/g, " "));
       if (
         summaries.length <= 1 ||
-        (await tokenize(summaries.reduce((a, b) => a + " " + b))).length <= 2200
+        (await tokenize(summaries.join(" "))).length <= 2200
       ) {
         return summaries.join(" ");
+      } else {
+        console.log("summaries");
+        console.log(summaries);
+        const text = summaries.join("\n---\n");
+        const parts = await new RecursiveCharacterTextSplitter({
+          separators: ["---"],
+          chunkSize: maxTokens,
+          chunkOverlap: 100,
+        }).splitText(text);
+        return await summarizeRecursively(
+          await Promise.all(parts.map(callApi))
+        );
       }
-      console.log("summaries");
-      console.log(summaries);
-      const text = summaries.join("\n---\n");
-      const parts = await new RecursiveCharacterTextSplitter({
-        separators: ["---"],
-        chunkSize: maxTokens,
-        chunkOverlap: 200,
-      }).splitText(text);
-      return await summarizeRecursively(await Promise.all(parts.map(callApi)));
     };
 
     const summary = await summarizeRecursively(summaries);
@@ -174,10 +162,22 @@ export const recursivelySummarizeTweets = () =>
 
 if (require.main === module) {
   (async () => {
+    const p = path.resolve("packages/cli/.env");
+    dotenv.config({ path: p });
+    console.log("SUMMARIZE TWEETS");
+    console.time("SUMMARIZE TWEETS");
+    const run = new DefaultRun();
     const sum = await recursivelySummarizeTweets().execute({
       user: experilearningTwitterUser,
-      tweets: experilearningTweets,
+      tweets: experilearningTweets.slice(0, 20),
+      run,
     });
+    const cost = await calculateCost({
+      calls: run.getSuccessfulModelCalls(),
+      costCalculators: [new OpenAICostCalculator()],
+    });
+    console.log("cost", cost.formatAsDollarAmount({ decimals: 2 }));
+    console.timeEnd("SUMMARIZE TWEETS");
     console.log("FINAL SUMMARY");
     console.log(sum);
   })();

@@ -1,5 +1,6 @@
 import { Job, JobHelpers } from "graphile-worker";
 import { createTask, TypedTask } from "graphile-worker-zod";
+import { DefaultRun } from "modelfusion";
 import { ZodTypeAny, z } from "zod";
 
 export type TaskNamePayloadMaps<TaskListType> = {
@@ -33,6 +34,7 @@ type SagaJobHelpers = JobHelpers & {
   cancel: (reason?: string) => void;
   logInfo: (message: string) => void;
   logDebug: (message: string) => void;
+  run: DefaultRun;
 };
 
 class CancelError extends Error {}
@@ -47,6 +49,7 @@ const makeSagaJobHelpers = (helpers: JobHelpers): SagaJobHelpers => {
       helpers.logger.info(message, { jobId: helpers.job.id }),
     logDebug: (message: string) =>
       helpers.logger.debug(message, { jobId: helpers.job.id }),
+    run: new DefaultRun(),
   };
 };
 
@@ -63,6 +66,7 @@ type Step<PriorSteps, StepResult, StepName extends string, InitialPayload> = {
     runResult: StepResult,
     helpers: JobHelpers
   ) => Promise<unknown>;
+  maxAttempts?: number;
 };
 
 type StepTemplate = Step<any, any, any, any>;
@@ -103,6 +107,11 @@ type AddStepToPriorSteps<
 
 interface SagaOptions<InitialPayload> {
   beforeEnqueueStage?: (
+    initialPayload: InitialPayload,
+    step: StepTemplate,
+    helpers: SagaJobHelpers
+  ) => Promise<void>;
+  afterStage?: (
     initialPayload: InitialPayload,
     step: StepTemplate,
     helpers: SagaJobHelpers
@@ -187,10 +196,16 @@ export class Saga<
           const nextStep = this.steps[stepIdx + 1];
           if (nextStep) {
             const nextJobName = `${this.sagaName}|${nextStep.name}`;
-            await helpers.addJob(nextJobName, {
-              initialPayload,
-              previousResults: accumulatedResults,
-            });
+            await helpers.addJob(
+              nextJobName,
+              {
+                initialPayload,
+                previousResults: accumulatedResults,
+              },
+              {
+                maxAttempts: nextStep.maxAttempts,
+              }
+            );
           }
 
           // If next step is null, the saga is done!

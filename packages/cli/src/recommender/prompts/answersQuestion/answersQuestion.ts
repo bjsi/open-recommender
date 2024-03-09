@@ -5,6 +5,7 @@ import {
 } from "./schemas/answersQuestionInputSchema";
 import { answersQuestionOutputSchema } from "./schemas/answersQuestionOutputSchema";
 import { answersQuestionPrompt } from "./prompts/answersQuestionPrompt";
+import { DefaultRun } from "modelfusion";
 
 export const ANSWERS_QUESTION = "Answers Question";
 
@@ -23,11 +24,12 @@ class AnswersQuestion extends Prompt<
       output: answersQuestionOutputSchema,
     });
   }
-  async execute(args: AnswersQuestionInput) {
+  async execute(args: AnswersQuestionInput & { run?: DefaultRun }) {
     try {
       return this.run({
         stream: false,
         promptVariables: args,
+        run: args.run,
       });
     } catch (e) {
       console.error(e);

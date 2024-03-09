@@ -1,21 +1,18 @@
 import { Prompt } from "prompt-iteration-assistant";
-import {
-  RequestTagsWithoutName,
-  formatPromptName,
-} from "../../../openpipe/requestTags";
-import { openpipe } from "../../../openpipe/openpipe";
+import { RequestTagsWithoutName } from "../../../openpipe/requestTags";
 import {
   FindStartOfAnswerInput,
   findStartOfAnswerInputSchema,
 } from "./schemas/findStartOfAnswerOutputSchema";
-import { findStartOfAnswerOutputSchema } from "./schemas/findStartOfAnswerInputSchema";
 import { findStartOfAnswerPrompt } from "./prompts/findStartOfAnswerPrompt";
+import { z } from "zod";
+import { DefaultRun } from "modelfusion";
 
 export const FIND_START_OF_ANSWER = "Find Start Of Answer";
 
 class FindStartOfAnswer extends Prompt<
   typeof findStartOfAnswerInputSchema,
-  typeof findStartOfAnswerOutputSchema
+  z.ZodString
 > {
   constructor() {
     super({
@@ -24,7 +21,6 @@ class FindStartOfAnswer extends Prompt<
       prompts: [findStartOfAnswerPrompt],
       model: "gpt-4",
       input: findStartOfAnswerInputSchema,
-      output: findStartOfAnswerOutputSchema,
       exampleData: [],
     });
   }
@@ -32,9 +28,8 @@ class FindStartOfAnswer extends Prompt<
   async execute(args: {
     question: string;
     text: string;
-    openPipeRequestTags?: RequestTagsWithoutName;
-    enableOpenPipeLogging?: boolean;
-  }) {
+    run?: DefaultRun;
+  }): Promise<string | undefined | null> {
     const promptVariables: FindStartOfAnswerInput = {
       text: args.text,
       question: args.question,
@@ -43,10 +38,11 @@ class FindStartOfAnswer extends Prompt<
       return this.run({
         stream: false,
         promptVariables,
+        run: args.run,
       });
     } catch (e) {
       console.error(e);
-      return { quotedAnswer: null };
+      return null;
     }
   }
 }

@@ -4,6 +4,7 @@
   "main": "./dist/src/main.js",
   "version": "0.0.0",
   "dependencies": {
+    "@modelfusion/cost-calculator": "^0.1.0",
     "@prisma/client": "5.8.0",
     "@quixo3/prisma-session-store": "^3.1.13",
     "@react-email/components": "^0.0.15",
@@ -17,6 +18,7 @@
     "express-session": "^1.17.3",
     "graphile-worker": "^0.16.2",
     "graphile-worker-zod": "0.0.2",
+    "modelfusion": "^0.137.0",
     "nodemon": "^3.0.2",
     "passport": "^0.7.0",
     "passport-twitter": "^1.0.4",

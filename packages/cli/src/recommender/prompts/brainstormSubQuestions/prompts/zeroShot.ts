@@ -19,7 +19,8 @@ export const brainstormQuestionsZeroShotPrompt =
 - Your task is to brainstorm related questions to research.
 - If the topic is controversial, try to include both sides of the argument.
 - DO NOT USE ACRONYMS OR ABBREVIATIONS, ALWAYS USE THE FULL NAME WITH THE ACRONYM IN PARANTHESES.
-- Brainstorm five questions.
+- Don't include introductory or background questions.
+- Brainstorm three questions.
 `.trim()
         ),
         {
@@ -33,11 +34,9 @@ How can Spaced Repetition Systems (SRS) be improved with AI?
           name: toCamelCase(BRAINSTORM_QUESTIONS),
           arguments: {
             questions: [
-              "What are the current limitations of Spaced Repetition Systems (SRS) for learning?",
               "How has artificial intelligence (AI) been applied to educational systems in other contexts? Can these methods be adapted for Spaced Repetition Systems (SRS)?",
               "What potential improvements could artificial intelligence (AI) bring to Spaced Repetition Systems (SRS) in terms of personalization and effectiveness?",
               "What are the possible risks or drawbacks in integrating artificial intelligence (AI) into Spaced Repetition Systems (SRS)?",
-              "How do professionals in the fields of education and artificial intelligence (AI) view the potential integration of artificial intelligence (AI) and Spaced Repetition Systems (SRS)?",
             ],
           },
         }),

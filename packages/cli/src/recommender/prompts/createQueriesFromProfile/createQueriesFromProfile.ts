@@ -11,6 +11,7 @@ import {
 import { openpipe } from "../../../openpipe/openpipe";
 import { experilearningDataset } from "./datasets/experilearningDataset";
 import { createQueriesFromProfileZeroShotFreeFormPrompt } from "./prompts/zeroShotFreeForm";
+import { DefaultRun } from "modelfusion";
 
 export const CREATE_SEARCH_QUERIES_FROM_PROFILE = "Create Questions";
 
@@ -38,39 +39,24 @@ export class CreateSearchQueriesFromProfile extends Prompt<
     user: string;
     profile: string;
     bio: string;
-    openPipeRequestTags?: RequestTagsWithoutName;
-    enableOpenPipeLogging?: boolean;
+    run?: DefaultRun;
   }) {
     const promptVariables: CreateQueriesFromProfileInput = {
       user: args.user,
       bio: args.bio,
       profile: args.profile,
     };
-    const candidatePrompt = this.chooseCandidatePrompt(promptVariables);
-    const res = await openpipe.functionCall({
-      function: {
-        name: this.name,
-        description: this.description,
-        input: this.input!,
-        output: this.output!,
-      },
-      vars: promptVariables,
-      prompt: candidatePrompt,
-      body: {
-        max_tokens: this.max_tokens,
-        temperature: this.temperature,
-        model: this.model,
+    try {
+      const res = await this.run({
+        promptVariables,
         stream: false,
-      },
-      openPipeRequestTags: args.openPipeRequestTags
-        ? {
-            ...args.openPipeRequestTags,
-            promptName: formatPromptName(this.name, candidatePrompt.name),
-          }
-        : undefined,
-      enableOpenPipeLogging: args.enableOpenPipeLogging,
-    });
-    return res || { queries: [] };
+        run: args.run,
+      });
+      return res || { queries: [] };
+    } catch (e) {
+      console.error(e);
+      return { queries: [] };
+    }
   }
 }
 

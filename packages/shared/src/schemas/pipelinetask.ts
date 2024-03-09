@@ -10,6 +10,7 @@ export const PipelineTaskModel = z.object({
   pipelineRunId: z.number().int(),
   name: z.string(),
   status: z.nativeEnum(TaskStatus),
+  costInMillicents: z.number().int().nullish(),
 })
 
 export interface CompletePipelineTask extends z.infer<typeof PipelineTaskModel> {

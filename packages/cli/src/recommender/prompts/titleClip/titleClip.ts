@@ -5,6 +5,7 @@ import {
   titleClipInputSchema,
 } from "./schemas/titleClipInputSchema";
 import { titleClipOutputSchema } from "./schemas/titleClipOutputSchema";
+import { DefaultRun } from "modelfusion";
 
 export const TITLE_CLIP = "Title Clip";
 
@@ -23,11 +24,12 @@ class TitleClip extends Prompt<
     });
   }
 
-  async execute(args: TitleClipInput) {
+  async execute(args: TitleClipInput & { run?: DefaultRun }) {
     try {
       return this.run({
         stream: false,
         promptVariables: args,
+        run: args.run,
       });
     } catch (e) {
       console.error(e);

@@ -219,6 +219,7 @@ model PipelineTask {
   name          String
   status        TaskStatus        @default(running)
   logs          PipelineTaskLog[]
+  costInMillicents Int?
 }
 
 model PipelineTaskLog {
