@@ -125,6 +125,9 @@ function TasksTable(props: TasksTableProps) {
                 <span className="font-semibold">Logs</span>
               </TableCell>
               <TableCell>
+                <span className="font-semibold">Retries / Max</span>
+              </TableCell>
+              <TableCell>
                 <span className="font-semibold">Cost ($)</span>
               </TableCell>
               <TableCell>
@@ -161,6 +164,9 @@ function TasksTable(props: TasksTableProps) {
                           ))}
                       </ul>
                     )}
+                  </TableCell>
+                  <TableCell>
+                    {task.job?.attempts} / {task.job?.max_attempts}
                   </TableCell>
                   <TableCell>${task.costInMillicents || 0 / 100_000}</TableCell>
                   <TableCell>
